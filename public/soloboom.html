@@ -1,0 +1,1771 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Tienda de Puntos de Azmeyn · SoloBoom Challenge 6</title>
+  <meta name="description" content="Tienda de puntos, premios y sorteos de Azmeyn durante el SoloBoom Challenge 6.">
+  <meta name="theme-color" content="#ff3d81">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:title" content="Tienda de Puntos de Azmeyn · SoloBoom Challenge 6">
+  <meta property="og:description" content="Mirá mi directo en Twitch, juntá puntos para canjear premios y participá por +USD 170 en sorteos durante el SoloBoom 6.">
+  <meta property="og:image" content="logo.png">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link id="fav" rel="icon" href="logo.png">
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --panel: #12141a;
+      --panel-2: #191c24;
+      --line: #272b37;
+      --fg: #eceef3;
+      --muted: #b4bac8;
+      --accent: #ff3d81;
+      --accent-ink: #1a0210;
+      --good: #4fd1a1;
+      --live: #4fd1a1;
+      --off: #e5484d;
+      --side-w: 264px;
+      --font-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+      --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: env(safe-area-inset-top, 0px); }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 400 16px/1.5 var(--font-body);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0 0 auto;
+      height: env(safe-area-inset-top, 0px);
+      z-index: 40;
+      background: var(--panel);
+    }
+    img { max-width: 100%; }
+    [hidden]:not([hidden=until-found i]) { display: none !important; }
+    h1, h2, h3, h4, p { margin: 0; }
+    h1, h2, h3 { text-wrap: balance; }
+    a { color: var(--accent); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.92em;
+      background: var(--panel-2);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+    }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    /* La barra de estado queda fija arriba: se le suma aire para que nunca tape un título */
+    section[id] { scroll-margin-top: calc(var(--side-h, 53px) + 20px); }
+    @media (min-width: 960px) { section[id] { scroll-margin-top: calc(var(--top-h, 65px) + 24px); } }
+    p { text-wrap: pretty; }
+    .skip {
+      position: absolute; left: 12px; top: -60px; z-index: 60;
+      background: var(--accent); color: var(--accent-ink);
+      padding: 10px 14px; font-weight: 700; border-radius: 4px;
+    }
+    .skip:focus { top: 12px; }
+
+    /* ---------- Estructura general (igual que index.html) ---------- */
+    .app { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 100vh; }
+    @media (min-width: 960px) { .app { grid-template-columns: var(--side-w) minmax(0, 1fr); } }
+
+    /* ---------- Barra lateral (arriba en celular) ---------- */
+    .side {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px));
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .side::-webkit-scrollbar { display: none; }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--fg); text-decoration: none; flex: none; margin-right: 8px;
+    }
+    .logo { width: 34px; height: 34px; flex: none; border-radius: 50%; object-fit: cover; background: var(--panel-2); }
+    .logo.bad { opacity: 0; }
+    .brand b { font: 700 26px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+    .brand small { display: none; }
+    .brand small:empty { display: none !important; }
+    /* El logo se marca cuando estás en vivo */
+    .logo-wrap { position: relative; display: block; flex: none; line-height: 0; border-radius: 50%; background: var(--panel-2); }
+    .logo-dot {
+      position: absolute; right: -4px; top: -4px;
+      width: 13px; height: 13px; border-radius: 50%;
+      background: var(--live);
+      border: 2px solid var(--panel);
+      display: none;
+    }
+    .brand[data-live="true"] .logo-dot { display: block; animation: pulse 1.8s ease-out infinite; }
+    .brand[data-live="true"] .logo { outline: 2px solid var(--live); outline-offset: 2px; }
+    .brand[data-live="true"] small { color: var(--live); }
+    .nav { display: flex; gap: 2px; flex: none; }
+    .grp { display: contents; }
+    .grp-h { display: none; }
+    .nav a {
+      display: block;
+      padding: 11px 12px;
+      border-radius: 4px;
+      color: var(--muted);
+      font: 600 14px/1 var(--font-body);
+      text-decoration: none;
+      white-space: nowrap;
+      border-left: 3px solid transparent;
+    }
+    .nav a:hover { color: var(--fg); background: var(--panel-2); }
+    .nav a[aria-current] { color: #fff; background: rgba(255, 61, 129, 0.14); border-left-color: var(--accent); }
+    /* Subsecciones de la tienda, anidadas bajo "SoloBoom 6" (en celular solo se ven dentro de la tienda) */
+    .has-sub { display: contents; }
+    .sub { display: none; }
+    .nav a[aria-current="page"] + .sub { display: contents; }
+    .sub a { font-weight: 500; color: #a3abba; }
+    .sub a[aria-current="true"] { color: #fff; background: rgba(255, 61, 129, 0.14); border-left-color: var(--accent); }
+
+    @media (min-width: 960px) {
+      .side {
+        top: 0;
+        height: 100vh;
+        align-self: start;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 26px;
+        padding: 28px 14px 22px max(14px, env(safe-area-inset-left, 0px));
+        border-bottom: 0;
+        border-right: 1px solid var(--line);
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      .brand { padding: 0 10px; margin-right: 0; gap: 12px; }
+      .logo { width: 44px; height: 44px; }
+      .brand b { font-size: 30px; }
+      .brand small {
+        display: block;
+        font: 500 10px/1.2 var(--font-mono);
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .nav { flex-direction: column; gap: 22px; }
+      .grp { display: block; }
+      .grp-h {
+        display: block;
+        padding: 0 12px 8px;
+        font: 700 13px/1 var(--font-mono);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--fg);
+      }
+      .nav a { padding: 12px; font-size: 15px; margin-bottom: 2px; }
+      .nav-bottom { padding-top: 12px; border-top: 1px solid var(--line); }
+      /* Las subsecciones de la tienda se abren al pasar el mouse por "SoloBoom 6" (o con el teclado).
+         Dentro de la tienda quedan abiertas, porque ahí hacen de índice. */
+      .has-sub { display: block; }
+      .sub, .nav a[aria-current="page"] + .sub { margin: 0 0 8px 22px; border-left: 1px solid var(--line); }
+      .sub a { padding: 8px 12px; font-size: 13px; margin-bottom: 0; border-left: 0; }
+      .has-sub:hover .sub, .has-sub:focus-within .sub, .nav a[aria-current="page"] + .sub { display: block; }
+      .has-sub:hover .sub, .has-sub:focus-within .sub { animation: subin 0.16s ease-out; }
+      @keyframes subin { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    }
+
+    /* ---------- Contenido principal ---------- */
+    .main {
+      min-width: 0;
+      background:
+        radial-gradient(ellipse 980px 560px at 8% 0, rgba(255, 61, 129, 0.13), rgba(255, 61, 129, 0.055) 45%, transparent 100%)
+        no-repeat;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 1440px;
+      padding-left: max(20px, env(safe-area-inset-left, 0px));
+      padding-right: max(20px, env(safe-area-inset-right, 0px));
+    }
+    @media (min-width: 960px) { .wrap { padding-left: 36px; padding-right: 36px; } }
+
+    /* ---------- Barra de estado fija arriba (online / offline) ---------- */
+    .topbar {
+      position: sticky;
+      top: calc(var(--side-h, 53px) + env(safe-area-inset-top, 0px));
+      z-index: 25;
+      background: rgba(18, 20, 26, 0.86);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    @media (min-width: 960px) { .topbar { top: 0; } }
+    /* Celular: la barra de estado deja de ser fija, así no se juntan dos barras pegadas tapando la pantalla.
+       La barra de progreso pasa a quedar pegada debajo de la barra de arriba. */
+    .progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); transform-origin: left; transform: scaleX(0); pointer-events: none; }
+    @media (max-width: 959px) {
+      .topbar { position: static; backdrop-filter: none; -webkit-backdrop-filter: none; }
+      .progress { position: fixed; top: calc(var(--side-h, 53px) + env(safe-area-inset-top, 0px)); bottom: auto; z-index: 26; }
+    }
+    .statusbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-block: 12px; }
+    .sb-k {
+      margin-right: 4px; padding-right: 16px;
+      border-right: 1px solid var(--line);
+      font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 6px 8px;
+      min-height: 40px;
+      border-radius: 12px;
+      color: var(--fg);
+      text-decoration: none;
+    }
+    .pill svg { width: 26px; height: 26px; flex: none; color: var(--muted); }
+    /* Logos: grises si no hay directo, con el color de la marca cuando estás en vivo */
+    .pill[data-state="live"] .ic-tw { color: #9146ff; }
+    .pill[data-state="live"] .ic-kick { color: #53fc18; }
+    /* Etiqueta de estado: "live" / "offline"; al pasar el mouse dice "ver en vivo" / "ver canal" */
+    .pill .tag {
+      display: inline-grid; place-items: center;
+      padding: 7px 12px;
+      border: 1px solid #3a3e4b;
+      border-radius: 999px;
+      background: #262932;
+      color: var(--muted);
+      font: 500 12px/1 var(--font-mono);
+      letter-spacing: 0.02em;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .pill .tag > span { grid-area: 1 / 1; }
+    .pill .tag .t-b { visibility: hidden; }
+    .pill[data-state="live"] .tag { border-color: #2f7d62; background: #153227; color: var(--live); position: relative; padding-left: 26px; }
+    .pill[data-state="live"] .tag::before {
+      content: ""; position: absolute; left: 11px; top: 50%; width: 8px; height: 8px; margin-top: -4px;
+      border-radius: 50%; background: var(--live); animation: pulse 1.8s ease-out infinite;
+    }
+    .pill:hover .tag, .pill:focus-visible .tag { border-color: var(--accent); }
+    /* Otras redes (solo logo) a la derecha de los directos */
+    .sb-sep { width: 1px; align-self: stretch; margin: 6px 6px; background: var(--line); }
+    .soc {
+      display: inline-grid; place-items: center;
+      width: 36px; height: 40px;
+      border-radius: 12px;
+      color: var(--muted);
+    }
+    .soc svg { width: 24px; height: 24px; }
+    .soc:hover, .soc:focus-visible { color: var(--accent); }
+    /* Celular: fila 1 los dos directos, fila 2 las redes repartidas en todo el ancho */
+    @media (max-width: 640px) {
+      .sb-k, .sb-sep { display: none; }
+      .statusbar { gap: 4px 8px; padding-block: 8px; }
+      .pill { flex: 1 1 calc(50% - 4px); }
+      .soc { flex: 1 1 0; width: auto; min-width: 0; height: 36px; }
+    }
+    .pill:hover .t-a, .pill:focus-visible .t-a { visibility: hidden; }
+    .pill:hover .t-b, .pill:focus-visible .t-b { visibility: visible; }
+    @media (hover: none) {
+      .pill:hover .t-a { visibility: visible; }
+      .pill:hover .t-b { visibility: hidden; }
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(79, 209, 161, 0.55); }
+      100% { box-shadow: 0 0 0 9px rgba(79, 209, 161, 0); }
+    }
+    .content {
+      display: grid;
+      gap: 72px;
+      align-content: start;
+      padding-block: 36px 0;
+      padding-left: max(20px, env(safe-area-inset-left, 0px));
+      padding-right: max(20px, env(safe-area-inset-right, 0px));
+    }
+    @media (min-width: 960px) {
+      .content { padding-left: 36px; padding-right: 36px; }
+    }
+    
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font: 500 12px/1.3 var(--font-mono);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      background: var(--accent);
+      flex: none;
+    }
+    h1 {
+      font: 700 clamp(42px, 8.5vw, 72px)/0.95 var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      margin-top: 14px;
+    }
+    .lede { max-width: 50ch; margin-top: 14px; color: var(--muted); font-size: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font: 700 14px/1 var(--font-body);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 14px 20px;
+      min-height: 44px;
+      border-radius: 4px;
+      border: 2px solid var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+    .btn.ghost:hover { border-color: var(--accent); color: var(--accent); filter: none; }
+    /* Feedback al copiar: verde y un rebote corto */
+    .btn.copied, .btn.ghost.copied:hover { background: #4fd1a1; border-color: #4fd1a1; color: #06241a; filter: none; animation: pop 0.45s ease; }
+    @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.07); } 100% { transform: scale(1); } }
+    .btn.sm { padding: 11px 14px; min-height: 40px; font-size: 13px; }
+    .btn:disabled {
+      cursor: not-allowed;
+      background: transparent;
+      color: var(--muted);
+      border-color: var(--line);
+      filter: none;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      gap: 36px;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+    @media (min-width: 1240px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr) minmax(380px, 430px);
+        gap: clamp(56px, 6vw, 96px);
+        align-items: center;
+      }
+    }
+    .prize {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px 16px;
+      margin-top: 30px;
+    }
+    .prize b {
+      font: 700 clamp(60px, 14vw, 104px)/0.85 var(--font-display);
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+    .prize span { color: var(--muted); max-width: 30ch; }
+    .hero-rows { margin-top: 24px; }
+    .hero-rows .r {
+      display: grid;
+      grid-template-columns: 158px minmax(0, 1fr);
+      align-items: baseline;
+      gap: 2px 14px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+    @media (min-width: 560px) { .hero-rows .r { grid-template-columns: 160px 110px minmax(0, 1fr); } }
+    .hero-rows .r:last-child { border-bottom: 1px solid var(--line); }
+    .hero-rows .k {
+      font: 700 16px/1.2 var(--font-display);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .hero-rows .v {
+      font: 700 26px/1 var(--font-display);
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .hero-rows .t { grid-column: 1 / -1; color: var(--muted); font-size: 15px; }
+    @media (min-width: 560px) { .hero-rows .t { grid-column: auto; } }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+    /* Calendario del evento */
+    .cal {
+      width: 100%;
+      max-width: 520px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    @media (min-width: 1240px) {
+      .cal { max-width: none; }
+    }
+    .cal-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 4px 12px;
+    }
+    .cal-label {
+      font: 500 12px/1.3 var(--font-mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .cal-next { font: 400 12px/1.4 var(--font-mono); color: var(--muted); }
+    .cal-status {
+      font: 700 38px/1 var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .cal-status.clock { font-size: clamp(26px, 7.4vw, 38px); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .cal-grid {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .cal-dow {
+      font: 500 12px/1 var(--font-mono);
+      color: var(--muted);
+      text-align: center;
+      padding-bottom: 2px;
+    }
+    .cal-cell {
+      min-height: 66px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 7px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2px;
+      font: 600 18px/1 var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      background: var(--bg);
+    }
+    .cal-cell small {
+      font: 600 10.5px/1 var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0;
+      white-space: nowrap;
+      color: var(--accent);
+      min-height: 10px;
+    }
+    .cal-cell i { font: 500 10px/1 var(--font-mono); font-style: normal; color: var(--muted); text-transform: uppercase; display: block; margin-top: 4px; }
+    .cal-cell.final i { color: var(--accent-ink); }
+    .cal-cell small .two { font-size: 9.5px; }
+    .cal-cell small .s { display: none; }
+    @media (max-width: 479px) {
+      .cal-cell small .l { display: none; }
+      .cal-cell small .s { display: inline; }
+    }
+    .cal-cell.is-draw { background: var(--panel-2); border-color: var(--accent); }
+    .cal-cell.final { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .cal-cell.final small { color: var(--accent-ink); }
+    .cal-cell.past { opacity: 0.6; }
+    .cal-cell.today { outline: 3px solid var(--fg); outline-offset: 1px; opacity: 1; }
+    .cal-foot {
+      font: 400 12px/1.4 var(--font-mono);
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 12px;
+    }
+
+    /* Encabezados de sección */
+    .sec-h { display: flex; align-items: center; gap: 16px; }
+    .sec-h h2 {
+      font: 700 30px/1 var(--font-display);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      min-width: 0;
+    }
+    .sec-h::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    .sec-p { margin-top: 10px; max-width: 62ch; color: var(--muted); }
+    .sec-body { margin-top: 22px; }
+
+    /* Cómo funciona */
+    .how { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 560px) { .how { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1240px) { .how { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    .step {
+      position: relative;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 20px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .step .n {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font: 700 30px/1 var(--font-display);
+      color: var(--accent);
+    }
+    .step .ic {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 61, 129, 0.12);
+      border: 1px solid rgba(255, 61, 129, 0.32);
+      color: var(--accent);
+      border-radius: 4px;
+    }
+    .step h3 {
+      font: 700 21px/1.1 var(--font-display);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .step p { color: var(--muted); font-size: 15px; }
+    /* Entrada suave: se activa una sola vez cuando la tarjeta aparece en pantalla */
+    .fx { opacity: 0; transform: translateY(12px); }
+    .fx.in { opacity: 1; transform: none; transition: opacity 0.35s ease, transform 0.35s ease; }
+
+    .earn-grid { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); margin-top: 36px; }
+    @media (min-width: 1000px) {
+      .earn-grid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+    }
+    .earn-h, .quick h3 {
+      font: 700 20px/1 var(--font-display);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .earn { margin: 12px 0 0; padding: 0; list-style: none; }
+    .earn li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .earn li:first-child { border-top: 1px solid var(--line); }
+    .earn .what { min-width: 0; }
+    .earn .what span { display: block; font-size: 14px; color: var(--muted); }
+    .earn .val {
+      font: 700 24px/1 var(--font-display);
+      color: var(--accent);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .quick {
+      display: grid;
+      gap: 6px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 18px;
+    }
+    .quick > p { color: var(--muted); font-size: 14px; }
+    .quick-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+    }
+    .quick-row:first-of-type { margin-top: 8px; }
+    .quick-row .d { flex: 1 1 140px; min-width: 0; font-size: 14px; color: var(--muted); }
+    .quick-status, .sheet-msg { font: 500 12px/1.3 var(--font-mono); color: var(--muted); min-height: 16px; }
+    .quick-status.ok, .sheet-msg.ok { color: var(--good); }
+
+    /* Tienda */
+    .pts-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+    .pts-box label { font-weight: 600; font-size: 18px; }
+    .pts-box input {
+      font: 600 22px/1 var(--font-mono);
+      width: 10ch;
+      min-width: 0;
+      padding: 16px 18px;
+      border: 2px solid var(--line);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--fg);
+      font-variant-numeric: tabular-nums;
+    }
+    .pts-box input:focus { outline: none; border-color: var(--accent); }
+    .pts-box small { color: var(--muted); font-size: 15px; flex-basis: 100%; }
+    @media (min-width: 640px) { .pts-box small { flex-basis: auto; } }
+    .pts-side { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; flex-basis: 100%; }
+    @media (min-width: 900px) { .pts-side { flex-basis: auto; margin-left: auto; } }
+    .pts-count { font: 500 14px/1.3 var(--font-mono); color: var(--muted); }
+    .pts-count b { color: var(--accent); font-size: 20px; font-variant-numeric: tabular-nums; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .chip {
+      font: 600 14px/1 var(--font-body);
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--fg);
+      cursor: pointer;
+    }
+    .chip:hover { border-color: var(--accent); }
+    .chip[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .grid { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 560px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 760px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 900px) and (max-width: 1099px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      min-width: 0;
+      transition: border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    /* Calculadora: las que te alcanzan se encienden, las que no bajan de intensidad */
+    .card.can { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(255, 61, 129, 0.35), 0 0 24px rgba(255, 61, 129, 0.18); }
+    .card.cant { opacity: 0.55; }
+    .card.cant:hover { opacity: 0.85; }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--panel-2);
+      font: 500 12px/1.2 var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .card-top .stock { color: var(--muted); }
+    .card-art {
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      padding: 16px 12px;
+      background: repeating-linear-gradient(135deg, transparent 0 14px, rgba(255, 255, 255, 0.03) 14px 15px);
+    }
+    .card-art .num {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 700 46px/0.9 var(--font-display);
+      font-variant-numeric: tabular-nums;
+    }
+    .card-art small {
+      font: 500 11px/1.2 var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .card.cant .num { color: var(--muted); }
+    .card.cant .coin circle:first-child { fill: var(--muted); }
+    .card-body { display: flex; flex-direction: column; gap: 8px; padding: 16px; flex: 1; }
+    .card-body h3 {
+      font: 700 22px/1.1 var(--font-display);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .card-body p { color: var(--muted); font-size: 15px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font: 500 11px/1 var(--font-mono);
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+    .afford { font: 500 12px/1.2 var(--font-mono); min-height: 14px; }
+    .afford.yes { color: var(--good); }
+    .afford.no { color: var(--muted); }
+    .card-body .btn { margin-top: auto; width: 100%; }
+    /* Botón apagado hasta que los puntos alcanzan; al pasar el mouse se enciende en rosa */
+    .card-body .btn.ghost:hover { background: rgba(255, 61, 129, 0.08); border-color: var(--accent); color: var(--accent); }
+
+    /* Premio mayor: cierra la grilla de 3 columnas ocupando todo el ancho */
+    .card.major { position: relative; overflow: hidden; border-color: rgba(255, 61, 129, 0.55); }
+    .card.major .card-top { color: var(--accent); }
+    .card.major .card-top .stock { color: var(--accent); }
+    @media (min-width: 760px) and (max-width: 899px), (min-width: 1100px) {
+      /* Columnas: precio | título, descripción y tags | botón */
+      .card.major { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(220px, 260px) minmax(0, 1fr); }
+      .card.major .card-top { grid-column: 1 / -1; }
+      .card.major .card-art { grid-row: 2; align-content: center; }
+      .card.major .card-body { grid-row: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 28px; row-gap: 8px; align-content: center; }
+      .card.major .card-body > :not(.btn) { grid-column: 1; }
+      .card.major .card-body h3 { font-size: 30px; }
+      .card.major .card-body .btn { grid-column: 2; grid-row: 1 / span 4; align-self: center; width: auto; min-width: 200px; margin-top: 0; }
+    }
+    /* Destello diagonal muy discreto, cada 7 segundos (premio mayor y sorteo final) */
+    .card.major::after, .draw.final::after {
+      content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 38%;
+      background: linear-gradient(100deg, transparent, rgba(255, 61, 129, 0.08), rgba(255, 255, 255, 0.05), transparent);
+      transform: translateX(-130%) skewX(-18deg);
+      pointer-events: none;
+      animation: shine 7s ease-in-out infinite;
+    }
+    @keyframes shine { 0%, 70% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(380%) skewX(-18deg); } }
+    /* Al filtrar por categoría las tarjetas entran con un fundido corto */
+    .card.fade { animation: cardFade 0.18s ease; }
+    @keyframes cardFade { from { opacity: 0; transform: translateY(6px); } }
+
+    /* Sorteos */
+    .draws { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 640px) { .draws { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .draw {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .draw .when {
+      font: 500 12px/1.3 var(--font-mono);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .draw h3 {
+      font: 700 26px/1.05 var(--font-display);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .draw p { font-size: 15px; color: var(--muted); }
+    .draw-meta {
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      font: 500 11px/1.2 var(--font-mono);
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .draw-meta b { color: var(--muted); }
+    .draw-meta b.is-active { color: var(--good); }
+    .draw.final {
+      position: relative;
+      overflow: hidden;
+      grid-column: 1 / -1;
+      border: 3px solid var(--accent);
+      background: linear-gradient(135deg, rgba(255, 61, 129, 0.1), transparent 55%), var(--panel);
+      padding: 22px 24px;
+    }
+    .draw.final h3 { font-size: 42px; }
+    .draw .amt { font: 700 22px/1 var(--font-display); letter-spacing: 0.02em; color: var(--accent); text-transform: none; }
+    .draw.final .amt { font-size: 34px; }
+    .draw-meta { align-items: baseline; }
+
+    .tickets-row { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); margin-top: 28px; }
+    @media (min-width: 900px) { .tickets-row { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; } }
+    .tickets { margin: 0; padding: 0; list-style: none; }
+    .tickets li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .tickets li:first-child { border-top: 1px solid var(--line); }
+    .tickets .val { font: 700 22px/1 var(--font-display); color: var(--accent); white-space: nowrap; }
+    .rules-col { display: grid; gap: 12px; }
+    .rules {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
+      padding: 18px;
+      display: grid;
+      gap: 6px;
+    }
+    .rules .k { font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+    .rules p { color: var(--muted); font-size: 15px; }
+
+    /* FAQ */
+    .faq-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    @media (min-width: 760px) {
+      .faq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .faq-item {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+    .faq-item span {
+      font: 700 15px/1 var(--font-mono);
+      color: var(--accent);
+    }
+    .faq-item h3 {
+      font: 700 20px/1.15 var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 10px;
+    }
+    .faq-item p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+    footer {
+      margin-top: 72px;
+      padding-block: 24px max(32px, env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    body.sheet-open footer { padding-bottom: 280px; }
+    .foot-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; }
+    .foot-in p { max-width: 70ch; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+    .foot-links a { color: var(--muted); text-decoration: none; }
+    .foot-links a:hover, .foot-links a:focus-visible { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Hoja de canje */
+    .sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      background: var(--panel);
+      border-top: 3px solid var(--accent);
+      box-shadow: 0 -12px 34px rgba(0, 0, 0, 0.6);
+      padding-top: 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+    }
+    .sheet:not([hidden]) { animation: sheetIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes sheetIn { from { transform: translateY(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+    .sheet-in { max-width: 680px; margin: 0 auto; display: grid; gap: 12px; }
+    .sheet-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+    .sheet-top h3 {
+      font: 700 26px/1.05 var(--font-display);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .sheet-top p { font: 400 13px/1.3 var(--font-mono); color: var(--muted); margin-top: 4px; }
+    .cmd { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .cmd code {
+      flex: 1 1 220px;
+      min-width: 0;
+      font: 500 15px/1.3 var(--font-mono);
+      background: var(--panel-2);
+      padding: 12px;
+      border-radius: 4px;
+      overflow-wrap: anywhere;
+      user-select: all;
+    }
+    .sheet-note { font-size: 14px; color: var(--muted); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      html { scroll-behavior: auto; }
+      .card:hover { transform: none; }
+      .fx { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+<a class="skip" href="#contenido-principal">Saltar al contenido</a>
+
+<div class="app">
+
+  <!-- ===== BARRA LATERAL IZQUIERDA (igual que index.html) ===== -->
+  <header class="side">
+    <a class="brand" href="index.html#inicio" aria-label="Azmeyn, ir al inicio">
+      <span class="logo-wrap">
+        <img class="logo" id="logo" src="logo.png" alt="" width="44" height="44">
+        <span class="logo-dot" aria-hidden="true"></span>
+      </span>
+      <span><b>Azmeyn</b><small id="brand-sub"></small></span>
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      <div class="grp">
+        <p class="grp-h">Directo</p>
+        <a href="index.html#inicio">Inicio</a>
+        <div class="has-sub">
+          <a href="soloboom.html" aria-current="page">SoloBoom 6</a>
+          <div class="sub">
+            <a href="#como">Cómo funciona</a>
+            <a href="#tienda">Premios</a>
+            <a href="#sorteos">Sorteos</a>
+            <a href="#faq">Preguntas</a>
+          </div>
+        </div>
+      </div>
+      <div class="grp">
+        <p class="grp-h">Comunidad</p>
+        <a href="index.html#discord">Discord</a>
+        <a href="index.html#cuentas">Mis cuentas</a>
+      </div>
+      <div class="grp nav-bottom">
+        <a href="index.html#contacto">Contacto</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="main">
+    <!-- ===== BARRA DE ESTADO FIJA ARRIBA (online / offline) ===== -->
+    <div class="topbar">
+      <div class="wrap">
+        <div class="statusbar" aria-label="Estado de los directos">
+          <span class="sb-k">Directos</span>
+          <a class="pill" id="pill-twitch" data-state="unknown" data-link="twitch" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">
+            <svg class="ic-tw" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
+            <span class="tag"><span class="t-a"></span><span class="t-b"></span></span>
+          </a>
+          <a class="pill" id="pill-kick" data-state="unknown" data-link="kick" href="https://kick.com/meyn" target="_blank" rel="noopener noreferrer">
+            <svg class="ic-kick" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"/></svg>
+            <span class="tag"><span class="t-a"></span><span class="t-b"></span></span>
+          </a>
+          <span class="sb-sep" aria-hidden="true"></span>
+          <a class="soc" href="https://discord.gg/8Vsda74tt" target="_blank" rel="noopener noreferrer" aria-label="Discord" title="Discord">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12a1 1 0 1 0 0 .01M15 12a1 1 0 1 0 0 .01"/><path d="M7.5 7.5c3.5-1 5.5-1 9 0"/><path d="M7 16.5c3.5 1 6.5 1 10 0"/><path d="M15.5 17c0 1 1.5 3 2 3 1.5 0 2.833-1.667 3.5-3 .667-1.667.5-5.833-1.5-11.5-1.457-1.015-3-1.34-4.5-1.5l-.972 1.923a11.913 11.913 0 0 0-4.053 0L9 4c-1.5.16-3.043.485-4.5 1.5-2 5.667-2.167 9.833-1.5 11.5.667 1.333 2 3 3.5 3 .5 0 2-2 2-3"/></svg>
+          </a>
+          <a class="soc" href="https://www.youtube.com/@azmeyn" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg>
+          </a>
+          <a class="soc" href="https://x.com/pasaroncosasxd" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+          </a>
+          <a class="soc" href="https://www.instagram.com/az.meyn/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
+          </a>
+          <a class="soc" href="https://www.tiktok.com/@azmeyn" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2.1 4.2 5 4.4"/></svg>
+          </a>
+        </div>
+      </div>
+      <span class="progress" id="progress" aria-hidden="true"></span>
+    </div>
+
+    <main class="content" id="contenido-principal">
+      <!-- HERO + CALENDARIO -->
+      <section class="hero" aria-labelledby="titulo">
+        <div>
+          <p class="eyebrow">SoloBoom Challenge 6 · 30/11 al 20/12</p>
+          <h1 id="titulo">Tienda de Puntos de Azmeyn</h1>
+          <p class="lede">Mirá mi directo en Twitch, juntá puntos para canjear premios y acumulá tickets en el chat para los sorteos.</p>
+          <div class="prize">
+            <b>+USD 170</b>
+            <span>en sorteos y premios de la tienda</span>
+          </div>
+          <div class="hero-rows">
+            <div class="r"><span class="k">Cada hora</span><span class="v">+60</span><span class="t">puntos mirando el directo en Twitch</span></div>
+            <div class="r"><span class="k">Cada domingo</span><span class="v">USD 20</span><span class="t">en el sorteo semanal (6, 13 y 20/12)</span></div>
+            <div class="r"><span class="k">Domingo 20/12</span><span class="v">USD 60</span><span class="t">en el sorteo final</span></div>
+          </div>
+          <div class="cta">
+            <a class="btn" href="#tienda">Ir a los premios</a>
+            <a class="btn ghost" href="#como">Cómo funciona</a>
+          </div>
+        </div>
+
+        <section class="cal" aria-labelledby="cal-h">
+          <div class="cal-head">
+            <h2 id="cal-h" class="cal-label">Calendario del evento</h2>
+            <span class="cal-next" id="next"></span>
+          </div>
+          <p class="cal-status" id="status">SoloBoom Challenge 6</p>
+          <ol class="cal-grid" id="cal" aria-label="Calendario del torneo y de los sorteos"></ol>
+          <div class="cal-foot">
+            <span>Inicio torneo: 30/11 · 17:00 hs ARG</span>
+            <span>Cierre torneo: 20/12 · 18:00 hs ARG</span>
+            <span>Sorteo final: 20/12 al cierre</span>
+          </div>
+        </section>
+      </section>
+
+      <!-- CÓMO FUNCIONA -->
+      <section id="como" aria-labelledby="como-h">
+        <div class="sec-h"><h2 id="como-h">Cómo funciona</h2></div>
+        <p class="sec-p">Los puntos los suma el bot de mi canal mientras mirás el directo en Twitch (los puntos, tickets y comandos funcionan únicamente en Twitch, no en Kick). Escribí <code>!puntos</code> en el chat para ver cuántos tenés.</p>
+
+        <div class="how sec-body">
+          <article class="step">
+            <span class="n" aria-hidden="true">01</span>
+            <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <h3>Ganá puntos viendo</h3>
+            <p>Sumás +60 puntos por hora mirando el directo en Twitch. No hace falta escribir en el chat.</p>
+          </article>
+          <article class="step">
+            <span class="n" aria-hidden="true">02</span>
+            <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg></span>
+            <h3>Registrá tu presencia</h3>
+            <p>Escribí <code>!presente</code> una vez por día en el chat de Twitch para sumar puntos y un ticket para los sorteos.</p>
+          </article>
+          <article class="step">
+            <span class="n" aria-hidden="true">03</span>
+            <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v9H5v-9"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg></span>
+            <h3>Cambialos en la tienda</h3>
+            <p>Elegí un premio, copiá el comando y pegalo en mi chat de Twitch. Lo confirmo en vivo.</p>
+          </article>
+          <article class="step">
+            <span class="n" aria-hidden="true">04</span>
+            <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V7z"/></svg></span>
+            <h3>Jugá los sorteos</h3>
+            <p>Cada domingo hay un sorteo semanal y el domingo 20/12, día de cierre, también el sorteo final con todos tus tickets.</p>
+          </article>
+        </div>
+
+        <div class="earn-grid">
+          <div>
+            <h3 class="earn-h">Formas de juntar puntos</h3>
+            <ul class="earn">
+              <li><div class="what">Mirar el directo en Twitch<span>Mientras estés conectado al stream</span></div><span class="val">+60 / hora</span></li>
+              <li><div class="what">Check-in diario con <code>!presente</code><span>Una vez por día en el chat de Twitch</span></div><span class="val">+100</span></li>
+              <li><div class="what">Racha de 3 días seguidos<span>Tres días seguidos con <code>!presente</code></span></div><span class="val">+300</span></li>
+              <li><div class="what">Acertar una predicción<span>Se gana participando y acertando las predicciones del chat en vivo</span></div><span class="val">+200</span></li>
+            </ul>
+          </div>
+
+          <aside class="quick" aria-labelledby="quick-h">
+            <h3 id="quick-h">Comandos rápidos</h3>
+            <p>Copialos y pegalos en el chat de mi canal. Funcionan solo en Twitch, no en Kick.</p>
+            <div class="quick-row">
+              <code>!puntos</code>
+              <span class="d">Ver cuántos puntos tenés</span>
+              <button class="btn ghost sm" type="button" data-quick="!puntos">Copiar</button>
+            </div>
+            <div class="quick-row">
+              <code>!presente</code>
+              <span class="d">Check-in diario</span>
+              <button class="btn ghost sm" type="button" data-quick="!presente">Copiar</button>
+            </div>
+            <div class="quick-row">
+              <code>!canjear [premio]</code>
+              <span class="d">Elegí un premio para copiar su comando</span>
+              <a class="btn ghost sm" href="#tienda">Ir a premios →</a>
+            </div>
+            <p class="quick-status" id="quick-msg" role="status" aria-live="polite"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- TIENDA / PREMIOS -->
+      <section id="tienda" aria-labelledby="tienda-h">
+        <div class="sec-h"><h2 id="tienda-h">Premios</h2></div>
+        <p class="sec-p">Los premios con stock limitado se entregan por orden de canje.</p>
+        <div class="sec-body">
+          <div class="pts-box">
+            <label for="pts">Mis puntos</label>
+            <input id="pts" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+            <small>Escribí lo que te muestra <code>!puntos</code> en Twitch y te marco lo que te alcanza.</small>
+            <div class="pts-side">
+              <span class="pts-count" id="pts-count" aria-live="polite"></span>
+              <button class="btn ghost sm" type="button" id="pts-clear" hidden>Limpiar</button>
+            </div>
+          </div>
+          <div class="chips" id="chips" role="group" aria-label="Filtrar premios por tipo"></div>
+          <div class="grid" id="grid"></div>
+        </div>
+      </section>
+
+      <!-- SORTEOS -->
+      <section id="sorteos" aria-labelledby="sorteos-h">
+        <div class="sec-h"><h2 id="sorteos-h">Sorteos</h2></div>
+        <p class="sec-p">Tres sorteos semanales y uno final. Los ganadores se eligen en vivo al cierre del stream del día.</p>
+        <div class="draws sec-body">
+          <article class="draw" data-draw="6">
+            <p class="when">Domingo 6/12</p>
+            <h3>Sorteo semanal 1</h3>
+            <p>RP o skins por un valor de USD 20. Participan los tickets de la semana 1.</p>
+            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Valor: <strong class="amt">USD 20</strong></span></div>
+          </article>
+          <article class="draw" data-draw="13">
+            <p class="when">Domingo 13/12</p>
+            <h3>Sorteo semanal 2</h3>
+            <p>RP o skins por un valor de USD 20. Participan los tickets de la semana 2.</p>
+            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Valor: <strong class="amt">USD 20</strong></span></div>
+          </article>
+          <article class="draw" data-draw="20">
+            <p class="when">Domingo 20/12</p>
+            <h3>Sorteo semanal 3</h3>
+            <p>RP o skins por un valor de USD 20. Participan los tickets de la semana 3.</p>
+            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Valor: <strong class="amt">USD 20</strong></span></div>
+          </article>
+          <article class="draw final" data-draw="20f">
+            <p class="when">Domingo 20/12 · día de cierre del torneo</p>
+            <h3>Sorteo final</h3>
+            <p>RP o skins por un valor de USD 60. Todos los tickets que juntaste durante las tres semanas van a una ruleta digital que giro en vivo.</p>
+            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Pozo: <strong class="amt">USD 60</strong></span></div>
+          </article>
+        </div>
+
+        <div class="tickets-row">
+          <ul class="tickets">
+            <li><span>Check-in diario con <code>!presente</code></span><span class="val">1 ticket</span></li>
+            <li><span>Acertar 3 predicciones en el mismo día</span><span class="val">1 ticket</span></li>
+            <li><span>Canje en tienda (800 pts · máx. 3/semana)</span><span class="val">1 ticket</span></li>
+            <li><span>Suscriptor del canal de Twitch (sorteo final)</span><span class="val">Tickets x2</span></li>
+          </ul>
+          <div class="rules-col">
+            <aside class="rules">
+              <span class="k">Bonus suscriptores</span>
+              <p>Si estás suscripto a mi canal de Twitch, tus tickets valen x2 en la ruleta del sorteo final.</p>
+            </aside>
+            <aside class="rules">
+              <span class="k">Regla</span>
+              <p>Quien gana un sorteo semanal no puede ganar otro semanal. El sorteo final no tiene esa restricción.</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREGUNTAS FRECUENTES (FAQ) -->
+      <section id="faq" aria-labelledby="faq-h">
+        <div class="sec-h"><h2 id="faq-h">Preguntas frecuentes</h2></div>
+        <p class="sec-p">Dudas rápidas sobre los puntos, los tickets de sorteo y cómo reclamar cada canje en mi canal de Twitch.</p>
+        <div class="faq-grid sec-body">
+          <article class="faq-item">
+            <span>01</span>
+            <h3>¿Puedo acumular más de un ticket para el mismo sorteo?</h3>
+            <p>Sí. Sumás tickets todos los días con <code>!presente</code>, acertando 3 predicciones en el mismo día o canjeando hasta 3 tickets extra por semana en la sección Premios (800 puntos cada uno).</p>
+          </article>
+          <article class="faq-item">
+            <span>02</span>
+            <h3>¿Cómo se canjea un premio de la tienda?</h3>
+            <p>Hacé clic en «Canjear» en el premio que quieras y copiá el comando <code>!canjear</code> para pegarlo en el chat de <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">twitch.tv/azmeyn</a>. Lo verifico y confirmo en vivo (el sistema funciona únicamente en Twitch, no en Kick). Para coordinar entregas o revisiones, sumate a mi <a href="https://discord.gg/8Vsda74tt" target="_blank" rel="noopener noreferrer">Discord</a>.</p>
+          </article>
+          <article class="faq-item">
+            <span>03</span>
+            <h3>¿Cómo funcionan los tickets del sorteo final?</h3>
+            <p>Los tickets que ganás (con <code>!presente</code>, con predicciones o canjeándolos en la tienda) se acumulan en tu cuenta. El día del sorteo final, todos van a una ruleta digital que giro en vivo y cada ticket es una chance. Si estás suscripto al canal de Twitch, tenés doble chance: tus tickets valen x2.</p>
+          </article>
+          <article class="faq-item">
+            <span>04</span>
+            <h3>¿Cuándo y cómo se entregan los premios de RP o skins?</h3>
+            <p>Los sorteos semanales se definen en vivo al cierre del stream de los domingos 6/12, 13/12 y 20/12, y ese mismo 20/12, día de cierre del torneo, se sortea el pozo final de USD 60 con todos los tickets acumulados. Si ganás, te escribo por Discord para coordinar la entrega: según el caso, puede hacer falta que seamos amigos en LoL antes de regalarte la skin o el RP, o te paso un código o una transferencia.</p>
+          </article>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="wrap foot-in">
+        <p>© 2026 Azmeyn · Sitio personal para el SoloBoom Challenge 6. No es una página oficial del evento ni está respaldada por Riot Games. Los premios dependen de las reglas del torneo y de las condiciones de Riot Games en tu región. Confirmo cada canje en el chat de Twitch antes de entregarlo.</p>
+        <nav class="foot-links" aria-label="Redes">
+          <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer" data-link="twitch">Twitch</a>
+          <a href="https://kick.com/meyn" target="_blank" rel="noopener noreferrer" data-link="kick">Kick</a>
+          <a href="https://discord.gg/8Vsda74tt" target="_blank" rel="noopener noreferrer">Discord</a>
+          <a href="https://www.youtube.com/@azmeyn" target="_blank" rel="noopener noreferrer">YouTube</a>
+          <a href="https://x.com/pasaroncosasxd" target="_blank" rel="noopener noreferrer">X</a>
+          <a href="https://www.tiktok.com/@azmeyn" target="_blank" rel="noopener noreferrer">TikTok</a>
+          <a href="https://www.instagram.com/az.meyn/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        </nav>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- HOJA INFERIOR DE CANJE -->
+<div class="sheet" id="sheet" role="dialog" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-in">
+    <div class="sheet-top">
+      <div>
+        <h3 id="sheet-title">Tu canje</h3>
+        <p id="sheet-sub"></p>
+      </div>
+      <button class="btn ghost sm" type="button" id="sheet-close">Cerrar</button>
+    </div>
+    <div class="cmd">
+      <code id="cmd" aria-label="Comando de canje"></code>
+      <button class="btn" type="button" id="copy">Copiar comando</button>
+    </div>
+    <p class="sheet-note">Pegá el comando en el chat de Twitch (solo funciona en Twitch). Si no se copia solo, seleccionalo y copialo a mano.</p>
+    <p class="sheet-msg" id="msg" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DAY = 86400000;
+  var START = new Date("2026-11-30T00:00:00-03:00").getTime();
+  var KICKOFF = new Date("2026-11-30T17:00:00-03:00").getTime();   /* arranque real del torneo (cuenta regresiva) */
+  var TOTAL_DAYS = 21;   /* el torneo dura del 30/11 al 20/12 (fechas oficiales del SoloBoom) */
+
+  /* Sorteos. day = día del evento en que se sortea (0 = 30/11).
+     from = primer día en que cuentan los tickets de ese sorteo.
+     Alimenta el calendario y el estado de cada sorteo (Próximo / Activo / Finalizado). */
+  var DRAWS = [
+    { day: 6, from: 0, label: "USD 20" },
+    { day: 13, from: 7, label: "USD 20" },
+    { day: 20, from: 14, label: "USD 20" },
+    { day: 20, from: 0, label: "USD 60", final: true }
+  ];
+  var WEEKDAYS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+
+  var CATS = [
+    { id: "todos", name: "Todos" },
+    { id: "directo", name: "En el directo" },
+    { id: "sorteos", name: "Sorteos" },
+    { id: "comunidad", name: "Comunidad" },
+    { id: "rp", name: "RP y skins" }
+  ];
+
+  /* CATÁLOGO. stock: cantidad fija que se muestra en la tarjeta
+     (null = sin límite, 0 = agotado). */
+  var ITEMS = [
+    { id: "campeon-runas", cat: "directo", name: "Elegí mi campeón y runas", desc: "Elegís el campeón y sus runas para mi próxima ranked entre los 10 campeones de mi pool (runas viables, sin trollear).", cost: 700, stock: null, limit: "1 por día" },
+    { id: "cofre", cat: "rp", name: "Cofre Hextech + Llave", desc: "Un cofre Hextech con su llave para abrirlo. Lo canjeás y te lo entrego.", cost: 2500, stock: 10, limit: "1 por persona" },
+    { id: "ticket", cat: "sorteos", name: "Ticket extra de sorteo", desc: "+1 ticket para el sorteo semanal y también se acumula para el sorteo final.", cost: 800, stock: null, limit: "Hasta 3 por semana" },
+    { id: "spells", cat: "directo", name: "Elegí mis hechizos", desc: "Elegís mis hechizos de invocador (Fantasmal, Extenuación, etc.) para la próxima partida — siempre opciones viables y sin trollear.", cost: 1000, stock: null, limit: "1 por día" },
+    { id: "rol", cat: "comunidad", name: "Rol especial en Discord", desc: "Rol con color propio y destaque en la lista del servidor de Discord.", cost: 2000, stock: null, limit: "1 por persona" },
+    { id: "duelo", cat: "directo", name: "Duelo 1v1 contra mí", desc: "Me desafiás a un 1v1 en vivo en el Abismo de los Lamentos.", cost: 3000, stock: 5, limit: "1 por stream" },
+    { id: "castigo", cat: "directo", name: "Castigo", desc: "Sensibilidad al mango, mute, modo caster o lo que elijas. Queda sujeto a mi aprobación y sin romper reglas del torneo.", cost: 4000, stock: 5, limit: "1 por persona" },
+    { id: "vip", cat: "comunidad", name: "VIP en Twitch", desc: "Insignia de VIP en mi canal de Twitch, y te queda para siempre.", cost: 1500, stock: 10, limit: "1 por persona" },
+    { id: "rp5", cat: "rp", name: "RP o skin por USD 5", desc: "Skin o RP directo en tu cuenta LAS / LAN / BR.", cost: 5000, stock: 6, limit: "1 por persona" },
+    { id: "skin10", cat: "rp", name: "RP o skin por USD 10", desc: "Skin o RP de mayor valor directo en tu cuenta LAS / LAN / BR.", cost: 10000, stock: 2, limit: "1 por persona", major: true }
+  ];
+
+  var COIN = '<svg class="coin" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#ff3d81"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#1a0210" stroke-width="2"/></svg>';
+
+  function $(id) { return document.getElementById(id); }
+  function store(key, val) {
+    try {
+      if (val === undefined) { return localStorage.getItem(key); }
+      localStorage.setItem(key, val);
+    } catch (e) { return null; }
+  }
+  function fmt(n) { return n.toLocaleString("es-AR"); }
+  function dateOf(i) {
+    var d = new Date(Date.UTC(2026, 10, 30 + i));
+    return { d: d.getUTCDate(), m: d.getUTCMonth() + 1, w: d.getUTCDay() };
+  }
+  /* Si un día tiene dos sorteos (semanal y final el 20/12), sin segundo argumento devuelve el final.
+     Con true devuelve solo el final y con false solo el semanal. */
+  function drawOn(day, wantFinal) {
+    var list = DRAWS.filter(function (x) { return x.day === day; });
+    if (wantFinal === true) { return list.filter(function (x) { return x.final; })[0] || null; }
+    if (wantFinal === false) { return list.filter(function (x) { return !x.final; })[0] || null; }
+    return list.filter(function (x) { return x.final; })[0] || list[0] || null;
+  }
+
+  /* ---------- Copiar al portapapeles (con plan B si el navegador no deja) ---------- */
+  function setMsg(el, text, ok) {
+    el.textContent = text;
+    el.classList.toggle("ok", ok);
+  }
+  /* El botón pasa a verde con "¡Copiado! ✓" por 2 segundos */
+  function flash(btn) {
+    if (!btn) { return; }
+    if (!btn.getAttribute("data-t")) { btn.setAttribute("data-t", btn.textContent); }
+    btn.classList.add("copied");
+    btn.textContent = "¡Copiado! ✓";
+    clearTimeout(btn._t);
+    btn._t = setTimeout(function () {
+      btn.classList.remove("copied");
+      btn.textContent = btn.getAttribute("data-t");
+    }, 2000);
+  }
+  function copyText(text, msgEl, okText, selectEl, btn) {
+    function fail() {
+      var sel = false;
+      if (selectEl) {
+        try {
+          var r = document.createRange();
+          r.selectNodeContents(selectEl);
+          var s = window.getSelection();
+          s.removeAllRanges();
+          s.addRange(r);
+          sel = true;
+        } catch (e) {}
+      }
+      setMsg(msgEl, "No se pudo copiar solo." + (sel ? " Quedó seleccionado." : ""), false);
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { setMsg(msgEl, okText, true); flash(btn); }, fail);
+      } else { fail(); }
+    } catch (e) { fail(); }
+  }
+
+  /* ---------- Cuenta regresiva en vivo (hasta el arranque del torneo) ---------- */
+  var clockOn = false;
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+  function paintClock() {
+    var ms = KICKOFF - Date.now();
+    var el = $("status");
+    if (ms <= 0) {
+      if (clockOn) { clockOn = false; el.classList.remove("clock"); renderCalendar(); renderDrawStates(); }
+      return;
+    }
+    clockOn = true;
+    var s = Math.floor(ms / 1000);
+    el.classList.add("clock");
+    el.textContent = Math.floor(s / 86400) + "d : " + pad(Math.floor(s % 86400 / 3600)) + "h : " + pad(Math.floor(s % 3600 / 60)) + "m : " + pad(s % 60) + "s";
+  }
+  setInterval(function () { if (clockOn) { paintClock(); } }, 1000);
+
+  /* ---------- Calendario y estado del evento ---------- */
+  var MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  function renderCalendar() {
+    var now = Date.now();
+    var idx = Math.floor((now - START) / DAY);
+    var grid = $("cal");
+    grid.textContent = "";
+    ["L", "M", "M", "J", "V", "S", "D"].forEach(function (l) {
+      var li = document.createElement("li");
+      li.className = "cal-dow";
+      li.setAttribute("aria-hidden", "true");
+      li.textContent = l;
+      grid.appendChild(li);
+    });
+    for (var i = 0; i < TOTAL_DAYS; i++) {
+      var dt = dateOf(i);
+      var draw = drawOn(i);
+      var li2 = document.createElement("li");
+      li2.className = "cal-cell";
+      if (draw) { li2.classList.add(draw.final ? "final" : "is-draw"); }
+      if (idx >= 0 && i < idx) { li2.classList.add("past"); }
+      if (i === idx) { li2.classList.add("today"); }
+      li2.setAttribute("aria-label", WEEKDAYS[dt.w] + " " + dt.d + "/" + dt.m +
+        (draw ? ", " + (draw.final ? "sorteo final" : "sorteo semanal") + " de " + draw.label : "") +
+        (draw && draw.final && drawOn(i, false) ? " y sorteo semanal de " + drawOn(i, false).label : ""));
+      var top = document.createElement("span");
+      top.textContent = String(dt.d);
+      if (i === 0 || dt.d === 1) {
+        var mo = document.createElement("i");
+        mo.textContent = MONTHS[dt.m - 1];
+        top.appendChild(mo);
+      }
+      var tag = document.createElement("small");
+      if (draw) {
+        /* Etiqueta larga en pantallas anchas y una estrella en las angostas */
+        var long = document.createElement("span");
+        long.className = "l";
+        var weekly = draw.final ? drawOn(i, false) : null;
+        if (weekly) { long.className += " two"; }
+        long.textContent = weekly ? "$" + weekly.label.replace("USD ", "") + "+$" + draw.label.replace("USD ", "") : draw.label;
+        if (weekly) { li2.setAttribute("title", "Sorteo semanal de " + weekly.label + " y sorteo final de " + draw.label); }
+        var star = document.createElement("span");
+        star.className = "s";
+        star.textContent = "★";
+        tag.appendChild(long);
+        tag.appendChild(star);
+      }
+      li2.appendChild(top);
+      li2.appendChild(tag);
+      grid.appendChild(li2);
+    }
+
+    var status = $("status");
+    if (now < KICKOFF) {
+      paintClock();
+    } else if (idx >= TOTAL_DAYS) {
+      status.classList.remove("clock");
+      status.textContent = "El evento terminó";
+    } else if (idx === TOTAL_DAYS - 1) {
+      status.classList.remove("clock");
+      status.textContent = "Último día: sorteo final";
+    } else {
+      status.classList.remove("clock");
+      status.textContent = "Día " + (idx + 1) + " de " + TOTAL_DAYS;
+    }
+    var from = Math.max(idx, 0);
+    var next = DRAWS.map(function (d) { return d.day; })
+      .sort(function (a, b) { return a - b; })
+      .filter(function (k) { return k >= from; })[0];
+    if (next === undefined) {
+      $("next").textContent = "Los sorteos terminaron";
+    } else {
+      var nd = dateOf(next);
+      $("next").textContent = "Próximo sorteo: " + WEEKDAYS[nd.w] + " " + nd.d + "/" + nd.m;
+    }
+  }
+
+  /* ---------- Estado de cada sorteo: Próximo → Activo → Finalizado ---------- */
+  function renderDrawStates() {
+    var now = Date.now();
+    document.querySelectorAll("[data-draw]").forEach(function (el) {
+      var raw = el.getAttribute("data-draw");
+      var d = drawOn(parseInt(raw, 10), /f$/.test(raw));
+      if (!d) { return; }
+      var key = now < START + d.from * DAY ? "next" : now < START + (d.day + 1) * DAY ? "active" : "done";
+      var b = el.querySelector(".state");
+      b.textContent = key === "next" ? "Próximo" : key === "active" ? "Activo" : "Finalizado";
+      b.classList.toggle("is-active", key === "active");
+    });
+  }
+
+  /* ---------- Premios ---------- */
+  var pts = null;
+  var cat = "todos";
+  var current = null;
+  var lastTrigger = null;
+  var shopSeen = false;
+  var fadeNext = false;
+
+  function catName(id) {
+    for (var i = 0; i < CATS.length; i++) { if (CATS[i].id === id) { return CATS[i].name; } }
+    return "";
+  }
+
+  function renderChips() {
+    var box = $("chips");
+    box.textContent = "";
+    CATS.forEach(function (c) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = c.name;
+      b.setAttribute("aria-pressed", c.id === cat ? "true" : "false");
+      b.addEventListener("click", function () { cat = c.id; fadeNext = true; renderChips(); renderShop(); });
+      box.appendChild(b);
+    });
+  }
+
+  function renderShop() {
+    var root = $("grid");
+    root.textContent = "";
+    var list = ITEMS.filter(function (it) { return cat === "todos" || it.cat === cat; })
+      .sort(function (a, b) { return a.cost - b.cost; });
+    list.forEach(function (it) {
+      var soldOut = it.stock === 0;
+      var canBuy = pts !== null && pts >= it.cost;
+
+      var major = !!it.major && cat === "todos";
+      var card = document.createElement("article");
+      card.className = "card" + (major ? " major" : "") + (pts !== null && canBuy && !soldOut ? " can" : pts !== null ? " cant" : "") + (!shopSeen ? " fx" : "") + (fadeNext ? " fade" : "");
+
+      var top = document.createElement("div");
+      top.className = "card-top";
+      var stock = document.createElement("span");
+      stock.className = "stock";
+      stock.textContent = (major ? "Premio mayor · " : "") + (it.stock === null ? "Sin límite"
+        : soldOut ? "Agotado"
+        : "Stock: " + it.stock + (it.stock === 1 ? " unidad" : " unidades"));
+      top.appendChild(stock);
+
+      var art = document.createElement("div");
+      art.className = "card-art";
+      var num = document.createElement("div");
+      num.className = "num";
+      var coin = document.createElement("span");
+      coin.innerHTML = COIN;
+      var val = document.createElement("span");
+      val.textContent = fmt(it.cost);
+      var sm = document.createElement("small");
+      sm.textContent = "puntos";
+      num.appendChild(coin);
+      num.appendChild(val);
+      art.appendChild(num);
+      art.appendChild(sm);
+
+      var body = document.createElement("div");
+      body.className = "card-body";
+      var h = document.createElement("h3");
+      h.textContent = it.name;
+      var d = document.createElement("p");
+      d.textContent = it.desc;
+      var tags = document.createElement("div");
+      tags.className = "tags";
+      [catName(it.cat), it.limit].forEach(function (t) {
+        var s = document.createElement("span");
+        s.className = "tag";
+        s.textContent = t;
+        tags.appendChild(s);
+      });
+      var aff = document.createElement("div");
+      aff.className = "afford";
+      if (pts !== null && !soldOut) {
+        if (canBuy) { aff.className += " yes"; aff.textContent = "Te alcanza"; }
+        else { aff.className += " no"; aff.textContent = "Te faltan " + fmt(it.cost - pts); }
+      }
+      /* Botón oscuro por defecto; rosa solo al pasar el mouse o cuando te alcanzan los puntos */
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn" + (canBuy ? "" : " ghost");
+      btn.textContent = soldOut ? "Agotado" : "Canjear";
+      btn.disabled = soldOut;
+      btn.setAttribute("aria-label", (soldOut ? "Agotado: " : "Canjear ") + it.name);
+      btn.addEventListener("click", function () { openSheet(it, btn); });
+
+      body.appendChild(h);
+      body.appendChild(d);
+      body.appendChild(tags);
+      body.appendChild(aff);
+      body.appendChild(btn);
+
+      card.appendChild(top);
+      card.appendChild(art);
+      card.appendChild(body);
+      root.appendChild(card);
+    });
+    fadeNext = false;
+    renderPtsInfo();
+    if (!shopSeen) { shopSeen = true; revealOnce(root.querySelectorAll(".card")); }
+  }
+
+  /* Contador de la calculadora y botón Limpiar */
+  function renderPtsInfo() {
+    var n = 0;
+    if (pts !== null) {
+      ITEMS.forEach(function (it) { if (it.stock !== 0 && pts >= it.cost) { n++; } });
+      $("pts-count").innerHTML = "Te alcanza para: <b>" + n + "</b> de " + ITEMS.length + " premios";
+    } else {
+      $("pts-count").textContent = ITEMS.length + " premios disponibles";
+    }
+    $("pts-clear").hidden = !(pts !== null && pts > 0);
+  }
+
+  /* Entrada suave de las tarjetas: una sola vez, cuando aparecen en pantalla */
+  function revealOnce(list) {
+    if (!("IntersectionObserver" in window)) {
+      Array.prototype.forEach.call(list, function (el) { el.classList.remove("fx"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) { return; }
+        io.unobserve(e.target);
+        var el = e.target;
+        el.classList.add("in");
+        setTimeout(function () { el.classList.remove("fx", "in"); }, 450);
+      });
+    }, { threshold: 0.12 });
+    Array.prototype.forEach.call(list, function (el) { io.observe(el); });
+  }
+
+  /* ---------- Hoja de canje ----------
+     El comando no lleva el usuario: en el chat de Twitch ya se ve quién lo escribe. */
+  function openSheet(item, trigger) {
+    current = item;
+    lastTrigger = trigger;
+    $("sheet-title").textContent = item.name;
+    $("sheet-sub").textContent = fmt(item.cost) + " puntos";
+    $("cmd").textContent = "!canjear " + item.id;
+    setMsg($("msg"), "", false);
+    $("sheet").hidden = false;
+    document.body.classList.add("sheet-open");
+    $("copy").focus();
+  }
+  function closeSheet() {
+    $("sheet").hidden = true;
+    document.body.classList.remove("sheet-open");
+    current = null;
+    if (lastTrigger) { try { lastTrigger.focus(); } catch (e) {} }
+  }
+  $("copy").addEventListener("click", function () {
+    copyText($("cmd").textContent, $("msg"), "Copiado. Pegalo en el chat de Twitch.", $("cmd"), $("copy"));
+  });
+  $("sheet-close").addEventListener("click", closeSheet);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !$("sheet").hidden) { closeSheet(); }
+  });
+
+  /* ---------- Comandos rápidos ---------- */
+  document.querySelectorAll("[data-quick]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var cmd = btn.getAttribute("data-quick");
+      copyText(cmd, $("quick-msg"), "Copiado " + cmd + ". Pegalo en el chat de Twitch.", btn.parentNode.querySelector("code"), btn);
+    });
+  });
+
+  /* ---------- Mis puntos ---------- */
+  $("pts").addEventListener("input", function () {
+    var digits = this.value.replace(/[^0-9]/g, "").slice(0, 7);
+    if (digits !== this.value) { this.value = digits; }
+    pts = digits === "" ? null : parseInt(digits, 10);
+    store("canjes-pts", digits);
+    renderShop();
+  });
+  $("pts-clear").addEventListener("click", function () {
+    $("pts").value = "";
+    pts = null;
+    store("canjes-pts", "");
+    renderShop();
+    $("pts").focus();
+  });
+  var savedPts = store("canjes-pts");
+  if (savedPts && /^[0-9]{1,7}$/.test(savedPts)) {
+    $("pts").value = savedPts;
+    pts = parseInt(savedPts, 10);
+  }
+
+  /* ---------- Estado online/offline (misma lógica que index.html) ----------
+     Si cambia un canal, cambialo también en CONFIG de index.html. */
+  var CONFIG = { twitch: "azmeyn", kick: "meyn", api: "/api/live", pollMs: 60000 };
+  var NAMES = { twitch: "Twitch", kick: "Kick" };
+  var URLS = {
+    twitch: "https://www.twitch.tv/" + CONFIG.twitch,
+    kick: "https://kick.com/" + CONFIG.kick
+  };
+  var favEl = $("fav");
+  /* Logo: usa logo.png si lo subiste a la carpeta public; si no, la foto de tu canal de Twitch */
+  var logoEl = $("logo");
+  var logoFailed = false;
+  function useAvatar(data) {
+    if (!logoFailed) { return; }
+    var u = data && data.twitch && typeof data.twitch.avatar === "string" ? data.twitch.avatar : "";
+    if (/^https:\/\//.test(u) && logoEl.getAttribute("src") !== u) {
+      logoEl.src = u;
+      favEl.setAttribute("href", u);
+    }
+  }
+  function logoBad() { logoFailed = true; logoEl.classList.add("bad"); }
+  logoEl.addEventListener("error", logoBad);
+  logoEl.addEventListener("load", function () { logoEl.classList.remove("bad"); });
+  if (logoEl.complete && logoEl.naturalWidth === 0) { logoBad(); }
+  var titleOff = document.title;
+
+  document.querySelectorAll("[data-link]").forEach(function (a) {
+    a.setAttribute("href", URLS[a.getAttribute("data-link")]);
+  });
+
+  function applyLive(data) {
+    var livePfs = [];
+    ["twitch", "kick"].forEach(function (p) {
+      var d = data && data[p];
+      var s = d && typeof d.live === "boolean" ? d.live : null;
+      var pill = $("pill-" + p);
+      pill.setAttribute("data-state", s === true ? "live" : s === false ? "off" : "unknown");
+      pill.querySelector(".t-a").textContent = s === true ? "live" : "offline";
+      pill.querySelector(".t-b").textContent = s === true ? "ver en vivo" : "ver canal";
+      var label = s === true ? NAMES[p] + ": en vivo, ver en vivo" : s === false ? NAMES[p] + ": offline, ver canal" : "Ver canal de " + NAMES[p];
+      pill.setAttribute("aria-label", label);
+      pill.setAttribute("title", label);
+      if (s === true) { livePfs.push(p); }
+    });
+    var anyLive = livePfs.length > 0;
+    document.querySelector(".brand").setAttribute("data-live", anyLive ? "true" : "false");
+    /* "En vivo en Twitch", "En vivo en Kick" o "En vivo · Twitch y Kick" si prendo en las dos */
+    $("brand-sub").textContent = livePfs.length === 2 ? "En vivo · Twitch y Kick" : anyLive ? "En vivo en " + NAMES[livePfs[0]] : "";
+    document.title = anyLive ? "● En vivo · Azmeyn" : titleOff;
+    useAvatar(data);
+  }
+  function refreshLive() {
+    if (document.hidden) { return; }
+    var ctl = typeof AbortController === "function" ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, 8000) : null;
+    fetch(CONFIG.api, { cache: "no-store", signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { if (!r.ok) { throw new Error("http " + r.status); } return r.json(); })
+      .then(applyLive)
+      .catch(function () { applyLive(null); })
+      .then(function () { if (timer) { clearTimeout(timer); } });
+  }
+  /* ---------- Menú lateral: marca la subsección de la tienda que se está viendo ---------- */
+  var subLinks = Array.prototype.slice.call(document.querySelectorAll(".sub a"));
+  var ticking = false;
+  function updateSub() {
+    ticking = false;
+    var tb = document.querySelector(".topbar").offsetHeight;
+    var line = window.pageYOffset + (window.innerWidth >= 960 ? tb : document.querySelector(".side").offsetHeight) + Math.round(window.innerHeight * 0.25);
+    var act = null;
+    subLinks.forEach(function (a) {
+      var el = $(a.getAttribute("href").slice(1));
+      if (el && el.getBoundingClientRect().top + window.pageYOffset <= line) { act = a; }
+    });
+    /* Al llegar al final de la página queda marcada la última (Preguntas) */
+    if (subLinks.length && window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 4) {
+      act = subLinks[subLinks.length - 1];
+    }
+    subLinks.forEach(function (a) {
+      if (a === act) { a.setAttribute("aria-current", "true"); } else { a.removeAttribute("aria-current"); }
+    });
+    /* Barra de progreso de lectura */
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    $("progress").style.transform = "scaleX(" + (max > 0 ? Math.min(1, Math.max(0, window.pageYOffset / max)) : 0) + ")";
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(updateSub); } }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  window.addEventListener("load", updateSub);
+  updateSub();
+
+  refreshLive();
+  setInterval(refreshLive, CONFIG.pollMs);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) { refreshLive(); } });
+
+  /* La barra de estado se pega justo debajo de la barra de arriba (celular): se mide su alto real */
+  function syncBar() {
+    document.documentElement.style.setProperty("--side-h", document.querySelector(".side").offsetHeight + "px");
+    document.documentElement.style.setProperty("--top-h", document.querySelector(".topbar").offsetHeight + "px");
+  }
+  syncBar();
+  window.addEventListener("resize", syncBar);
+  window.addEventListener("load", syncBar);
+
+  renderCalendar();
+  renderDrawStates();
+  renderChips();
+  renderShop();
+
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  revealOnce((function () {
+    var steps = document.querySelectorAll(".step");
+    if (!reduced) { Array.prototype.forEach.call(steps, function (el) { el.classList.add("fx"); }); }
+    return reduced ? [] : steps;
+  })());
+
+  /* El número del pozo sube de 0 al total al cargar (800 ms) */
+  (function () {
+    var el = document.querySelector(".prize b");
+    if (!el || reduced) { return; }
+    var total = parseInt(el.textContent.replace(/\D/g, ""), 10);
+    if (isNaN(total)) { return; }
+    el.style.minWidth = el.offsetWidth + "px";
+    var t0 = null;
+    function step(t) {
+      if (t0 === null) { t0 = t; }
+      var k = Math.min(1, (t - t0) / 800);
+      el.textContent = "+USD " + Math.round(total * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) { requestAnimationFrame(step); }
+    }
+    el.textContent = "+USD 0";
+    requestAnimationFrame(step);
+  })();
+})();
+</script>
+
+</body>
+</html>
