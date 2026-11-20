@@ -10,10 +10,24 @@
   <meta property="og:title" content="Azmeyn">
   <meta property="og:description" content="Directos en Twitch y Kick, comunidad en Discord y contenido en TikTok, Instagram y YouTube.">
   <meta property="og:locale" content="es_AR">
-  <meta property="og:image" content="logo.png">
-  <meta name="twitter:card" content="summary">
-  <link id="fav" rel="icon" href="logo.png">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <meta property="og:image" content="og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    /* Fuentes propias (carpeta fonts/): no dependen de Google */
+    @font-face { font-family: "Barlow"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-500-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
+  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -722,7 +736,7 @@
               </section>
 
               <!-- Torneo: tarjeta al costado del reproductor -->
-              <aside class="event" id="soloboom" aria-labelledby="ev-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T17:00:00-03:00" data-days="21">
+              <aside class="event" id="soloboom" aria-labelledby="ev-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T18:00:00-03:00" data-days="21">
                 <div class="ev-main">
                   <p class="ev-k">Cuenta regresiva</p>
                   <span class="count" id="event-count" role="timer"></span>
@@ -731,7 +745,7 @@
                   <p class="ev-p">Mirá mis directos en Twitch durante el torneo, juntá puntos y canjealos por premios, castigos y tickets para los sorteos.</p>
                 </div>
                 <div class="event-cta">
-                  <a class="btn" href="soloboom.html">Ver tienda de puntos</a>
+                  <a class="btn" href="soloboom.html">Ir a la tienda</a>
                   <a class="btn ghost" href="https://soloboom.net/#que-es" target="_blank" rel="noopener noreferrer">Info oficial del torneo ↗</a>
                 </div>
               </aside>

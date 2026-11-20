@@ -3,17 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Tienda de Puntos de Azmeyn · SoloBoom Challenge 6</title>
-  <meta name="description" content="Tienda de puntos, premios y sorteos de Azmeyn durante el SoloBoom Challenge 6.">
+  <title>Tienda · SoloBoom Challenge 6</title>
+  <meta name="description" content="Canjes, premios y sorteos de Azmeyn durante el SoloBoom Challenge 6.">
   <meta name="theme-color" content="#ff3d81">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_AR">
-  <meta property="og:title" content="Tienda de Puntos de Azmeyn · SoloBoom Challenge 6">
+  <meta property="og:title" content="Tienda · SoloBoom Challenge 6">
   <meta property="og:description" content="Mirá mi directo en Twitch, juntá puntos para canjear premios y participá por +USD 170 en sorteos durante el SoloBoom 6.">
-  <meta property="og:image" content="logo.png">
-  <meta name="twitter:card" content="summary">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
-  <link id="fav" rel="icon" href="logo.png">
+  <meta property="og:image" content="og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    /* Fuentes propias (carpeta fonts/): no dependen de Google */
+    @font-face { font-family: "Barlow"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-500-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
+  </style>
+  <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <style>
     :root {
       --bg: #0b0c10;
@@ -990,7 +1004,7 @@
       <section class="hero" aria-labelledby="titulo">
         <div>
           <p class="eyebrow">SoloBoom Challenge 6 · 30/11 al 20/12</p>
-          <h1 id="titulo">Tienda de Puntos de Azmeyn</h1>
+          <h1 id="titulo">Tienda</h1>
           <p class="lede">Mirá mi directo en Twitch, juntá puntos para canjear premios y acumulá tickets en el chat para los sorteos.</p>
           <div class="prize">
             <b>+USD 170</b>
@@ -1015,7 +1029,7 @@
           <p class="cal-status" id="status">SoloBoom Challenge 6</p>
           <ol class="cal-grid" id="cal" aria-label="Calendario del torneo y de los sorteos"></ol>
           <div class="cal-foot">
-            <span>Inicio torneo: 30/11 · 17:00 hs ARG</span>
+            <span>Inicio torneo: 30/11 · 18:00 hs ARG</span>
             <span>Cierre torneo: 20/12 · 18:00 hs ARG</span>
             <span>Sorteo final: 20/12 al cierre</span>
           </div>
@@ -1230,7 +1244,7 @@
 
   var DAY = 86400000;
   var START = new Date("2026-11-30T00:00:00-03:00").getTime();
-  var KICKOFF = new Date("2026-11-30T17:00:00-03:00").getTime();   /* arranque real del torneo (cuenta regresiva) */
+  var KICKOFF = new Date("2026-11-30T18:00:00-03:00").getTime();   /* arranque real del torneo (cuenta regresiva) */
   var TOTAL_DAYS = 21;   /* el torneo dura del 30/11 al 20/12 (fechas oficiales del SoloBoom) */
 
   /* Sorteos. day = día del evento en que se sortea (0 = 30/11).
