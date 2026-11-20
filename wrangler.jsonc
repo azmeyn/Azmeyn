@@ -7,6 +7,7 @@
   "preview_urls": false,
   // No borra las variables cargadas en el panel de Cloudflare al desplegar
   "keep_vars": true,
+"kv_namespaces": [{ "binding": "CHECKINS", "id": "f2675dba0fb3436f9eec3f18aecdd38c" }],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
