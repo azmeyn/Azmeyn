@@ -10,7 +10,7 @@
   <meta property="og:title" content="Azmeyn">
   <meta property="og:description" content="Directos en Twitch y Kick, comunidad en Discord y contenido en TikTok, Instagram y YouTube.">
   <meta property="og:locale" content="es_AR">
-  <meta property="og:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png">
+  <meta property="og:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
   <meta name="twitter:card" content="summary_large_image">
   <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -736,9 +736,9 @@
               </section>
 
               <!-- Torneo: tarjeta al costado del reproductor -->
-              <aside class="event" id="soloboom" aria-labelledby="ev-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T18:00:00-03:00" data-days="21">
+              <aside class="event" id="soloboom" aria-labelledby="ev-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T18:00:00-03:00" data-end="2026-12-20T18:00:00-03:00" data-days="21">
                 <div class="ev-main">
-                  <p class="ev-k">Cuenta regresiva</p>
+                  <p class="ev-k" id="ev-k">Cuenta regresiva</p>
                   <span class="count" id="event-count" role="timer"></span>
                   <h3 id="ev-h">SoloBoom Challenge <span>6</span></h3>
                   <p class="ev-date">30 de noviembre al 20 de diciembre</p>
@@ -883,7 +883,7 @@
 
   /* ---------- Evento (cuenta regresiva) ----------
      data-start = día 1 a las 00:00 (para contar los días), data-kickoff = arranque real del torneo.
-     Para cambiar de evento, editá data-start, data-kickoff y data-days en .event */
+     Para cambiar de evento, editá data-start, data-kickoff, data-end y data-days en .event */
   var evEl = document.querySelector(".event");
   function pad(n) { return n < 10 ? "0" + n : String(n); }
   /* Día calendario en Argentina (UTC-3), para decir "hoy / mañana / en N días" */
@@ -895,25 +895,28 @@
     var days = parseInt(evEl.getAttribute("data-days"), 10);
     if (isNaN(start) || isNaN(days)) { return null; }
     if (isNaN(kick)) { kick = start; }
+    var end = new Date(evEl.getAttribute("data-end")).getTime();
     var now = Date.now();
     if (now < kick) {
       var left = argDay(kick) - argDay(now);
       var s = Math.floor((kick - now) / 1000);
       return {
         over: false,
+        label: "Cuenta regresiva",
         clock: Math.floor(s / 86400) + "d : " + pad(Math.floor(s % 86400 / 3600)) + "h : " + pad(Math.floor(s % 3600 / 60)) + "m : " + pad(s % 60) + "s",
         text: left <= 0 ? "Empieza hoy" : left === 1 ? "Empieza mañana" : "Empieza en " + left + " días"
       };
     }
     var idx = Math.floor((now - start) / DAY);
-    if (idx >= days) { return { over: true, text: "El evento ya terminó" }; }
-    return { over: false, text: "En curso · Día " + (idx + 1) + " de " + days };
+    if (idx >= days || (!isNaN(end) && now >= end)) { return { over: true, label: "Torneo finalizado", text: "El evento ya terminó" }; }
+    return { over: false, label: "Torneo en curso", text: "En curso · Día " + (idx + 1) + " de " + days };
   }
   var ei = eventInfo();
   function renderEvent() {
     ei = eventInfo();
     var c = $("event-count");
     c.textContent = ei ? (ei.clock || ei.text) : "";
+    if (ei && ei.label) { $("ev-k").textContent = ei.label; }
     if (ei && ei.clock) { c.setAttribute("aria-label", ei.text); } else { c.removeAttribute("aria-label"); }
   }
   renderEvent();
