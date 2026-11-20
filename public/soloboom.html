@@ -9,8 +9,8 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_AR">
   <meta property="og:title" content="Tienda · SoloBoom Challenge 6">
-  <meta property="og:description" content="Mirá mi directo en Twitch, juntá puntos para canjear premios y participá por +USD 170 en sorteos durante el SoloBoom 6.">
-  <meta property="og:image" content="og.png">
+  <meta property="og:description" content="Mirá mi directo en Twitch, juntá puntos para canjear premios y participá en los sorteos durante el SoloBoom 6.">
+  <meta property="og:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -379,19 +379,6 @@
         align-items: center;
       }
     }
-    .prize {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 6px 16px;
-      margin-top: 30px;
-    }
-    .prize b {
-      font: 700 clamp(60px, 14vw, 104px)/0.85 var(--font-display);
-      color: var(--accent);
-      letter-spacing: -0.01em;
-    }
-    .prize span { color: var(--muted); max-width: 30ch; }
     .hero-rows { margin-top: 24px; }
     .hero-rows .r {
       display: grid;
@@ -1006,10 +993,6 @@
           <p class="eyebrow">SoloBoom Challenge 6 · 30/11 al 20/12</p>
           <h1 id="titulo">Tienda</h1>
           <p class="lede">Mirá mi directo en Twitch, juntá puntos para canjear premios y acumulá tickets en el chat para los sorteos.</p>
-          <div class="prize">
-            <b>+USD 170</b>
-            <span>en sorteos y premios de la tienda</span>
-          </div>
           <div class="hero-rows">
             <div class="r"><span class="k">Cada hora</span><span class="v">+60</span><span class="t">puntos mirando el directo en Twitch</span></div>
             <div class="r"><span class="k">Cada domingo</span><span class="v">USD 20</span><span class="t">en el sorteo semanal (6, 13 y 20/12)</span></div>
@@ -1760,24 +1743,6 @@
     if (!reduced) { Array.prototype.forEach.call(steps, function (el) { el.classList.add("fx"); }); }
     return reduced ? [] : steps;
   })());
-
-  /* El número del pozo sube de 0 al total al cargar (800 ms) */
-  (function () {
-    var el = document.querySelector(".prize b");
-    if (!el || reduced) { return; }
-    var total = parseInt(el.textContent.replace(/\D/g, ""), 10);
-    if (isNaN(total)) { return; }
-    el.style.minWidth = el.offsetWidth + "px";
-    var t0 = null;
-    function step(t) {
-      if (t0 === null) { t0 = t; }
-      var k = Math.min(1, (t - t0) / 800);
-      el.textContent = "+USD " + Math.round(total * (1 - Math.pow(1 - k, 3)));
-      if (k < 1) { requestAnimationFrame(step); }
-    }
-    el.textContent = "+USD 0";
-    requestAnimationFrame(step);
-  })();
 })();
 </script>
 
