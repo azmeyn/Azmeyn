@@ -11,15 +11,18 @@
   <meta property="og:title" content="Mi tienda de puntos · SoloBoom 6">
   <meta property="og:description" content="Mirá mi directo en Twitch, juntá puntos para canjear premios y participá por +USD 170 en premios y sorteos durante el SoloBoom 6.">
   <meta property="og:site_name" content="Azmeyn">
+  <meta property="og:url" content="https://azmeyn.azmeynmgmt.workers.dev/soloboom.html">
+  <link rel="canonical" href="https://azmeyn.azmeynmgmt.workers.dev/soloboom.html">
   <meta property="og:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Azmeyn: directos de LoL en Twitch y Kick">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
   <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/ibm-plex-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <style>
     /* Fuentes propias (carpeta fonts/): no dependen de Google y cargan con swap */
@@ -27,7 +30,6 @@
     @font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-500-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-600-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-700-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
     @font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
     @font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
@@ -1168,6 +1170,7 @@
               <span class="k">Bonus y reglas</span>
               <p><b>Suscriptores:</b> si estás suscripto a mi canal de Twitch, tus tickets valen x2 en la ruleta del sorteo final.</p>
               <p><b>Un semanal por persona:</b> quien gana un sorteo semanal no puede ganar otro semanal. El sorteo final no tiene esa restricción.</p>
+              <p><b>Para cobrar RP o skins:</b> agregame en LoL como <code>OTK Azmeyn#OTK</code> (LAS) al menos 7 días antes del sorteo: hasta el 29/11 para el del 6/12. En BR solo puedo regalar RP.</p>
             </aside>
           </div>
         </div>
@@ -1192,7 +1195,7 @@
           </details>
           <details class="faq" name="faq">
             <summary><span class="q-n">04</span><h3>¿Cuándo y cómo se entregan los premios de RP o skins?</h3><span class="chev" aria-hidden="true"></span></summary>
-            <div class="faq-a"><p>Los sorteos semanales se definen en vivo al cierre del stream de los domingos 6/12, 13/12 y 20/12, y ese mismo 20/12, día de cierre del torneo, se sortea el pozo final de USD 60 con todos los tickets acumulados. Si ganás, te escribo por Discord para coordinar la entrega: según el caso, puede hacer falta que seamos amigos en LoL antes de regalarte la skin o el RP, o te paso un código o una transferencia.</p></div>
+            <div class="faq-a"><p>Los sorteos semanales se definen en vivo al cierre del stream de los domingos 6/12, 13/12 y 20/12, y ese mismo 20/12, día de cierre del torneo, se sortea el pozo final de USD 60 con todos los tickets acumulados. Los premios se regalan desde el cliente de LoL, así que Riot pide que seamos amigos hace 7 días o más y que estemos en el mismo servidor: agregame como <code>OTK Azmeyn#OTK</code> en LAS (en BR solo puedo regalar RP). Fechas límite para agregarme: 29/11 para el sorteo del 6/12, 6/12 para el del 13/12 y 13/12 para el del 20/12. Si ganás, pasame tu nombre#tag y servidor por el canal #reclamar-canje de mi <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a> dentro de las 48 h; si todavía no cumplimos los 7 días, te guardo el premio y te lo regalo apenas se cumplan.</p></div>
           </details>
         </div>
       </section>
@@ -1271,16 +1274,16 @@
   /* CATÁLOGO. stock: cantidad fija que se muestra en la tarjeta
      (null = sin límite, 0 = agotado). */
   var ITEMS = [
-    { id: "campeon-runas", cat: "directo", name: "Elegí mi campeón y runas", desc: "Elegís el campeón y sus runas para mi próxima ranked entre los 10 campeones de mi pool (runas viables, sin trollear).", cost: 700, stock: null, limit: "1 por día" },
+    { id: "campeonrunas", cat: "directo", name: "Elegí mi campeón y runas", desc: "Elegís el campeón y sus runas para mi próxima ranked entre los 10 campeones de mi pool (runas viables, sin trollear).", cost: 700, stock: null, limit: "1 por día" },
     { id: "cofre", cat: "rp", name: "Cofre Hextech + Llave", desc: "Un cofre Hextech con su llave para abrirlo. Lo canjeás y te lo entrego.", cost: 2500, stock: 10, limit: "1 por persona" },
     { id: "ticket", cat: "sorteos", name: "Ticket extra de sorteo", desc: "+1 ticket para el sorteo semanal y también se acumula para el sorteo final.", cost: 800, stock: null, limit: "Hasta 3 por semana" },
     { id: "spells", cat: "directo", name: "Elegí mis hechizos", desc: "Elegís mis hechizos de invocador (Fantasmal, Extenuación, etc.) para la próxima partida — siempre opciones viables y sin trollear.", cost: 1000, stock: null, limit: "1 por día" },
     { id: "rol", cat: "comunidad", name: "Rol especial en Discord", desc: "Rol con color propio y destaque en la lista del servidor de Discord.", cost: 2000, stock: null, limit: "1 por persona" },
     { id: "duelo", cat: "directo", name: "Duelo 1v1 contra mí", desc: "Me desafiás a un 1v1 en vivo en el Abismo de los Lamentos.", cost: 3000, stock: 5, limit: "1 por stream" },
-    { id: "castigo", cat: "directo", name: "Castigo", desc: "Sensibilidad al mango, mute, modo caster o lo que elijas. Queda sujeto a mi aprobación y sin romper reglas del torneo.", cost: 4000, stock: 5, limit: "1 por persona" },
+    { id: "castigo", cat: "directo", name: "Castigo", desc: "Sensibilidad al mango, modo caster, sin sonido del juego o lo que elijas. Queda sujeto a mi aprobación: nunca apago la cámara ni el micrófono y no rompe las reglas del torneo.", cost: 4000, stock: 5, limit: "1 por persona" },
     { id: "vip", cat: "comunidad", name: "VIP en Twitch", desc: "Insignia de VIP en mi canal de Twitch, y te queda para siempre.", cost: 1500, stock: 10, limit: "1 por persona" },
-    { id: "rp5", cat: "rp", name: "RP o skin por USD 5", desc: "Skin o RP directo en tu cuenta LAS / LAN / BR.", cost: 5000, stock: 6, limit: "1 por persona" },
-    { id: "skin10", cat: "rp", name: "RP o skin por USD 10", desc: "Skin o RP de mayor valor directo en tu cuenta LAS / LAN / BR.", cost: 10000, stock: 2, limit: "1 por persona", major: true }
+    { id: "rp5", cat: "rp", name: "RP o skin por USD 5", desc: "Skin o RP regalado a tu cuenta de LAS (en BR, solo RP). Tenés que tenerme de amigo en LoL hace 7 días o más.", cost: 5000, stock: 6, limit: "1 por persona" },
+    { id: "skin10", cat: "rp", name: "RP o skin por USD 10", desc: "Skin o RP de mayor valor regalado a tu cuenta de LAS (en BR, solo RP). Tenés que tenerme de amigo en LoL hace 7 días o más.", cost: 10000, stock: 2, limit: "1 por persona", major: true }
   ];
 
   var COIN = '<svg class="coin" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#ff3d81"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#1a0210" stroke-width="2"/></svg>';
@@ -1716,7 +1719,6 @@
     twitch: "https://www.twitch.tv/" + CONFIG.twitch,
     kick: "https://kick.com/" + CONFIG.kick
   };
-  var favEl = $("fav");
   /* Logo: usa logo.png si lo subiste a la carpeta public; si no, la foto de tu canal de Twitch */
   var logoEl = $("logo");
   var logoFailed = false;

@@ -11,12 +11,15 @@
   <meta property="og:description" content="Directos en Twitch y Kick, comunidad en Discord y contenido en TikTok, Instagram y YouTube.">
   <meta property="og:locale" content="es_AR">
   <meta property="og:site_name" content="Azmeyn">
+  <meta property="og:url" content="https://azmeyn.azmeynmgmt.workers.dev/">
+  <link rel="canonical" href="https://azmeyn.azmeynmgmt.workers.dev/">
   <meta property="og:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Azmeyn: directos de LoL en Twitch y Kick">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
-  <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -43,7 +46,6 @@
     @font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-500-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-600-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-700-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
     @font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
     @font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
@@ -379,7 +381,6 @@
     .sec-body { margin-top: 24px; }
     /* ---------- Inicio: reproductor centrado ---------- */
     .hero { padding-block: 40px 0; }
-    .hero-in { max-width: none; }
     .hero-grid {
       display: grid; gap: 24px;
       grid-template-columns: minmax(0, 1fr);
@@ -1005,7 +1006,6 @@
   });
 
   /* ---------- Logo, ícono de pestaña y título según estés en vivo ---------- */
-  var favEl = $("fav");
   /* Logo: usa logo.png si lo subiste a la carpeta public; si no, la foto de tu canal de Twitch */
   var logoEl = $("logo");
   var logoFailed = false;
