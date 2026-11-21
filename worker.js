@@ -169,6 +169,19 @@ function missing(env, names) {
   return names.filter(function (n) { return !env[n]; });
 }
 
+// La clave de !presente queda a la vista en la página pública de comandos de StreamElements
+// (los comandos activos se listan con su respuesta). Para que eso no sirva para sumar
+// presentes con el directo apagado, solo se aceptan mientras el canal de Twitch está en vivo.
+// Si la consulta a Twitch falla, se acepta igual (mejor no romper el comando en pleno directo).
+async function twitchLive(env) {
+  try {
+    const t = await twitchData(env);
+    return t ? t.live : true;
+  } catch (e) {
+    return true;
+  }
+}
+
 async function presente(url, env) {
   const miss = missing(env, ["CHECKINS", "SE_JWT", "SE_CHANNEL_ID", "PRESENTE_KEY"]);
   if (miss.length) { return plain("!presente todavía no está configurado (falta " + miss.join(", ") + ")"); }
@@ -180,6 +193,7 @@ async function presente(url, env) {
   const idx = dayIndex(today);
   if (idx < 0) { return plain("@" + user + " el torneo empieza el 30/11, ahí arranca el !presente"); }
   if (idx >= EVENT_DAYS) { return plain("@" + user + " el torneo ya terminó, gracias por acompañar"); }
+  if (!(await twitchLive(env))) { return plain("@" + user + " el !presente cuenta solo con el directo prendido"); }
 
   const before = await loadRec(env, user);
   if (before.last === today) {
