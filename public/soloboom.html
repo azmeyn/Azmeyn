@@ -1246,7 +1246,7 @@
 
   var DAY = 86400000;
   var START = new Date("2026-11-30T00:00:00-03:00").getTime();
-  var KICKOFF = new Date("2026-11-30T17:00:00-03:00").getTime();   /* arranque real del torneo (cuenta regresiva) */
+  var KICKOFF = new Date("2026-11-30T18:00:00-03:00").getTime();   /* arranque real del torneo (cuenta regresiva) */
   var TOTAL_DAYS = 21;   /* el torneo dura del 30/11 al 20/12 (fechas oficiales del SoloBoom) */
 
   /* Sorteos. day = día del evento en que se sortea (0 = 30/11).
@@ -1371,7 +1371,7 @@
   function milestones() {
     var weekly = DRAWS.filter(function (d) { return !d.final; });
     var fin = DRAWS.filter(function (d) { return d.final; })[0];
-    var list = [{ day: 0, title: "Arranca el torneo", sub: "Inicio · 17:00 hs ARG", start: true }];
+    var list = [{ day: 0, title: "Arranca el torneo", sub: "Inicio · 18:00 hs ARG", start: true }];
     weekly.forEach(function (d, i) {
       var both = !!fin && fin.day === d.day;
       list.push({
