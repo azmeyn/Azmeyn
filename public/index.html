@@ -10,24 +10,17 @@
   <meta property="og:title" content="Azmeyn">
   <meta property="og:description" content="Directos en Twitch y Kick, comunidad en Discord y contenido en TikTok, Instagram y YouTube.">
   <meta property="og:locale" content="es_AR">
+  <meta property="og:site_name" content="Azmeyn">
   <meta property="og:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
   <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <style>
-    /* Fuentes propias (carpeta fonts/): no dependen de Google */
-    @font-face { font-family: "Barlow"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-400-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-500-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-600-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-700-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
-    @font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
-    @font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
-  </style>
+  <link rel="preload" href="fonts/ibm-plex-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -45,6 +38,15 @@
   }
   </script>
   <style>
+    /* Fuentes propias (carpeta fonts/): no dependen de Google y cargan con swap */
+    @font-face { font-family: "Barlow"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-500-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
     /* ============================================================
        COLORES Y TIPOGRAFÍA: todo el look sale de estas variables.
        Cuando decidas la identidad visual, cambiá solo este bloque.
@@ -53,7 +55,8 @@
       --bg: #0b0c10;
       --panel: #12141a;
       --panel-2: #191c24;
-      --line: #272b37;
+      --line: #363b4b;
+      --line-hi: #4a5166;
       --fg: #eceef3;
       --muted: #b4bac8;
       --accent: #ff3d81;
@@ -84,6 +87,7 @@
     button { font: inherit; }
     [hidden] { display: none !important; }
     :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .btn:focus-visible { outline-offset: 3px; }
     /* La barra de estado queda fija arriba: se le suma aire para que nunca tape un título */
     section[id] { scroll-margin-top: calc(var(--side-h, 53px) + 20px); }
     @media (min-width: 960px) { section[id] { scroll-margin-top: calc(var(--top-h, 65px) + 24px); } }
@@ -116,10 +120,16 @@
     .side::-webkit-scrollbar { display: none; }
     .brand {
       display: flex; align-items: center; gap: 10px;
-      color: var(--fg); text-decoration: none; flex: none; margin-right: 8px;
+      color: var(--fg); text-decoration: none; flex: none; margin-right: 8px; min-height: 40px;
     }
-    .logo { width: 34px; height: 34px; flex: none; border-radius: 50%; object-fit: cover; background: var(--panel-2); }
+    .logo { position: relative; z-index: 1; width: 34px; height: 34px; flex: none; border-radius: 50%; object-fit: cover; background: var(--panel-2); }
     .logo.bad { opacity: 0; }
+    /* Si falta logo.png queda este monograma en su lugar */
+    .logo-wrap::before {
+      content: "A"; position: absolute; inset: 0; display: grid; place-items: center;
+      border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-hi);
+      color: var(--accent); font: 700 22px/1 var(--font-display);
+    }
     .brand b { font: 700 26px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
     .brand small { display: none; }
     .brand small:empty { display: none !important; }
@@ -131,16 +141,28 @@
       background: var(--live);
       border: 2px solid var(--panel);
       display: none;
+      z-index: 2;
     }
     .brand[data-live="true"] .logo-dot { display: block; animation: pulse 1.8s ease-out infinite; }
     .brand[data-live="true"] .logo { outline: 2px solid var(--live); outline-offset: 2px; }
     .brand[data-live="true"] small { color: var(--live); }
+    /* Celular: la barra de estado no queda fija, así que "En vivo" se ve en la barra de arriba */
+    .live-chip {
+      flex: none; display: inline-flex; align-items: center; gap: 8px;
+      min-height: 40px; padding: 0 12px; margin-right: 6px;
+      border-radius: 999px; border: 1px solid #2f7d62; background: #153227; color: var(--live);
+      font: 600 12px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+    }
+    .live-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--live); animation: pulse 1.8s ease-out infinite; }
+    @media (min-width: 960px) { .live-chip { display: none !important; } }
     .nav { display: flex; gap: 2px; flex: none; }
     .grp { display: contents; }
     .grp-h { display: none; }
     .nav a {
-      display: block;
-      padding: 11px 12px;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 8px 12px;
       border-radius: 4px;
       color: var(--muted);
       font: 600 14px/1 var(--font-body);
@@ -173,11 +195,12 @@
       }
       .brand { padding: 0 10px; margin-right: 0; gap: 12px; }
       .logo { width: 44px; height: 44px; }
+      .logo-wrap::before { font-size: 28px; }
       .brand b { font-size: 30px; }
       .brand small {
         display: block;
-        font: 500 10px/1.2 var(--font-mono);
-        letter-spacing: 0.07em;
+        font: 500 12px/1.2 var(--font-mono);
+        letter-spacing: 0.04em;
         text-transform: uppercase;
         color: var(--muted);
         margin-top: 4px;
@@ -192,7 +215,7 @@
         text-transform: uppercase;
         color: var(--fg);
       }
-      .nav a { padding: 12px; font-size: 15px; margin-bottom: 2px; }
+      .nav a { padding: 8px 12px; min-height: 42px; font-size: 15px; margin-bottom: 2px; }
       .nav-bottom {
         padding-top: 12px;
         border-top: 1px solid var(--line);
@@ -201,7 +224,7 @@
          Dentro de la tienda quedan abiertas, porque ahí hacen de índice. */
       .has-sub { display: block; }
       .sub, .nav a[aria-current="page"] + .sub { margin: 0 0 8px 22px; border-left: 1px solid var(--line); }
-      .sub a { padding: 8px 12px; font-size: 13px; margin-bottom: 0; border-left: 0; }
+      .sub a { padding: 6px 12px; min-height: 40px; font-size: 14px; margin-bottom: 0; border-left: 0; }
       .has-sub:hover .sub, .has-sub:focus-within .sub, .nav a[aria-current="page"] + .sub { display: block; }
       .has-sub:hover .sub, .has-sub:focus-within .sub { animation: subin 0.16s ease-out; }
       @keyframes subin { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -254,7 +277,7 @@
     .sb-k {
       margin-right: 4px; padding-right: 16px;
       border-right: 1px solid var(--line);
-      font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+      font: 500 12px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
     }
     .pill {
       display: inline-flex; align-items: center; gap: 10px;
@@ -288,11 +311,14 @@
       border-radius: 50%; background: var(--live); animation: pulse 1.8s ease-out infinite;
     }
     .pill:hover .tag, .pill:focus-visible .tag { border-color: var(--accent); }
+    /* Mientras se consulta el estado, la etiqueta parpadea suave en vez de quedar vacía */
+    .pill[data-state="unknown"] .tag { animation: blink 1.4s ease-in-out infinite; }
+    @keyframes blink { 50% { opacity: 0.45; } }
     /* Otras redes (solo logo) a la derecha de los directos */
     .sb-sep { width: 1px; align-self: stretch; margin: 6px 6px; background: var(--line); }
     .soc {
       display: inline-grid; place-items: center;
-      width: 36px; height: 40px;
+      width: 40px; height: 44px;
       border-radius: 12px;
       color: var(--muted);
     }
@@ -303,7 +329,7 @@
       .sb-k, .sb-sep { display: none; }
       .statusbar { gap: 4px 8px; padding-block: 8px; }
       .pill { flex: 1 1 calc(50% - 4px); }
-      .soc { flex: 1 1 0; width: auto; min-width: 0; height: 36px; }
+      .soc { flex: 1 1 0; width: auto; min-width: 0; height: 40px; }
     }
     .pill:hover .t-a, .pill:focus-visible .t-a { visibility: hidden; }
     .pill:hover .t-b, .pill:focus-visible .t-b { visibility: visible; }
@@ -311,6 +337,7 @@
       .pill:hover .t-a { visibility: visible; }
       .pill:hover .t-b { visibility: hidden; }
     }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(79, 209, 161, 0.55); }
       100% { box-shadow: 0 0 0 9px rgba(79, 209, 161, 0); }
@@ -358,7 +385,12 @@
       grid-template-columns: minmax(0, 1fr);
       grid-template-areas: "player" "vods" "ev";
     }
-    .hero-grid .player { grid-area: player; }
+    .hero-grid .player { grid-area: player; animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hero-grid .event { animation: rise 0.55s 0.12s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hero-grid .vods { animation: rise 0.55s 0.24s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    /* Entrada al hacer scroll: una sola vez, escalonada */
+    .fx { opacity: 0; transform: translateY(12px); }
+    .fx.in { opacity: 1; transform: none; transition: opacity 0.35s ease, transform 0.35s ease; }
     .hero-grid .event { grid-area: ev; }
     .hero-grid .vods { grid-area: vods; }
     @media (min-width: 1240px) {
@@ -379,7 +411,7 @@
     }
     .tabs { display: flex; gap: 6px; }
     .tab {
-      padding: 10px 14px; min-height: 40px;
+      padding: 10px 14px; min-height: 42px;
       border-radius: 999px;
       border: 1px solid var(--line);
       background: var(--panel-2);
@@ -456,7 +488,7 @@
     .play::after {
       content: ""; position: absolute; inset: -2px; border-radius: 50%;
       border: 2px solid var(--accent); pointer-events: none;
-      animation: ring 2.6s ease-out infinite;
+      animation: ring 2.6s ease-out 4;
     }
     @keyframes ring { 0% { transform: scale(1); opacity: 0.5; } 70%, 100% { transform: scale(1.55); opacity: 0; } }
     .play:hover { background: var(--accent); color: var(--accent-ink); transform: scale(1.06); }
@@ -467,8 +499,8 @@
     .screen[data-pv="on"] .play { background: rgba(11, 12, 16, 0.6); }
     .screen[data-pv="on"] .play:hover { background: var(--accent); }
 
-    .pl-fallback { padding: 8px 16px 10px; text-align: right; font: 400 11px/1.4 var(--font-mono); color: var(--muted); }
-    .pl-fallback a { color: var(--muted); text-underline-offset: 3px; }
+    .pl-fallback { padding: 4px 16px 6px; text-align: right; font: 400 12px/1.4 var(--font-mono); color: var(--muted); }
+    .pl-fallback a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 4px; color: var(--muted); text-underline-offset: 3px; }
     .pl-fallback a:hover { color: var(--accent); }
     .vods { padding: 14px 16px 16px; background: var(--panel); border: 1px solid var(--line); min-width: 0; }
     .vods h3 { font: 500 12px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
@@ -483,13 +515,26 @@
       border: 1px solid var(--line); background: var(--panel-2);
     }
     .vod:hover { border-color: var(--accent); }
-    .vod-th { aspect-ratio: 16 / 9; background: #07080b center / cover no-repeat; }
+    .vod-th { aspect-ratio: 16 / 9; background: #07080b; overflow: hidden; }
+    .vod-th img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    /* Esqueletos: mientras llega la respuesta de /api/live */
+    .sk-box { background: linear-gradient(100deg, var(--panel-2) 30%, #262b38 50%, var(--panel-2) 70%) 0 0 / 200% 100%; animation: shimmer 1.4s linear infinite; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .vod.sk { display: block; }
+    .vod.sk .vod-th, .sk-line { display: block; }
+    .sk-line { height: 12px; border-radius: 3px; }
+    .sk-line.short { width: 60%; }
+    .screen[data-loading]::after {
+      content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%) 0 0 / 200% 100%;
+      animation: shimmer 1.6s linear infinite;
+    }
     .vod-b { padding: 8px 10px 10px; display: grid; gap: 4px; }
     .vod-t {
       font: 600 13px/1.25 var(--font-body);
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .vod-d { font: 500 11px/1.2 var(--font-mono); color: var(--muted); text-transform: uppercase; }
+    .vod-d { font: 500 12px/1.2 var(--font-mono); color: var(--muted); text-transform: uppercase; }
 
     /* ---------- Discord ---------- */
     .dc {
@@ -502,14 +547,14 @@
       text-decoration: none;
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
-    .dc:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .dc:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(255, 61, 129, 0.12); }
     @media (min-width: 800px) { .dc { grid-template-columns: auto minmax(0, 1fr) auto; gap: 28px; padding: 30px 32px; } }
     .dc-ic { width: 64px; height: 64px; display: grid; place-items: center; background: var(--panel-2); color: var(--accent); border-radius: 6px; }
     .dc-ic svg { width: 36px; height: 36px; }
     .dc h3 { font: 700 34px/1 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; }
     .dc p { margin-top: 8px; color: var(--muted); max-width: 56ch; }
     .dc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-    .dc-tags span { font: 500 11px/1 var(--font-mono); padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+    .dc-tags span { font: 500 12px/1 var(--font-mono); padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
     .dc-go {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       min-height: 44px; padding: 14px 22px;
@@ -532,7 +577,7 @@
       text-decoration: none;
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
-    .account:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .account:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(255, 61, 129, 0.12); }
     .acc-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .srv {
       padding: 6px 10px;
@@ -542,7 +587,7 @@
       font: 500 12px/1 var(--font-mono);
       letter-spacing: 0.1em;
     }
-    .acc-k { font: 500 11px/1.2 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .acc-k { font: 500 12px/1.2 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
     .account h3 { font: 700 28px/1 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; overflow-wrap: anywhere; }
     .account .handle { font: 500 13px/1.3 var(--font-mono); color: var(--accent); }
     .account .go { margin-top: auto; padding-top: 12px; font: 700 13px/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -585,6 +630,10 @@
       font-variant-numeric: tabular-nums;
     }
     .event .count:empty { display: none; }
+    /* Falta menos de un día: la etiqueta pulsa */
+    .event .count.urgent { animation: pulseInk 1.8s ease-out infinite; }
+    @keyframes pulseInk { 0% { box-shadow: 0 0 0 0 rgba(26, 2, 16, 0.55); } 100% { box-shadow: 0 0 0 10px rgba(26, 2, 16, 0); } }
+    .event :focus-visible { outline-color: var(--accent-ink); }
     .event h3 { margin-top: 14px; font: 700 clamp(36px, 10.5vw, 56px)/0.92 var(--font-display); text-transform: uppercase; }
     .event h3 span { color: #fff; }
     .ev-main { min-width: 0; }
@@ -619,14 +668,15 @@
     }
     .foot-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; }
     .foot-in p { flex: 1 1 520px; max-width: none; }
-    .foot-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-    .foot-links a { color: var(--muted); text-decoration: none; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 0 4px; }
+    .foot-links a { display: inline-block; min-width: 40px; padding: 11px 8px; text-align: center; color: var(--muted); text-decoration: none; }
     .foot-links a:hover, .foot-links a:focus-visible { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; animation: none !important; }
       html { scroll-behavior: auto; }
       .dc:hover, .account:hover, .play:hover { transform: none; }
+      .fx { opacity: 1; transform: none; }
     }
   </style>
 </head>
@@ -644,6 +694,7 @@
       </span>
       <span><b>Azmeyn</b><small id="brand-sub"></small></span>
     </a>
+    <a class="live-chip" id="live-chip" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer" hidden><i aria-hidden="true"></i>En vivo</a>
     <nav class="nav" aria-label="Secciones">
       <div class="grp">
         <p class="grp-h">Directo</p>
@@ -677,11 +728,11 @@
           <span class="sb-k">Directos</span>
           <a class="pill" id="pill-twitch" data-state="unknown" data-link="twitch" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">
             <svg class="ic-tw" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
-            <span class="tag"><span class="t-a"></span><span class="t-b"></span></span>
+            <span class="tag"><span class="t-a">···</span><span class="t-b"></span></span>
           </a>
           <a class="pill" id="pill-kick" data-state="unknown" data-link="kick" href="https://kick.com/meyn" target="_blank" rel="noopener noreferrer">
             <svg class="ic-kick" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"/></svg>
-            <span class="tag"><span class="t-a"></span><span class="t-b"></span></span>
+            <span class="tag"><span class="t-a">···</span><span class="t-b"></span></span>
           </a>
           <span class="sb-sep" aria-hidden="true"></span>
           <a class="soc" href="https://discord.gg/8Vsda74tt" target="_blank" rel="noopener noreferrer" aria-label="Discord" title="Discord">
@@ -718,7 +769,7 @@
                     <button class="tab" type="button" data-pf="kick" aria-pressed="false">Kick</button>
                   </div>
                 </div>
-                <div class="screen" id="screen">
+                <div class="screen" id="screen" data-loading="1">
                   <!-- Vista previa del directo (miniatura en vivo o último directo) -->
                   <div class="pv" id="pv" hidden>
                     <div class="pv-img" id="pv-img"></div>
@@ -736,7 +787,7 @@
               </section>
 
               <!-- Torneo: tarjeta al costado del reproductor -->
-              <aside class="event" id="soloboom" aria-labelledby="ev-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T18:00:00-03:00" data-end="2026-12-20T18:00:00-03:00" data-days="21">
+              <aside class="event" id="soloboom" aria-labelledby="ev-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T17:00:00-03:00" data-end="2026-12-20T18:00:00-03:00" data-days="21">
                 <div class="ev-main">
                   <p class="ev-k" id="ev-k">Cuenta regresiva</p>
                   <span class="count" id="event-count" role="timer"></span>
@@ -751,9 +802,9 @@
               </aside>
 
               <!-- Últimos directos: a todo el ancho, debajo del reproductor y la tarjeta -->
-              <div class="vods" id="vods" hidden>
+              <div class="vods" id="vods" aria-busy="true">
                 <h3>Últimos directos</h3>
-                <div class="vod-row" id="vod-row"></div>
+                <div class="vod-row" id="vod-row"><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span></div>
               </div>
             </div>
           </div>
@@ -904,6 +955,7 @@
         over: false,
         label: "Cuenta regresiva",
         clock: Math.floor(s / 86400) + "d : " + pad(Math.floor(s % 86400 / 3600)) + "h : " + pad(Math.floor(s % 3600 / 60)) + "m : " + pad(s % 60) + "s",
+        soon: kick - now < DAY,
         text: left <= 0 ? "Empieza hoy" : left === 1 ? "Empieza mañana" : "Empieza en " + left + " días"
       };
     }
@@ -916,6 +968,7 @@
     ei = eventInfo();
     var c = $("event-count");
     c.textContent = ei ? (ei.clock || ei.text) : "";
+    c.classList.toggle("urgent", !!(ei && ei.clock && ei.soon));
     if (ei && ei.label) { $("ev-k").textContent = ei.label; }
     if (ei && ei.clock) { c.setAttribute("aria-label", ei.text); } else { c.removeAttribute("aria-label"); }
   }
@@ -961,7 +1014,6 @@
     var u = data && data.twitch && typeof data.twitch.avatar === "string" ? data.twitch.avatar : "";
     if (/^https:\/\//.test(u) && logoEl.getAttribute("src") !== u) {
       logoEl.src = u;
-      favEl.setAttribute("href", u);
     }
   }
   function logoBad() { logoFailed = true; logoEl.classList.add("bad"); }
@@ -973,6 +1025,9 @@
   function setBrandLive(list) {
     var on = list.length > 0;
     document.querySelector(".brand").setAttribute("data-live", on ? "true" : "false");
+    var chip = $("live-chip");
+    chip.hidden = !on;
+    if (on) { chip.setAttribute("href", URLS[list[0]]); }
     $("brand-sub").textContent = list.length === 2 ? "En vivo · Twitch y Kick" : on ? "En vivo en " + NAMES[list[0]] : "";
     document.title = on ? "● En vivo · Azmeyn" : titleOff;
   }
@@ -1101,6 +1156,8 @@
     row.textContent = "";
     var list = vods.filter(function (v) { return safeUrl(v.url); }).slice(0, 8);
     $("vods").hidden = list.length === 0;
+    $("vods").removeAttribute("aria-busy");
+    $("screen").removeAttribute("data-loading");
     list.forEach(function (v) {
       var a = document.createElement("a");
       a.className = "vod";
@@ -1110,7 +1167,14 @@
       var th = document.createElement("div");
       th.className = "vod-th";
       var img = safeImg(v.thumbnail);
-      if (img) { th.style.backgroundImage = "url(\"" + img + "\")"; }
+      if (img) {
+        var im = document.createElement("img");
+        im.src = img;
+        im.alt = "";
+        im.loading = "lazy";
+        im.decoding = "async";
+        th.appendChild(im);
+      }
       var b = document.createElement("div");
       b.className = "vod-b";
       var t = document.createElement("span");
@@ -1168,6 +1232,27 @@
   syncBar();
   window.addEventListener("resize", syncBar);
   window.addEventListener("load", syncBar);
+
+  /* ---------- Entrada suave al hacer scroll (una sola vez, escalonada) ---------- */
+  (function () {
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var list = document.querySelectorAll(".dc, .account, .contact");
+    if (reduced || !("IntersectionObserver" in window)) { return; }
+    Array.prototype.forEach.call(list, function (el) { el.classList.add("fx"); });
+    var io = new IntersectionObserver(function (entries) {
+      var n = 0;
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) { return; }
+        io.unobserve(e.target);
+        var el = e.target, delay = Math.min(n, 4) * 80;
+        n++;
+        el.style.transitionDelay = delay + "ms";
+        el.classList.add("in");
+        setTimeout(function () { el.classList.remove("fx", "in"); el.style.transitionDelay = ""; }, 450 + delay);
+      });
+    }, { threshold: 0.12 });
+    Array.prototype.forEach.call(list, function (el) { io.observe(el); });
+  })();
 
   /* ---------- Menú: marca la sección que se está viendo ---------- */
   var links = Array.prototype.slice.call(document.querySelectorAll(".nav a"));

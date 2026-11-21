@@ -10,13 +10,19 @@
   <meta property="og:locale" content="es_AR">
   <meta property="og:title" content="Tienda · SoloBoom Challenge 6">
   <meta property="og:description" content="Mirá mi directo en Twitch, juntá puntos para canjear premios y participá en los sorteos durante el SoloBoom 6.">
+  <meta property="og:site_name" content="Azmeyn">
   <meta property="og:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://azmeyn.azmeynmgmt.workers.dev/og.png?v=2">
   <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/ibm-plex-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <style>
-    /* Fuentes propias (carpeta fonts/): no dependen de Google */
+    /* Fuentes propias (carpeta fonts/): no dependen de Google y cargan con swap */
     @font-face { font-family: "Barlow"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-400-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-500-normal.woff2) format("woff2"); }
     @font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/barlow-latin-600-normal.woff2) format("woff2"); }
@@ -25,15 +31,12 @@
     @font-face { font-family: "Barlow Condensed"; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
     @font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2"); }
     @font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
-  </style>
-  <link id="fav" rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <style>
     :root {
       --bg: #0b0c10;
       --panel: #12141a;
       --panel-2: #191c24;
-      --line: #272b37;
+      --line: #363b4b;
+      --line-hi: #4a5166;
       --fg: #eceef3;
       --muted: #b4bac8;
       --accent: #ff3d81;
@@ -79,6 +82,7 @@
       border: 1px solid var(--line);
     }
     :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .btn:focus-visible { outline-offset: 3px; }
     /* La barra de estado queda fija arriba: se le suma aire para que nunca tape un título */
     section[id] { scroll-margin-top: calc(var(--side-h, 53px) + 20px); }
     @media (min-width: 960px) { section[id] { scroll-margin-top: calc(var(--top-h, 65px) + 24px); } }
@@ -111,10 +115,16 @@
     .side::-webkit-scrollbar { display: none; }
     .brand {
       display: flex; align-items: center; gap: 10px;
-      color: var(--fg); text-decoration: none; flex: none; margin-right: 8px;
+      color: var(--fg); text-decoration: none; flex: none; margin-right: 8px; min-height: 40px;
     }
-    .logo { width: 34px; height: 34px; flex: none; border-radius: 50%; object-fit: cover; background: var(--panel-2); }
+    .logo { position: relative; z-index: 1; width: 34px; height: 34px; flex: none; border-radius: 50%; object-fit: cover; background: var(--panel-2); }
     .logo.bad { opacity: 0; }
+    /* Si falta logo.png queda este monograma en su lugar */
+    .logo-wrap::before {
+      content: "A"; position: absolute; inset: 0; display: grid; place-items: center;
+      border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-hi);
+      color: var(--accent); font: 700 22px/1 var(--font-display);
+    }
     .brand b { font: 700 26px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
     .brand small { display: none; }
     .brand small:empty { display: none !important; }
@@ -126,16 +136,28 @@
       background: var(--live);
       border: 2px solid var(--panel);
       display: none;
+      z-index: 2;
     }
     .brand[data-live="true"] .logo-dot { display: block; animation: pulse 1.8s ease-out infinite; }
     .brand[data-live="true"] .logo { outline: 2px solid var(--live); outline-offset: 2px; }
     .brand[data-live="true"] small { color: var(--live); }
+    /* Celular: la barra de estado no queda fija, así que "En vivo" se ve en la barra de arriba */
+    .live-chip {
+      flex: none; display: inline-flex; align-items: center; gap: 8px;
+      min-height: 40px; padding: 0 12px; margin-right: 6px;
+      border-radius: 999px; border: 1px solid #2f7d62; background: #153227; color: var(--live);
+      font: 600 12px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+    }
+    .live-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--live); animation: pulse 1.8s ease-out infinite; }
+    @media (min-width: 960px) { .live-chip { display: none !important; } }
     .nav { display: flex; gap: 2px; flex: none; }
     .grp { display: contents; }
     .grp-h { display: none; }
     .nav a {
-      display: block;
-      padding: 11px 12px;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 8px 12px;
       border-radius: 4px;
       color: var(--muted);
       font: 600 14px/1 var(--font-body);
@@ -168,11 +190,12 @@
       }
       .brand { padding: 0 10px; margin-right: 0; gap: 12px; }
       .logo { width: 44px; height: 44px; }
+      .logo-wrap::before { font-size: 28px; }
       .brand b { font-size: 30px; }
       .brand small {
         display: block;
-        font: 500 10px/1.2 var(--font-mono);
-        letter-spacing: 0.07em;
+        font: 500 12px/1.2 var(--font-mono);
+        letter-spacing: 0.04em;
         text-transform: uppercase;
         color: var(--muted);
         margin-top: 4px;
@@ -187,13 +210,13 @@
         text-transform: uppercase;
         color: var(--fg);
       }
-      .nav a { padding: 12px; font-size: 15px; margin-bottom: 2px; }
+      .nav a { padding: 8px 12px; min-height: 42px; font-size: 15px; margin-bottom: 2px; }
       .nav-bottom { padding-top: 12px; border-top: 1px solid var(--line); }
       /* Las subsecciones de la tienda se abren al pasar el mouse por "SoloBoom 6" (o con el teclado).
          Dentro de la tienda quedan abiertas, porque ahí hacen de índice. */
       .has-sub { display: block; }
       .sub, .nav a[aria-current="page"] + .sub { margin: 0 0 8px 22px; border-left: 1px solid var(--line); }
-      .sub a { padding: 8px 12px; font-size: 13px; margin-bottom: 0; border-left: 0; }
+      .sub a { padding: 6px 12px; min-height: 40px; font-size: 14px; margin-bottom: 0; border-left: 0; }
       .has-sub:hover .sub, .has-sub:focus-within .sub, .nav a[aria-current="page"] + .sub { display: block; }
       .has-sub:hover .sub, .has-sub:focus-within .sub { animation: subin 0.16s ease-out; }
       @keyframes subin { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -236,7 +259,7 @@
     .sb-k {
       margin-right: 4px; padding-right: 16px;
       border-right: 1px solid var(--line);
-      font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+      font: 500 12px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
     }
     .pill {
       display: inline-flex; align-items: center; gap: 10px;
@@ -270,11 +293,14 @@
       border-radius: 50%; background: var(--live); animation: pulse 1.8s ease-out infinite;
     }
     .pill:hover .tag, .pill:focus-visible .tag { border-color: var(--accent); }
+    /* Mientras se consulta el estado, la etiqueta parpadea suave en vez de quedar vacía */
+    .pill[data-state="unknown"] .tag { animation: blink 1.4s ease-in-out infinite; }
+    @keyframes blink { 50% { opacity: 0.45; } }
     /* Otras redes (solo logo) a la derecha de los directos */
     .sb-sep { width: 1px; align-self: stretch; margin: 6px 6px; background: var(--line); }
     .soc {
       display: inline-grid; place-items: center;
-      width: 36px; height: 40px;
+      width: 40px; height: 44px;
       border-radius: 12px;
       color: var(--muted);
     }
@@ -285,7 +311,7 @@
       .sb-k, .sb-sep { display: none; }
       .statusbar { gap: 4px 8px; padding-block: 8px; }
       .pill { flex: 1 1 calc(50% - 4px); }
-      .soc { flex: 1 1 0; width: auto; min-width: 0; height: 36px; }
+      .soc { flex: 1 1 0; width: auto; min-width: 0; height: 40px; }
     }
     .pill:hover .t-a, .pill:focus-visible .t-a { visibility: hidden; }
     .pill:hover .t-b, .pill:focus-visible .t-b { visibility: visible; }
@@ -293,6 +319,7 @@
       .pill:hover .t-a { visibility: visible; }
       .pill:hover .t-b { visibility: hidden; }
     }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(79, 209, 161, 0.55); }
       100% { box-shadow: 0 0 0 9px rgba(79, 209, 161, 0); }
@@ -326,7 +353,7 @@
       flex: none;
     }
     h1 {
-      font: 700 clamp(42px, 8.5vw, 72px)/0.95 var(--font-display);
+      font: 700 clamp(40px, 7vw, 64px)/0.96 var(--font-display);
       text-transform: uppercase;
       letter-spacing: 0.01em;
       margin-top: 14px;
@@ -375,10 +402,16 @@
     @media (min-width: 1240px) {
       .hero {
         grid-template-columns: minmax(0, 1fr) minmax(380px, 430px);
-        gap: clamp(56px, 6vw, 96px);
-        align-items: center;
+        gap: clamp(48px, 5vw, 80px);
+        align-items: start;
       }
     }
+    .hero-copy > * { animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hero-copy > :nth-child(2) { animation-delay: 0.05s; }
+    .hero-copy > :nth-child(3) { animation-delay: 0.1s; }
+    .hero-copy > :nth-child(4) { animation-delay: 0.15s; }
+    .hero-copy > :nth-child(5) { animation-delay: 0.2s; }
+    .hero-copy > :nth-child(6) { animation-delay: 0.25s; }
     .hero-rows { margin-top: 24px; }
     .hero-rows .r {
       display: grid;
@@ -397,105 +430,61 @@
     }
     .hero-rows .v {
       font: 700 26px/1 var(--font-display);
-      color: var(--accent);
+      color: var(--fg);
       font-variant-numeric: tabular-nums;
     }
+    .hero-rows .v.usd { color: var(--accent); }
     .hero-rows .t { grid-column: 1 / -1; color: var(--muted); font-size: 15px; }
     @media (min-width: 560px) { .hero-rows .t { grid-column: auto; } }
     .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 
-    /* Calendario del evento */
+    /* Calendario del evento: línea de tiempo con los hitos del torneo */
     .cal {
       width: 100%;
       max-width: 520px;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 18px;
+      padding: 20px;
       display: grid;
-      gap: 14px;
+      gap: 16px;
+      animation: rise 0.6s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
     }
-    @media (min-width: 1240px) {
-      .cal { max-width: none; }
-    }
-    .cal-head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 4px 12px;
-    }
-    .cal-label {
-      font: 500 12px/1.3 var(--font-mono);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+    @media (min-width: 1240px) { .cal { max-width: none; } }
+    .cal-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+    .cal-label { font: 500 12px/1.3 var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
     .cal-next { font: 400 12px/1.4 var(--font-mono); color: var(--muted); }
-    .cal-status {
-      font: 700 38px/1 var(--font-display);
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-    }
+    .cal-next.today { color: var(--accent); }
+    .cal-status { font: 700 38px/1 var(--font-display); text-transform: uppercase; letter-spacing: 0.02em; }
     .cal-status.clock { font-size: clamp(26px, 7.4vw, 38px); font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .cal-grid {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 6px;
+    /* Falta menos de un día: la cuenta regresiva se enciende en rosa */
+    .cal-status.urgent { color: var(--accent); animation: glow 1.8s ease-in-out infinite; }
+    @keyframes glow { 0%, 100% { text-shadow: 0 0 0 rgba(255, 61, 129, 0); } 50% { text-shadow: 0 0 18px rgba(255, 61, 129, 0.55); } }
+    .tl { list-style: none; margin: 0; padding: 8px 0 0; }
+    .tl li { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; column-gap: 14px; padding-bottom: 22px; }
+    .tl li:last-child { padding-bottom: 0; }
+    .tl li::before { content: ""; position: absolute; left: 11px; top: 28px; bottom: 2px; width: 2px; background: var(--line); }
+    .tl li:last-child::before { display: none; }
+    .tl li.done::before { background: var(--accent); }
+    .tl .dot {
+      position: relative; z-index: 1; width: 24px; height: 24px; margin-top: 1px;
+      display: grid; place-items: center;
+      border-radius: 50%; border: 2px solid var(--line-hi); background: var(--bg); color: var(--accent-ink);
     }
-    .cal-dow {
-      font: 500 12px/1 var(--font-mono);
-      color: var(--muted);
-      text-align: center;
-      padding-bottom: 2px;
-    }
-    .cal-cell {
-      min-height: 66px;
-      border: 1px solid var(--line);
-      border-radius: 3px;
-      padding: 7px 6px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 2px;
-      font: 600 18px/1 var(--font-mono);
-      font-variant-numeric: tabular-nums;
-      background: var(--bg);
-    }
-    .cal-cell small {
-      font: 600 10.5px/1 var(--font-mono);
-      text-transform: uppercase;
-      letter-spacing: 0;
-      white-space: nowrap;
-      color: var(--accent);
-      min-height: 10px;
-    }
-    .cal-cell i { font: 500 10px/1 var(--font-mono); font-style: normal; color: var(--muted); text-transform: uppercase; display: block; margin-top: 4px; }
-    .cal-cell.final i { color: var(--accent-ink); }
-    .cal-cell small .two { font-size: 9.5px; }
-    .cal-cell small .s { display: none; }
-    @media (max-width: 479px) {
-      .cal-cell small .l { display: none; }
-      .cal-cell small .s { display: inline; }
-    }
-    .cal-cell.is-draw { background: var(--panel-2); border-color: var(--accent); }
-    .cal-cell.final { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-    .cal-cell.final small { color: var(--accent-ink); }
-    .cal-cell.past { opacity: 0.6; }
-    .cal-cell.today { outline: 3px solid var(--fg); outline-offset: 1px; opacity: 1; }
-    .cal-foot {
-      font: 400 12px/1.4 var(--font-mono);
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-      padding-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 6px 12px;
-    }
+    .tl .dot svg { width: 12px; height: 12px; }
+    .tl li.done .dot, .tl li.final .dot { background: var(--accent); border-color: var(--accent); }
+    .tl li.next .dot { border-color: var(--accent); animation: pulsePink 2s ease-out infinite; }
+    @keyframes pulsePink { 0% { box-shadow: 0 0 0 0 rgba(255, 61, 129, 0.55); } 100% { box-shadow: 0 0 0 10px rgba(255, 61, 129, 0); } }
+    .tl .d { font: 500 12px/1.2 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .tl .d.hoy { color: var(--accent); }
+    .tl .t { margin-top: 3px; font: 700 20px/1.1 var(--font-display); letter-spacing: 0.02em; text-transform: uppercase; }
+    .tl .s { margin-top: 3px; font-size: 14px; color: var(--muted); }
+    .tl .a { align-self: center; text-align: right; white-space: nowrap; font: 700 22px/1.1 var(--font-display); color: var(--accent); }
+    .tl .a small { display: block; margin-top: 2px; font: 500 12px/1.2 var(--font-mono); color: var(--muted); }
+    .tl li.final .t { font-size: 24px; }
+    .tl li.done .t, .tl li.done .a { color: var(--muted); }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .cal-foot { font: 400 12px/1.4 var(--font-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 
     /* Encabezados de sección */
     .sec-h { display: flex; align-items: center; gap: 16px; }
@@ -513,6 +502,7 @@
     .how { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
     @media (min-width: 560px) { .how { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (min-width: 1240px) { .how { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    .step:hover { border-color: var(--line-hi); }
     .step {
       position: relative;
       background: var(--panel);
@@ -527,7 +517,7 @@
       top: 12px;
       right: 16px;
       font: 700 30px/1 var(--font-display);
-      color: var(--accent);
+      color: var(--line-hi);
     }
     .step .ic {
       width: 42px;
@@ -572,7 +562,7 @@
     .earn .what span { display: block; font-size: 14px; color: var(--muted); }
     .earn .val {
       font: 700 24px/1 var(--font-display);
-      color: var(--accent);
+      color: var(--fg);
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
     }
@@ -623,18 +613,24 @@
       color: var(--fg);
       font-variant-numeric: tabular-nums;
     }
-    .pts-box input:focus { outline: none; border-color: var(--accent); }
+    .pts-box input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 61, 129, 0.3); }
     .pts-box small { color: var(--muted); font-size: 15px; flex-basis: 100%; }
     @media (min-width: 640px) { .pts-box small { flex-basis: auto; } }
     .pts-side { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; flex-basis: 100%; }
     @media (min-width: 900px) { .pts-side { flex-basis: auto; margin-left: auto; } }
     .pts-count { font: 500 14px/1.3 var(--font-mono); color: var(--muted); }
     .pts-count b { color: var(--accent); font-size: 20px; font-variant-numeric: tabular-nums; }
+    /* Cuánto falta para el próximo premio */
+    .pts-next { flex-basis: 100%; display: grid; gap: 8px; font: 500 13px/1.3 var(--font-mono); color: var(--muted); }
+    .pts-bar { height: 4px; border-radius: 999px; background: var(--line); overflow: hidden; }
+    .pts-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.4s ease; }
 
     .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
     .chip {
       font: 600 14px/1 var(--font-body);
-      padding: 11px 16px;
+      padding: 13px 16px;
+      min-height: 42px;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
       border-radius: 999px;
       border: 1px solid var(--line);
       background: var(--panel-2);
@@ -662,7 +658,7 @@
       min-width: 0;
       transition: border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
     }
-    .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(255, 61, 129, 0.12); }
     /* Calculadora: las que te alcanzan se encienden, las que no bajan de intensidad */
     .card.can { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(255, 61, 129, 0.35), 0 0 24px rgba(255, 61, 129, 0.18); }
     .card.cant { opacity: 0.55; }
@@ -679,6 +675,8 @@
     }
     .card-top .stock { color: var(--muted); }
     .card-art {
+      position: relative;
+      overflow: hidden;
       display: grid;
       place-items: center;
       gap: 2px;
@@ -692,8 +690,15 @@
       font: 700 46px/0.9 var(--font-display);
       font-variant-numeric: tabular-nums;
     }
+    /* Ícono de la categoría, de fondo y muy tenue */
+    .art-ic { position: absolute; right: 8px; bottom: -14px; width: 92px; height: 92px; color: #fff; opacity: 0.07; pointer-events: none; transition: color 0.2s, opacity 0.2s; }
+    .art-ic svg { width: 100%; height: 100%; stroke-width: 1.2; }
+    .card:hover .art-ic { opacity: 0.12; }
+    .card.can .art-ic, .card.major .art-ic { color: var(--accent); opacity: 0.2; }
+    .card.major .art-ic { width: 140px; height: 140px; right: 14px; bottom: -22px; }
+    .card-art .num, .card-art small { position: relative; }
     .card-art small {
-      font: 500 11px/1.2 var(--font-mono);
+      font: 500 12px/1.2 var(--font-mono);
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--muted);
@@ -709,8 +714,8 @@
     .card-body p { color: var(--muted); font-size: 15px; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; }
     .tag {
-      font: 500 11px/1 var(--font-mono);
-      padding: 5px 9px;
+      font: 500 12px/1 var(--font-mono);
+      padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid var(--line);
       color: var(--muted);
@@ -720,6 +725,8 @@
     .afford.no { color: var(--muted); }
     .card-body .btn { margin-top: auto; width: 100%; }
     /* Botón apagado hasta que los puntos alcanzan; al pasar el mouse se enciende en rosa */
+    /* No te alcanzan los puntos: el botón queda gris y dice cuánto te falta */
+    .card-body .btn.lack { color: var(--muted); letter-spacing: 0.02em; text-transform: none; font-size: 14px; }
     .card-body .btn.ghost:hover { background: rgba(255, 61, 129, 0.08); border-color: var(--accent); color: var(--accent); }
 
     /* Premio mayor: cierra la grilla de 3 columnas ocupando todo el ancho */
@@ -736,14 +743,14 @@
       .card.major .card-body h3 { font-size: 30px; }
       .card.major .card-body .btn { grid-column: 2; grid-row: 1 / span 4; align-self: center; width: auto; min-width: 200px; margin-top: 0; }
     }
-    /* Destello diagonal muy discreto, cada 7 segundos (premio mayor y sorteo final) */
-    .card.major::after, .draw.final::after {
+    /* Destello diagonal muy discreto, solo en el sorteo final y solo mientras está a la vista */
+    .draw.final::after {
       content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 38%;
       background: linear-gradient(100deg, transparent, rgba(255, 61, 129, 0.08), rgba(255, 255, 255, 0.05), transparent);
       transform: translateX(-130%) skewX(-18deg);
       pointer-events: none;
-      animation: shine 7s ease-in-out infinite;
     }
+    .draw.final.vis::after { animation: shine 9s ease-in-out infinite; }
     @keyframes shine { 0%, 70% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(380%) skewX(-18deg); } }
     /* Al filtrar por categoría las tarjetas entran con un fundido corto */
     .card.fade { animation: cardFade 0.18s ease; }
@@ -759,31 +766,31 @@
       display: grid;
       gap: 8px;
       align-content: start;
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
+    .draw:hover { border-color: var(--line-hi); }
+    .draw.is-today { border-color: var(--accent); }
+    .draw-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
     .draw .when {
       font: 500 12px/1.3 var(--font-mono);
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
+    .state {
+      padding: 6px 10px; border: 1px solid var(--line-hi); border-radius: 999px;
+      font: 500 12px/1 var(--font-mono); letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+    }
+    .state.is-active { color: var(--good); border-color: #2f7d62; background: #153227; }
+    .state.is-today { color: var(--accent-ink); border-color: var(--accent); background: var(--accent); animation: pulsePink 2s ease-out infinite; }
     .draw h3 {
       font: 700 26px/1.05 var(--font-display);
       letter-spacing: 0.02em;
       text-transform: uppercase;
     }
     .draw p { font-size: 15px; color: var(--muted); }
-    .draw-meta {
-      margin-top: 6px;
-      padding-top: 8px;
-      border-top: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      font: 500 11px/1.2 var(--font-mono);
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .draw-meta b { color: var(--muted); }
-    .draw-meta b.is-active { color: var(--good); }
+    .draw p.draw-amt { display: flex; align-items: baseline; gap: 10px; margin-top: 4px; }
+    .draw-amt span { font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
     .draw.final {
       position: relative;
       overflow: hidden;
@@ -793,9 +800,8 @@
       padding: 22px 24px;
     }
     .draw.final h3 { font-size: 42px; }
-    .draw .amt { font: 700 22px/1 var(--font-display); letter-spacing: 0.02em; color: var(--accent); text-transform: none; }
-    .draw.final .amt { font-size: 34px; }
-    .draw-meta { align-items: baseline; }
+    .draw .amt { font: 700 30px/1 var(--font-display); letter-spacing: 0.02em; color: var(--accent); text-transform: none; }
+    .draw.final .amt { font-size: 44px; }
 
     .tickets-row { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); margin-top: 28px; }
     @media (min-width: 900px) { .tickets-row { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; } }
@@ -809,7 +815,7 @@
       border-bottom: 1px solid var(--line);
     }
     .tickets li:first-child { border-top: 1px solid var(--line); }
-    .tickets .val { font: 700 22px/1 var(--font-display); color: var(--accent); white-space: nowrap; }
+    .tickets .val { font: 700 22px/1 var(--font-display); color: var(--fg); white-space: nowrap; }
     .rules-col { display: grid; gap: 12px; }
     .rules {
       background: var(--panel);
@@ -819,37 +825,24 @@
       display: grid;
       gap: 6px;
     }
-    .rules .k { font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+    .rules .k { font: 500 12px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
     .rules p { color: var(--muted); font-size: 15px; }
+    .rules p b { color: var(--fg); font-weight: 600; }
 
-    /* FAQ */
-    .faq-grid {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: minmax(0, 1fr);
-    }
-    @media (min-width: 760px) {
-      .faq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    .faq-item {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      padding: 18px;
-      display: grid;
-      gap: 6px;
-      align-content: start;
-    }
-    .faq-item span {
-      font: 700 15px/1 var(--font-mono);
-      color: var(--accent);
-    }
-    .faq-item h3 {
-      font: 700 20px/1.15 var(--font-display);
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-      margin-bottom: 10px;
-    }
-    .faq-item p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+    /* FAQ: acordeón, una pregunta abierta a la vez */
+    .faq-list { display: grid; gap: 10px; max-width: 920px; }
+    .faq { background: var(--panel); border: 1px solid var(--line); transition: border-color 0.2s ease; }
+    .faq:hover, .faq[open] { border-color: var(--line-hi); }
+    .faq summary { display: flex; align-items: center; gap: 14px; min-height: 58px; padding: 14px 18px; cursor: pointer; list-style: none; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .q-n { font: 700 14px/1 var(--font-mono); color: var(--muted); }
+    .faq h3 { flex: 1; min-width: 0; font: 700 19px/1.15 var(--font-display); text-transform: uppercase; letter-spacing: 0.02em; }
+    .chev { flex: none; width: 10px; height: 10px; margin: 0 4px 3px 0; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.2s ease, border-color 0.2s ease; }
+    .faq[open] .chev { transform: rotate(-135deg); margin-bottom: -3px; border-color: var(--accent); }
+    .faq-a { padding: 0 18px 18px 56px; animation: faqIn 0.25s ease; }
+    @media (max-width: 559px) { .faq-a { padding-left: 18px; } }
+    @keyframes faqIn { from { opacity: 0; transform: translateY(-4px); } }
+    .faq-a p { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 70ch; }
 
     footer {
       margin-top: 72px;
@@ -858,11 +851,11 @@
       color: var(--muted);
       font-size: 13px;
     }
-    body.sheet-open footer { padding-bottom: 280px; }
+    body.sheet-open footer { padding-bottom: 340px; }
     .foot-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; }
     .foot-in p { max-width: 70ch; }
-    .foot-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-    .foot-links a { color: var(--muted); text-decoration: none; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 0 4px; }
+    .foot-links a { display: inline-block; min-width: 40px; padding: 11px 8px; text-align: center; color: var(--muted); text-decoration: none; }
     .foot-links a:hover, .foot-links a:focus-visible { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 
     /* Hoja de canje */
@@ -902,12 +895,25 @@
       user-select: all;
     }
     .sheet-note { font-size: 14px; color: var(--muted); }
+    .sheet-steps { counter-reset: s; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .sheet-steps li { counter-increment: s; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.3; color: var(--muted); }
+    .sheet-steps li::before {
+      content: counter(s); flex: none; width: 22px; height: 22px; display: grid; place-items: center;
+      border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line-hi); color: var(--fg); font: 600 12px/1 var(--font-mono);
+    }
+    .sheet.done { border-top-color: var(--good); }
+    .sheet-msg { display: flex; align-items: center; gap: 8px; }
+    .chk { flex: none; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--good); color: #06241a; animation: pop 0.45s ease; }
+    .chk svg { width: 12px; height: 12px; }
+    .chk path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: drawck 0.35s 0.1s ease forwards; }
+    @keyframes drawck { to { stroke-dashoffset: 0; } }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; animation: none !important; }
       html { scroll-behavior: auto; }
       .card:hover { transform: none; }
       .fx { opacity: 1; transform: none; }
+      .chk path { stroke-dashoffset: 0; }
     }
   </style>
 </head>
@@ -926,6 +932,7 @@
       </span>
       <span><b>Azmeyn</b><small id="brand-sub"></small></span>
     </a>
+    <a class="live-chip" id="live-chip" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer" hidden><i aria-hidden="true"></i>En vivo</a>
     <nav class="nav" aria-label="Secciones">
       <div class="grp">
         <p class="grp-h">Directo</p>
@@ -959,11 +966,11 @@
           <span class="sb-k">Directos</span>
           <a class="pill" id="pill-twitch" data-state="unknown" data-link="twitch" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">
             <svg class="ic-tw" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
-            <span class="tag"><span class="t-a"></span><span class="t-b"></span></span>
+            <span class="tag"><span class="t-a">···</span><span class="t-b"></span></span>
           </a>
           <a class="pill" id="pill-kick" data-state="unknown" data-link="kick" href="https://kick.com/meyn" target="_blank" rel="noopener noreferrer">
             <svg class="ic-kick" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"/></svg>
-            <span class="tag"><span class="t-a"></span><span class="t-b"></span></span>
+            <span class="tag"><span class="t-a">···</span><span class="t-b"></span></span>
           </a>
           <span class="sb-sep" aria-hidden="true"></span>
           <a class="soc" href="https://discord.gg/8Vsda74tt" target="_blank" rel="noopener noreferrer" aria-label="Discord" title="Discord">
@@ -989,14 +996,14 @@
     <main class="content" id="contenido-principal">
       <!-- HERO + CALENDARIO -->
       <section class="hero" aria-labelledby="titulo">
-        <div>
+        <div class="hero-copy">
           <p class="eyebrow">SoloBoom Challenge 6 · 30/11 al 20/12</p>
           <h1 id="titulo">Tienda</h1>
           <p class="lede">Mirá mi directo en Twitch, juntá puntos para canjear premios y acumulá tickets en el chat para los sorteos.</p>
           <div class="hero-rows">
             <div class="r"><span class="k">Cada hora</span><span class="v">+60</span><span class="t">puntos mirando el directo en Twitch</span></div>
-            <div class="r"><span class="k">Cada domingo</span><span class="v">USD 20</span><span class="t">en el sorteo semanal (6, 13 y 20/12)</span></div>
-            <div class="r"><span class="k">Domingo 20/12</span><span class="v">USD 60</span><span class="t">en el sorteo final</span></div>
+            <div class="r"><span class="k">Cada domingo</span><span class="v usd">USD 20</span><span class="t">en el sorteo semanal (6, 13 y 20/12)</span></div>
+            <div class="r"><span class="k">Domingo 20/12</span><span class="v usd">USD 60</span><span class="t">en el sorteo final</span></div>
           </div>
           <div class="cta">
             <a class="btn" href="#tienda">Ir a los premios</a>
@@ -1010,16 +1017,13 @@
             <span class="cal-next" id="next"></span>
           </div>
           <p class="cal-status" id="status">SoloBoom Challenge 6</p>
-          <ol class="cal-grid" id="cal" aria-label="Calendario del torneo y de los sorteos"></ol>
-          <div class="cal-foot">
-            <span>Inicio torneo: 30/11 · 18:00 hs ARG</span>
-            <span>Cierre torneo: 20/12 · 18:00 hs ARG</span>
-            <span>Sorteo final: 20/12 al cierre</span>
-          </div>
+          <ol class="tl" id="cal" aria-label="Hitos del torneo y de los sorteos"></ol>
+          <p class="cal-foot">Todos los horarios son de Argentina (ARG).</p>
         </section>
       </section>
 
       <!-- CÓMO FUNCIONA -->
+
       <section id="como" aria-labelledby="como-h">
         <div class="sec-h"><h2 id="como-h">Cómo funciona</h2></div>
         <p class="sec-p">Los puntos los suma el bot de mi canal mientras mirás el directo en Twitch (los puntos, tickets y comandos funcionan únicamente en Twitch, no en Kick). Escribí <code>!puntos</code> en el chat para ver cuántos tenés.</p>
@@ -1098,6 +1102,7 @@
               <span class="pts-count" id="pts-count" aria-live="polite"></span>
               <button class="btn ghost sm" type="button" id="pts-clear" hidden>Limpiar</button>
             </div>
+            <div class="pts-next" id="pts-next" hidden><span id="pts-next-t"></span><div class="pts-bar" aria-hidden="true"><i id="pts-bar-i"></i></div></div>
           </div>
           <div class="chips" id="chips" role="group" aria-label="Filtrar premios por tipo"></div>
           <div class="grid" id="grid"></div>
@@ -1110,28 +1115,28 @@
         <p class="sec-p">Tres sorteos semanales y uno final. Los ganadores se eligen en vivo al cierre del stream del día.</p>
         <div class="draws sec-body">
           <article class="draw" data-draw="6">
-            <p class="when">Domingo 6/12</p>
+            <div class="draw-top"><p class="when">Domingo 6/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 1</h3>
-            <p>RP o skins por un valor de USD 20. Participan los tickets de la semana 1.</p>
-            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Valor: <strong class="amt">USD 20</strong></span></div>
+            <p>RP o skins. Participan los tickets de la semana 1.</p>
+            <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
           </article>
           <article class="draw" data-draw="13">
-            <p class="when">Domingo 13/12</p>
+            <div class="draw-top"><p class="when">Domingo 13/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 2</h3>
-            <p>RP o skins por un valor de USD 20. Participan los tickets de la semana 2.</p>
-            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Valor: <strong class="amt">USD 20</strong></span></div>
+            <p>RP o skins. Participan los tickets de la semana 2.</p>
+            <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
           </article>
           <article class="draw" data-draw="20">
-            <p class="when">Domingo 20/12</p>
+            <div class="draw-top"><p class="when">Domingo 20/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 3</h3>
-            <p>RP o skins por un valor de USD 20. Participan los tickets de la semana 3.</p>
-            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Valor: <strong class="amt">USD 20</strong></span></div>
+            <p>RP o skins. Participan los tickets de la semana 3.</p>
+            <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
           </article>
           <article class="draw final" data-draw="20f">
-            <p class="when">Domingo 20/12 · día de cierre del torneo</p>
+            <div class="draw-top"><p class="when">Domingo 20/12 · día de cierre del torneo</p><span class="state">Próximo</span></div>
             <h3>Sorteo final</h3>
-            <p>RP o skins por un valor de USD 60. Todos los tickets que juntaste durante las tres semanas van a una ruleta digital que giro en vivo.</p>
-            <div class="draw-meta"><span>Estado: <b class="state">Próximo</b></span><span>Pozo: <strong class="amt">USD 60</strong></span></div>
+            <p>RP o skins. Todos los tickets que juntaste durante las tres semanas van a una ruleta digital que giro en vivo.</p>
+            <p class="draw-amt"><strong class="amt">USD 60</strong><span>de pozo</span></p>
           </article>
         </div>
 
@@ -1140,16 +1145,12 @@
             <li><span>Check-in diario con <code>!presente</code></span><span class="val">1 ticket</span></li>
             <li><span>Acertar 3 predicciones en el mismo día</span><span class="val">1 ticket</span></li>
             <li><span>Canje en tienda (800 pts · máx. 3/semana)</span><span class="val">1 ticket</span></li>
-            <li><span>Suscriptor del canal de Twitch (sorteo final)</span><span class="val">Tickets x2</span></li>
           </ul>
           <div class="rules-col">
             <aside class="rules">
-              <span class="k">Bonus suscriptores</span>
-              <p>Si estás suscripto a mi canal de Twitch, tus tickets valen x2 en la ruleta del sorteo final.</p>
-            </aside>
-            <aside class="rules">
-              <span class="k">Regla</span>
-              <p>Quien gana un sorteo semanal no puede ganar otro semanal. El sorteo final no tiene esa restricción.</p>
+              <span class="k">Bonus y reglas</span>
+              <p><b>Suscriptores:</b> si estás suscripto a mi canal de Twitch, tus tickets valen x2 en la ruleta del sorteo final.</p>
+              <p><b>Un semanal por persona:</b> quien gana un sorteo semanal no puede ganar otro semanal. El sorteo final no tiene esa restricción.</p>
             </aside>
           </div>
         </div>
@@ -1159,27 +1160,23 @@
       <section id="faq" aria-labelledby="faq-h">
         <div class="sec-h"><h2 id="faq-h">Preguntas frecuentes</h2></div>
         <p class="sec-p">Dudas rápidas sobre los puntos, los tickets de sorteo y cómo reclamar cada canje en mi canal de Twitch.</p>
-        <div class="faq-grid sec-body">
-          <article class="faq-item">
-            <span>01</span>
-            <h3>¿Puedo acumular más de un ticket para el mismo sorteo?</h3>
-            <p>Sí. Sumás tickets todos los días con <code>!presente</code>, acertando 3 predicciones en el mismo día o canjeando hasta 3 tickets extra por semana en la sección Premios (800 puntos cada uno).</p>
-          </article>
-          <article class="faq-item">
-            <span>02</span>
-            <h3>¿Cómo se canjea un premio de la tienda?</h3>
-            <p>Hacé clic en «Canjear» en el premio que quieras y copiá el comando <code>!canjear</code> para pegarlo en el chat de <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">twitch.tv/azmeyn</a>. Lo verifico y confirmo en vivo (el sistema funciona únicamente en Twitch, no en Kick). Para coordinar entregas o revisiones, sumate a mi <a href="https://discord.gg/8Vsda74tt" target="_blank" rel="noopener noreferrer">Discord</a>.</p>
-          </article>
-          <article class="faq-item">
-            <span>03</span>
-            <h3>¿Cómo funcionan los tickets del sorteo final?</h3>
-            <p>Los tickets que ganás (con <code>!presente</code>, con predicciones o canjeándolos en la tienda) se acumulan en tu cuenta. El día del sorteo final, todos van a una ruleta digital que giro en vivo y cada ticket es una chance. Si estás suscripto al canal de Twitch, tenés doble chance: tus tickets valen x2.</p>
-          </article>
-          <article class="faq-item">
-            <span>04</span>
-            <h3>¿Cuándo y cómo se entregan los premios de RP o skins?</h3>
-            <p>Los sorteos semanales se definen en vivo al cierre del stream de los domingos 6/12, 13/12 y 20/12, y ese mismo 20/12, día de cierre del torneo, se sortea el pozo final de USD 60 con todos los tickets acumulados. Si ganás, te escribo por Discord para coordinar la entrega: según el caso, puede hacer falta que seamos amigos en LoL antes de regalarte la skin o el RP, o te paso un código o una transferencia.</p>
-          </article>
+        <div class="faq-list sec-body">
+          <details class="faq" name="faq" open>
+            <summary><span class="q-n">01</span><h3>¿Puedo acumular más de un ticket para el mismo sorteo?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Sí. Sumás tickets todos los días con <code>!presente</code>, acertando 3 predicciones en el mismo día o canjeando hasta 3 tickets extra por semana en la sección Premios (800 puntos cada uno).</p></div>
+          </details>
+          <details class="faq" name="faq">
+            <summary><span class="q-n">02</span><h3>¿Cómo se canjea un premio de la tienda?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Hacé clic en «Canjear» en el premio que quieras y copiá el comando <code>!canjear</code> para pegarlo en el chat de <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">twitch.tv/azmeyn</a>. Lo verifico y confirmo en vivo (el sistema funciona únicamente en Twitch, no en Kick). Para coordinar entregas o revisiones, sumate a mi <a href="https://discord.gg/8Vsda74tt" target="_blank" rel="noopener noreferrer">Discord</a>.</p></div>
+          </details>
+          <details class="faq" name="faq">
+            <summary><span class="q-n">03</span><h3>¿Cómo funcionan los tickets del sorteo final?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Los tickets que ganás (con <code>!presente</code>, con predicciones o canjeándolos en la tienda) se acumulan en tu cuenta. El día del sorteo final, todos van a una ruleta digital que giro en vivo y cada ticket es una chance. Si estás suscripto al canal de Twitch, tenés doble chance: tus tickets valen x2.</p></div>
+          </details>
+          <details class="faq" name="faq">
+            <summary><span class="q-n">04</span><h3>¿Cuándo y cómo se entregan los premios de RP o skins?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Los sorteos semanales se definen en vivo al cierre del stream de los domingos 6/12, 13/12 y 20/12, y ese mismo 20/12, día de cierre del torneo, se sortea el pozo final de USD 60 con todos los tickets acumulados. Si ganás, te escribo por Discord para coordinar la entrega: según el caso, puede hacer falta que seamos amigos en LoL antes de regalarte la skin o el RP, o te paso un código o una transferencia.</p></div>
+          </details>
         </div>
       </section>
 
@@ -1216,7 +1213,12 @@
       <code id="cmd" aria-label="Comando de canje"></code>
       <button class="btn" type="button" id="copy">Copiar comando</button>
     </div>
-    <p class="sheet-note">Pegá el comando en el chat de Twitch (solo funciona en Twitch). Si no se copia solo, seleccionalo y copialo a mano.</p>
+    <ol class="sheet-steps">
+      <li>Copiá el comando</li>
+      <li>Pegalo en mi chat de Twitch</li>
+      <li>Esperá mi confirmación</li>
+    </ol>
+    <p class="sheet-note">Solo funciona en Twitch. Si no se copia solo, seleccionalo y copialo a mano.</p>
     <p class="sheet-msg" id="msg" role="status" aria-live="polite"></p>
   </div>
 </div>
@@ -1227,7 +1229,7 @@
 
   var DAY = 86400000;
   var START = new Date("2026-11-30T00:00:00-03:00").getTime();
-  var KICKOFF = new Date("2026-11-30T18:00:00-03:00").getTime();   /* arranque real del torneo (cuenta regresiva) */
+  var KICKOFF = new Date("2026-11-30T17:00:00-03:00").getTime();   /* arranque real del torneo (cuenta regresiva) */
   var TOTAL_DAYS = 21;   /* el torneo dura del 30/11 al 20/12 (fechas oficiales del SoloBoom) */
 
   /* Sorteos. day = día del evento en que se sortea (0 = 30/11).
@@ -1304,7 +1306,7 @@
       btn.textContent = btn.getAttribute("data-t");
     }, 2000);
   }
-  function copyText(text, msgEl, okText, selectEl, btn) {
+  function copyText(text, msgEl, okText, selectEl, btn, onOk) {
     function fail() {
       var sel = false;
       if (selectEl) {
@@ -1321,7 +1323,7 @@
     }
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () { setMsg(msgEl, okText, true); flash(btn); }, fail);
+        navigator.clipboard.writeText(text).then(function () { setMsg(msgEl, okText, true); flash(btn); if (onOk) { onOk(); } }, fail);
       } else { fail(); }
     } catch (e) { fail(); }
   }
@@ -1339,98 +1341,121 @@
     clockOn = true;
     var s = Math.floor(ms / 1000);
     el.classList.add("clock");
+    el.classList.toggle("urgent", ms < DAY);
     el.textContent = Math.floor(s / 86400) + "d : " + pad(Math.floor(s % 86400 / 3600)) + "h : " + pad(Math.floor(s % 3600 / 60)) + "m : " + pad(s % 60) + "s";
   }
   setInterval(function () { if (clockOn) { paintClock(); } }, 1000);
 
-  /* ---------- Calendario y estado del evento ---------- */
-  var MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  /* ---------- Calendario del evento: línea de tiempo con los hitos ---------- */
+  var SHORT = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var STAR = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>';
+  /* Hitos: el arranque y cada día de sorteo (si el final cae el mismo día que un semanal, comparten hito) */
+  function milestones() {
+    var weekly = DRAWS.filter(function (d) { return !d.final; });
+    var fin = DRAWS.filter(function (d) { return d.final; })[0];
+    var list = [{ day: 0, title: "Arranca el torneo", sub: "Inicio · 17:00 hs ARG", start: true }];
+    weekly.forEach(function (d, i) {
+      var both = !!fin && fin.day === d.day;
+      list.push({
+        day: d.day,
+        title: both ? "Semanal " + (i + 1) + " y sorteo final" : "Sorteo semanal " + (i + 1),
+        sub: both ? "Cierre del torneo · 18:00 hs ARG" : "Al cierre del stream",
+        amt: d.label,
+        more: both ? fin.label + " final" : "",
+        final: both
+      });
+    });
+    return list;
+  }
+  function mk(tag, cls, text) {
+    var el = document.createElement(tag);
+    if (cls) { el.className = cls; }
+    if (text) { el.textContent = text; }
+    return el;
+  }
   function renderCalendar() {
     var now = Date.now();
     var idx = Math.floor((now - START) / DAY);
-    var grid = $("cal");
-    grid.textContent = "";
-    ["L", "M", "M", "J", "V", "S", "D"].forEach(function (l) {
-      var li = document.createElement("li");
-      li.className = "cal-dow";
-      li.setAttribute("aria-hidden", "true");
-      li.textContent = l;
-      grid.appendChild(li);
+    var ol = $("cal");
+    ol.textContent = "";
+    var items = milestones();
+    var nextI = -1;
+    items.forEach(function (m, i) {
+      m.done = m.start ? now >= KICKOFF : now >= START + (m.day + 1) * DAY;
+      if (!m.done && nextI < 0) { nextI = i; }
     });
-    for (var i = 0; i < TOTAL_DAYS; i++) {
-      var dt = dateOf(i);
-      var draw = drawOn(i);
-      var li2 = document.createElement("li");
-      li2.className = "cal-cell";
-      if (draw) { li2.classList.add(draw.final ? "final" : "is-draw"); }
-      if (idx >= 0 && i < idx) { li2.classList.add("past"); }
-      if (i === idx) { li2.classList.add("today"); }
-      li2.setAttribute("aria-label", WEEKDAYS[dt.w] + " " + dt.d + "/" + dt.m +
-        (draw ? ", " + (draw.final ? "sorteo final" : "sorteo semanal") + " de " + draw.label : "") +
-        (draw && draw.final && drawOn(i, false) ? " y sorteo semanal de " + drawOn(i, false).label : ""));
-      var top = document.createElement("span");
-      top.textContent = String(dt.d);
-      if (i === 0 || dt.d === 1) {
-        var mo = document.createElement("i");
-        mo.textContent = MONTHS[dt.m - 1];
-        top.appendChild(mo);
+    items.forEach(function (m, i) {
+      var dt = dateOf(m.day);
+      var li = mk("li", (m.done ? "done" : i === nextI ? "next" : "") + (m.final ? " final" : ""));
+      if (i === nextI) { li.setAttribute("aria-current", "step"); }
+      var dot = mk("span", "dot");
+      dot.setAttribute("aria-hidden", "true");
+      dot.innerHTML = m.done ? CHECK : m.final ? STAR : "";
+      var body = mk("div");
+      var isToday = m.day === idx && now >= START;
+      var d = mk("p", "d" + (isToday ? " hoy" : ""), SHORT[dt.w] + " " + dt.d + "/" + dt.m + (isToday ? " · hoy" : ""));
+      if (m.done || i === nextI) { d.appendChild(mk("span", "sr", m.done ? " (ya pasó)" : " (próximo)")); }
+      body.appendChild(d);
+      body.appendChild(mk("p", "t", m.title));
+      body.appendChild(mk("p", "s", m.sub));
+      li.appendChild(dot);
+      li.appendChild(body);
+      if (m.amt) {
+        var a = mk("p", "a", m.amt);
+        if (m.more) { a.appendChild(mk("small", "", "+ " + m.more)); }
+        li.appendChild(a);
       }
-      var tag = document.createElement("small");
-      if (draw) {
-        /* Etiqueta larga en pantallas anchas y una estrella en las angostas */
-        var long = document.createElement("span");
-        long.className = "l";
-        var weekly = draw.final ? drawOn(i, false) : null;
-        if (weekly) { long.className += " two"; }
-        long.textContent = weekly ? "$" + weekly.label.replace("USD ", "") + "+$" + draw.label.replace("USD ", "") : draw.label;
-        if (weekly) { li2.setAttribute("title", "Sorteo semanal de " + weekly.label + " y sorteo final de " + draw.label); }
-        var star = document.createElement("span");
-        star.className = "s";
-        star.textContent = "★";
-        tag.appendChild(long);
-        tag.appendChild(star);
-      }
-      li2.appendChild(top);
-      li2.appendChild(tag);
-      grid.appendChild(li2);
-    }
+      ol.appendChild(li);
+    });
 
     var status = $("status");
     if (now < KICKOFF) {
       paintClock();
     } else if (idx >= TOTAL_DAYS) {
-      status.classList.remove("clock");
+      status.classList.remove("clock", "urgent");
       status.textContent = "El evento terminó";
     } else if (idx === TOTAL_DAYS - 1) {
-      status.classList.remove("clock");
+      status.classList.remove("clock", "urgent");
       status.textContent = "Último día: sorteo final";
     } else {
-      status.classList.remove("clock");
+      status.classList.remove("clock", "urgent");
       status.textContent = "Día " + (idx + 1) + " de " + TOTAL_DAYS;
     }
     var from = Math.max(idx, 0);
     var next = DRAWS.map(function (d) { return d.day; })
       .sort(function (a, b) { return a - b; })
       .filter(function (k) { return k >= from; })[0];
+    var nx = $("next");
+    var todayDraw = next !== undefined && next === idx && now >= START;
+    nx.classList.toggle("today", todayDraw);
     if (next === undefined) {
-      $("next").textContent = "Los sorteos terminaron";
+      nx.textContent = "Los sorteos terminaron";
+    } else if (todayDraw) {
+      nx.textContent = "Hoy hay sorteo · al cierre del stream";
     } else {
       var nd = dateOf(next);
-      $("next").textContent = "Próximo sorteo: " + WEEKDAYS[nd.w] + " " + nd.d + "/" + nd.m;
+      nx.textContent = "Próximo sorteo: " + WEEKDAYS[nd.w] + " " + nd.d + "/" + nd.m;
     }
   }
 
   /* ---------- Estado de cada sorteo: Próximo → Activo → Finalizado ---------- */
+  function etaText(n) { return n <= 0 ? "hoy" : n === 1 ? "mañana" : "en " + n + " días"; }
   function renderDrawStates() {
     var now = Date.now();
+    var idx = Math.floor((now - START) / DAY);
     document.querySelectorAll("[data-draw]").forEach(function (el) {
       var raw = el.getAttribute("data-draw");
       var d = drawOn(parseInt(raw, 10), /f$/.test(raw));
       if (!d) { return; }
       var key = now < START + d.from * DAY ? "next" : now < START + (d.day + 1) * DAY ? "active" : "done";
+      var eta = d.day - idx;
+      var today = key === "active" && eta === 0;
       var b = el.querySelector(".state");
-      b.textContent = key === "next" ? "Próximo" : key === "active" ? "Activo" : "Finalizado";
-      b.classList.toggle("is-active", key === "active");
+      b.textContent = key === "next" ? "Próximo · " + etaText(eta) : key === "active" ? (today ? "Sorteo hoy" : "Activo · " + etaText(eta)) : "Finalizado";
+      b.classList.toggle("is-active", key === "active" && !today);
+      b.classList.toggle("is-today", today);
+      el.classList.toggle("is-today", today);
     });
   }
 
@@ -1461,6 +1486,13 @@
     });
   }
 
+  var ICONS = {
+    directo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>',
+    sorteos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V7z"/><path d="M14 7v10" stroke-dasharray="2 2"/></svg>',
+    comunidad: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2a5 5 0 0 1 5 5.8"/></svg>',
+    rp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-2 6 5 12 5-12-2-6"/></svg>'
+  };
+
   function renderShop() {
     var root = $("grid");
     root.textContent = "";
@@ -1468,11 +1500,12 @@
       .sort(function (a, b) { return a.cost - b.cost; });
     list.forEach(function (it) {
       var soldOut = it.stock === 0;
-      var canBuy = pts !== null && pts >= it.cost;
+      var canBuy = pts !== null && pts >= it.cost && !soldOut;
+      var lack = pts !== null && !canBuy && !soldOut;
 
       var major = !!it.major && cat === "todos";
       var card = document.createElement("article");
-      card.className = "card" + (major ? " major" : "") + (pts !== null && canBuy && !soldOut ? " can" : pts !== null ? " cant" : "") + (!shopSeen ? " fx" : "") + (fadeNext ? " fade" : "");
+      card.className = "card" + (major ? " major" : "") + (canBuy ? " can" : pts !== null ? " cant" : "") + (!shopSeen ? " fx" : "") + (fadeNext ? " fade" : "");
 
       var top = document.createElement("div");
       top.className = "card-top";
@@ -1485,6 +1518,11 @@
 
       var art = document.createElement("div");
       art.className = "card-art";
+      var ic = document.createElement("span");
+      ic.className = "art-ic";
+      ic.setAttribute("aria-hidden", "true");
+      ic.innerHTML = ICONS[major ? "rp" : it.cat] || "";
+      art.appendChild(ic);
       var num = document.createElement("div");
       num.className = "num";
       var coin = document.createElement("span");
@@ -1514,17 +1552,14 @@
       });
       var aff = document.createElement("div");
       aff.className = "afford";
-      if (pts !== null && !soldOut) {
-        if (canBuy) { aff.className += " yes"; aff.textContent = "Te alcanza"; }
-        else { aff.className += " no"; aff.textContent = "Te faltan " + fmt(it.cost - pts); }
-      }
-      /* Botón oscuro por defecto; rosa solo al pasar el mouse o cuando te alcanzan los puntos */
+      if (canBuy) { aff.className += " yes"; aff.textContent = "✓ Te alcanza"; }
+      /* Botón: oscuro por defecto, rosa cuando te alcanzan los puntos y gris con "Te faltan X" cuando no */
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "btn" + (canBuy ? "" : " ghost");
-      btn.textContent = soldOut ? "Agotado" : "Canjear";
+      btn.className = "btn" + (canBuy ? "" : " ghost") + (lack ? " lack" : "");
+      btn.textContent = soldOut ? "Agotado" : lack ? "Te faltan " + fmt(it.cost - pts) : "Canjear";
       btn.disabled = soldOut;
-      btn.setAttribute("aria-label", (soldOut ? "Agotado: " : "Canjear ") + it.name);
+      btn.setAttribute("aria-label", soldOut ? "Agotado: " + it.name : "Canjear " + it.name + (lack ? " (te faltan " + fmt(it.cost - pts) + " puntos)" : ""));
       btn.addEventListener("click", function () { openSheet(it, btn); });
 
       body.appendChild(h);
@@ -1543,31 +1578,49 @@
     if (!shopSeen) { shopSeen = true; revealOnce(root.querySelectorAll(".card")); }
   }
 
-  /* Contador de la calculadora y botón Limpiar */
+  /* Contador de la calculadora, próximo premio y botón Limpiar */
   function renderPtsInfo() {
     var n = 0;
+    var nx = $("pts-next");
     if (pts !== null) {
       ITEMS.forEach(function (it) { if (it.stock !== 0 && pts >= it.cost) { n++; } });
       $("pts-count").innerHTML = "Te alcanza para: <b>" + n + "</b> de " + ITEMS.length + " premios";
+      var avail = ITEMS.filter(function (it) { return it.stock !== 0; });
+      var above = avail.filter(function (it) { return it.cost > pts; }).sort(function (a, b) { return a.cost - b.cost; })[0];
+      var below = avail.filter(function (it) { return it.cost <= pts; }).map(function (it) { return it.cost; });
+      var base = below.length ? Math.max.apply(null, below) : 0;
+      nx.hidden = false;
+      if (above) {
+        $("pts-next-t").textContent = "Próximo premio: " + above.name + " · te faltan " + fmt(above.cost - pts) + " pts";
+        $("pts-bar-i").style.width = Math.round(Math.min(1, Math.max(0, (pts - base) / (above.cost - base))) * 100) + "%";
+      } else {
+        $("pts-next-t").textContent = "Te alcanza para todo. ¡Elegí tu premio!";
+        $("pts-bar-i").style.width = "100%";
+      }
     } else {
       $("pts-count").textContent = ITEMS.length + " premios disponibles";
+      nx.hidden = true;
     }
     $("pts-clear").hidden = !(pts !== null && pts > 0);
   }
 
-  /* Entrada suave de las tarjetas: una sola vez, cuando aparecen en pantalla */
+  /* Entrada suave: una sola vez, cuando aparecen en pantalla, y escalonada si aparecen varias juntas */
   function revealOnce(list) {
     if (!("IntersectionObserver" in window)) {
       Array.prototype.forEach.call(list, function (el) { el.classList.remove("fx"); });
       return;
     }
     var io = new IntersectionObserver(function (entries) {
+      var n = 0;
       entries.forEach(function (e) {
         if (!e.isIntersecting) { return; }
         io.unobserve(e.target);
         var el = e.target;
+        var delay = Math.min(n, 6) * 70;
+        n++;
+        el.style.transitionDelay = delay + "ms";
         el.classList.add("in");
-        setTimeout(function () { el.classList.remove("fx", "in"); }, 450);
+        setTimeout(function () { el.classList.remove("fx", "in"); el.style.transitionDelay = ""; }, 450 + delay);
       });
     }, { threshold: 0.12 });
     Array.prototype.forEach.call(list, function (el) { io.observe(el); });
@@ -1582,6 +1635,7 @@
     $("sheet-sub").textContent = fmt(item.cost) + " puntos";
     $("cmd").textContent = "!canjear " + item.id;
     setMsg($("msg"), "", false);
+    $("sheet").classList.remove("done");
     $("sheet").hidden = false;
     document.body.classList.add("sheet-open");
     $("copy").focus();
@@ -1593,7 +1647,15 @@
     if (lastTrigger) { try { lastTrigger.focus(); } catch (e) {} }
   }
   $("copy").addEventListener("click", function () {
-    copyText($("cmd").textContent, $("msg"), "Copiado. Pegalo en el chat de Twitch.", $("cmd"), $("copy"));
+    copyText($("cmd").textContent, $("msg"), "¡Listo! Pegalo en mi chat de Twitch y esperá mi confirmación.", $("cmd"), $("copy"), function () {
+      /* Celebración corta: el borde de la hoja pasa a verde y aparece un tilde animado */
+      $("sheet").classList.add("done");
+      var chk = document.createElement("span");
+      chk.className = "chk";
+      chk.setAttribute("aria-hidden", "true");
+      chk.innerHTML = CHECK;
+      $("msg").insertBefore(chk, $("msg").firstChild);
+    });
   });
   $("sheet-close").addEventListener("click", closeSheet);
   document.addEventListener("keydown", function (e) {
@@ -1646,7 +1708,6 @@
     var u = data && data.twitch && typeof data.twitch.avatar === "string" ? data.twitch.avatar : "";
     if (/^https:\/\//.test(u) && logoEl.getAttribute("src") !== u) {
       logoEl.src = u;
-      favEl.setAttribute("href", u);
     }
   }
   function logoBad() { logoFailed = true; logoEl.classList.add("bad"); }
@@ -1675,6 +1736,9 @@
     });
     var anyLive = livePfs.length > 0;
     document.querySelector(".brand").setAttribute("data-live", anyLive ? "true" : "false");
+    var chip = $("live-chip");
+    chip.hidden = !anyLive;
+    if (anyLive) { chip.setAttribute("href", URLS[livePfs[0]]); }
     /* "En vivo en Twitch", "En vivo en Kick" o "En vivo · Twitch y Kick" si prendo en las dos */
     $("brand-sub").textContent = livePfs.length === 2 ? "En vivo · Twitch y Kick" : anyLive ? "En vivo en " + NAMES[livePfs[0]] : "";
     document.title = anyLive ? "● En vivo · Azmeyn" : titleOff;
@@ -1743,6 +1807,29 @@
     if (!reduced) { Array.prototype.forEach.call(steps, function (el) { el.classList.add("fx"); }); }
     return reduced ? [] : steps;
   })());
+
+  /* Sorteos y preguntas también entran con fundido, escalonado */
+  revealOnce((function () {
+    var more = document.querySelectorAll(".draw, .faq");
+    if (!reduced) { Array.prototype.forEach.call(more, function (el) { el.classList.add("fx"); }); }
+    return reduced ? [] : more;
+  })());
+
+  /* El destello del sorteo final solo corre mientras está a la vista */
+  (function () {
+    var fin = document.querySelector(".draw.final");
+    if (!fin || reduced || !("IntersectionObserver" in window)) { return; }
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { fin.classList.toggle("vis", e.isIntersecting); });
+    }).observe(fin);
+  })();
+
+  /* Si la página queda abierta, al cambiar el día se actualizan hitos y estados */
+  var lastIdx = Math.floor((Date.now() - START) / DAY);
+  setInterval(function () {
+    var i = Math.floor((Date.now() - START) / DAY);
+    if (i !== lastIdx) { lastIdx = i; renderCalendar(); renderDrawStates(); }
+  }, 60000);
 })();
 </script>
 
