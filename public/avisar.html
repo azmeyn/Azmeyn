@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Avisar video nuevo · Azmeyn</title>
+  <style>
+    :root { --bg:#0b0c10; --panel:#12141a; --line:#363b4b; --fg:#eceef3; --muted:#b4bac8; --accent:#ff3d81; --ok:#4fd1a1; --err:#e5484d; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; line-height:1.45; }
+    main { max-width:560px; margin:0 auto; padding:28px 18px 60px; }
+    h1 { font-size:1.5rem; margin:0 0 6px; }
+    p.sub { color:var(--muted); margin:0 0 22px; font-size:.95rem; }
+    label { display:block; margin:14px 0 5px; font-weight:600; font-size:.92rem; }
+    label small { font-weight:400; color:var(--muted); }
+    input, select, textarea { width:100%; padding:11px 12px; background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:8px; font:inherit; }
+    input:focus, select:focus { outline:2px solid var(--accent); outline-offset:1px; }
+    .row { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+    button { flex:1; padding:12px 16px; border-radius:8px; border:1px solid var(--line); background:var(--panel); color:var(--fg); font:inherit; font-weight:600; cursor:pointer; }
+    button.main { background:var(--accent); border-color:var(--accent); color:#1a0210; }
+    button:disabled { opacity:.55; cursor:wait; }
+    .chk { display:flex; align-items:center; gap:8px; margin-top:12px; font-size:.9rem; color:var(--muted); }
+    .chk input { width:auto; }
+    #msg { margin-top:18px; padding:12px; border-radius:8px; border:1px solid var(--line); white-space:pre-wrap; display:none; }
+    #msg.ok { border-color:var(--ok); } #msg.err { border-color:var(--err); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Avisar video nuevo</h1>
+  <p class="sub">Después de subir el video, completá esto. Primero tocá "Ver vista previa"; si está bien, "Publicar" lo manda a #clips-y-videos.</p>
+
+  <label for="plataforma">Plataforma</label>
+  <select id="plataforma">
+    <option value="tiktok">TikTok</option>
+    <option value="instagram">Instagram (Reel)</option>
+    <option value="youtube">YouTube (Short)</option>
+  </select>
+
+  <label for="titulo">Título del video</label>
+  <input id="titulo" maxlength="120" autocomplete="off" placeholder="Ej: Baneado bueno amigo">
+
+  <label for="gancho">Gancho <small>(opcional, una frase corta)</small></label>
+  <input id="gancho" maxlength="140" autocomplete="off" placeholder="Ej: no te lo vas a creer">
+
+  <label for="link">Link del video</label>
+  <input id="link" type="url" inputmode="url" autocomplete="off" placeholder="https://www.tiktok.com/@azmeyn/video/...">
+
+  <label for="clave">Tu clave</label>
+  <input id="clave" type="password" autocomplete="off">
+  <label class="chk"><input id="recordar" type="checkbox"> Recordar la clave en este navegador (solo en tu PC)</label>
+
+  <div class="row">
+    <button id="previa" type="button">Ver vista previa</button>
+    <button id="publicar" type="button" class="main">Publicar</button>
+  </div>
+  <div id="msg" role="status"></div>
+</main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "avisar-clave";
+  try { var g = localStorage.getItem(KEY); if (g) { $("clave").value = g; $("recordar").checked = true; } } catch (e) {}
+
+  function mostrar(texto, ok) {
+    var m = $("msg");
+    m.textContent = texto; m.className = ok ? "ok" : "err"; m.style.display = "block";
+  }
+
+  async function enviar(vistaPrevia) {
+    var botones = [$("previa"), $("publicar")];
+    botones.forEach(function (b) { b.disabled = true; });
+    try {
+      try {
+        if ($("recordar").checked) { localStorage.setItem(KEY, $("clave").value); } else { localStorage.removeItem(KEY); }
+      } catch (e) {}
+      var r = await fetch("/api/avisar", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-video-key": $("clave").value },
+        body: JSON.stringify({
+          plataforma: $("plataforma").value,
+          titulo: $("titulo").value,
+          gancho: $("gancho").value,
+          link: $("link").value,
+          vista_previa: vistaPrevia
+        })
+      });
+      var j = await r.json().catch(function () { return { ok: false, error: "Respuesta rara (" + r.status + ")" }; });
+      if (!j.ok) { mostrar("No salió: " + (j.error || r.status), false); return; }
+      if (vistaPrevia) { mostrar("Así saldría en Discord:\n\n" + j.discord, true); return; }
+      mostrar("Publicado en #clips-y-videos ✅\n\n" + j.discord + (j.guardado ? "" : "\n\n(No pude guardarlo para los timers; avisame)"), true);
+    } catch (e) {
+      mostrar("No pude conectar. Revisá tu internet y probá de nuevo.", false);
+    } finally {
+      botones.forEach(function (b) { b.disabled = false; });
+    }
+  }
+
+  $("previa").addEventListener("click", function () { enviar(true); });
+  $("publicar").addEventListener("click", function () { enviar(false); });
+})();
+</script>
+</body>
+</html>
