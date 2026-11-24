@@ -10,6 +10,8 @@
 // Si falta alguna credencial, esa plataforma devuelve null y la página
 // muestra "ver canal" en lugar de online/offline. Nunca se rompe la página.
 
+import { handleAvisos } from "./avisos.js";
+
 let twitchTokenCache = null; // { value, exp }
 let kickTokenCache = null;   // { value, exp }
 
@@ -313,6 +315,11 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname === "/api/live" && request.method === "GET") { return live(request, env, ctx); }
+    // Avisos de videos nuevos (ver avisos.js)
+    if (url.pathname === "/api/avisar") {
+      const r = await handleAvisos(request, env, url);
+      if (r) { return r; }
+    }
     if (request.method === "GET") {
       try {
         if (url.pathname === "/api/presente") { return await presente(url, env); }
