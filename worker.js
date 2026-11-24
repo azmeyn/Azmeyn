@@ -5,7 +5,7 @@
 // Variables que hay que cargar en Cloudflare (Settings > Variables and Secrets, tipo "Secret"):
 //   TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET   (https://dev.twitch.tv/console)
 //   KICK_CLIENT_ID,   KICK_CLIENT_SECRET     (Kick > Configuración > Developer)
-// Opcionales: TWITCH_LOGIN (por defecto "azmeyn") y KICK_SLUG (por defecto "meyn")
+// Opcionales: TWITCH_LOGIN (por defecto "azmeyn") y KICK_SLUG (por defecto "azmeyn")
 //
 // Si falta alguna credencial, esa plataforma devuelve null y la página
 // muestra "ver canal" en lugar de online/offline. Nunca se rompe la página.
@@ -94,7 +94,7 @@ async function kickToken(env) {
 
 async function kickData(env) {
   if (!env.KICK_CLIENT_ID || !env.KICK_CLIENT_SECRET) { return null; }
-  const slug = (env.KICK_SLUG || "meyn").toLowerCase();
+  const slug = (env.KICK_SLUG || "azmeyn").toLowerCase();
   const token = await kickToken(env);
   const res = await fetch("https://api.kick.com/public/v1/channels?slug=" + encodeURIComponent(slug), {
     headers: { Authorization: "Bearer " + token }
