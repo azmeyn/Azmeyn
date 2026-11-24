@@ -994,9 +994,6 @@
           <a class="soc" href="https://www.youtube.com/@azmeyn" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg>
           </a>
-          <a class="soc" href="https://x.com/pasaroncosasxd" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
-          </a>
           <a class="soc" href="https://www.instagram.com/az.meyn/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
           </a>
@@ -1210,7 +1207,6 @@
           <a href="https://kick.com/azmeyn" target="_blank" rel="noopener noreferrer" data-link="kick">Kick</a>
           <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a>
           <a href="https://www.youtube.com/@azmeyn" target="_blank" rel="noopener noreferrer">YouTube</a>
-          <a href="https://x.com/pasaroncosasxd" target="_blank" rel="noopener noreferrer">X</a>
           <a href="https://www.tiktok.com/@azmeyn" target="_blank" rel="noopener noreferrer">TikTok</a>
           <a href="https://www.instagram.com/az.meyn/" target="_blank" rel="noopener noreferrer">Instagram</a>
         </nav>
@@ -1279,7 +1275,6 @@
     { id: "ticket", cat: "sorteos", name: "Ticket extra de sorteo", desc: "+1 ticket para el sorteo semanal y también se acumula para el sorteo final.", cost: 800, stock: null, limit: "Hasta 3 por semana" },
     { id: "spells", cat: "directo", name: "Elegí mis hechizos", desc: "Elegís mis hechizos de invocador (Fantasmal, Extenuación, etc.) para la próxima partida — siempre opciones viables y sin trollear.", cost: 1000, stock: null, limit: "1 por día" },
     { id: "rol", cat: "comunidad", name: "Rol especial en Discord", desc: "Rol con color propio y destaque en la lista del servidor de Discord.", cost: 2000, stock: null, limit: "1 por persona" },
-    { id: "duelo", cat: "directo", name: "Duelo 1v1 contra mí", desc: "Me desafiás a un 1v1 en vivo en el Abismo de los Lamentos.", cost: 3000, stock: 5, limit: "1 por stream" },
     { id: "castigo", cat: "directo", name: "Castigo", desc: "Sensibilidad al mango, modo caster, sin sonido del juego o lo que elijas. Queda sujeto a mi aprobación: nunca apago la cámara ni el micrófono y no rompe las reglas del torneo.", cost: 4000, stock: 5, limit: "1 por persona" },
     { id: "vip", cat: "comunidad", name: "VIP en Twitch", desc: "Insignia de VIP en mi canal de Twitch, y te queda para siempre.", cost: 1500, stock: 10, limit: "1 por persona" },
     { id: "rp5", cat: "rp", name: "RP o skin por USD 5", desc: "Skin o RP regalado a tu cuenta de LAS (en BR, solo RP). Riot pide 7 días de amistad para regalar: si todavía no, te lo entrego apenas se cumplan.", cost: 5000, stock: 6, limit: "1 por persona" },
@@ -1449,7 +1444,10 @@
     var nx = $("next");
     var todayDraw = next !== undefined && next === idx && now >= START;
     nx.classList.toggle("today", todayDraw);
-    if (next === undefined) {
+    if (now < KICKOFF) {
+      var kd = dateOf(0);
+      nx.textContent = "Arranca el " + WEEKDAYS[kd.w] + " " + kd.d + "/" + kd.m + " · 18:00 ARG";
+    } else if (next === undefined) {
       nx.textContent = "Los sorteos terminaron";
     } else if (todayDraw) {
       nx.textContent = "Hoy hay sorteo · al cierre del stream";
