@@ -5,6 +5,11 @@
   "compatibility_date": "2025-09-01",
   "workers_dev": true,
   "preview_urls": false,
+  // Dominio propio (comprado en Spaceship, DNS en Cloudflare desde el 22/11)
+  "routes": [
+    { "pattern": "azmeyn.com", "custom_domain": true },
+    { "pattern": "www.azmeyn.com", "custom_domain": true }
+  ],
   // No borra las variables cargadas en el panel de Cloudflare al desplegar
   "keep_vars": true,
 "kv_namespaces": [{ "binding": "CHECKINS", "id": "f2675dba0fb3436f9eec3f18aecdd38c" }],
