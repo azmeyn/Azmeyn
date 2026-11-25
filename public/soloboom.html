@@ -1274,7 +1274,7 @@
   /* CATÁLOGO. stock: cantidad fija que se muestra en la tarjeta
      (null = sin límite, 0 = agotado). */
   var ITEMS = [
-    { id: "dominadas", cat: "directo", name: "10 dominadas", desc: "", cost: 500, stock: null, limit: "2 por día" },
+    { id: "dominadas", cat: "directo", name: "10 dominadas", desc: "", cost: 500, stock: null, limit: null },
     { id: "campeon", cat: "directo", name: "Elegí mi campeón", desc: "Elegís con qué campeón de mi pool juego la próxima ranked. Las runas y los hechizos los elijo yo.", cost: 1500, stock: null, limit: "1 por día" },
     { id: "ticket", cat: "sorteos", name: "Ticket extra de sorteo", desc: "+1 ticket para el sorteo semanal y también se acumula para el sorteo final.", cost: 800, stock: null, limit: "Hasta 3 por semana" },
     { id: "rol", cat: "comunidad", name: "Rol especial en Discord", desc: "Rol con color propio y destaque en la lista del servidor de Discord.", cost: 500, stock: null, limit: "1 por persona" },    { id: "vip", cat: "comunidad", name: "VIP en Twitch", desc: "Insignia de VIP en mi canal de Twitch, y te queda para siempre.", cost: 1200, stock: 10, limit: "1 por persona" },    { id: "rp5", cat: "rp", name: "RP o skin por USD 5", desc: "Skin o RP regalado a tu cuenta de LAS (en BR, solo RP). Riot pide 7 días de amistad para regalar: si todavía no, te lo entrego apenas se cumplan.", cost: 5000, stock: 6, limit: "1 por persona" },
@@ -1562,7 +1562,7 @@
       d.textContent = it.desc;
       var tags = document.createElement("div");
       tags.className = "tags";
-      [catName(it.cat), it.limit].forEach(function (t) {
+      [catName(it.cat), it.limit].filter(Boolean).forEach(function (t) {
         var s = document.createElement("span");
         s.className = "tag";
         s.textContent = t;
