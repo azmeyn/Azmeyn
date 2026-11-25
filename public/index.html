@@ -4,26 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Azmeyn</title>
-  <meta name="description" content="Azmeyn: directos en Twitch y Kick, comunidad en Discord y contenido en TikTok, Instagram y YouTube.">
-  <meta name="theme-color" content="#ff3d81">
+  <meta name="description" content="Directos de LoL.">
+  <meta name="theme-color" content="#121416">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Azmeyn">
-  <meta property="og:description" content="Directos en Twitch y Kick, comunidad en Discord y contenido en TikTok, Instagram y YouTube.">
+  <meta property="og:description" content="Directos de LoL.">
   <meta property="og:locale" content="es_AR">
   <meta property="og:site_name" content="Azmeyn">
   <meta property="og:url" content="https://azmeyn.com/">
   <link rel="canonical" href="https://azmeyn.com/">
-  <meta property="og:image" content="https://azmeyn.com/og.png?v=2">
+  <meta property="og:image" content="https://azmeyn.com/og.png?v=3">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Azmeyn: directos de LoL en Twitch y Kick">
+  <meta property="og:image:alt" content="Azmeyn">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://azmeyn.com/og.png?v=2">
+  <meta name="twitter:image" content="https://azmeyn.com/og.png?v=3">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preload" href="fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/ibm-plex-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/montserrat-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -687,6 +686,160 @@
     .btn { border-radius: var(--r); font-family: var(--font-display); font-size: 17px; letter-spacing: .06em; }
     .sec-h h2::before { content: "/"; color: var(--accent); margin-right: 8px; }
   </style>
+  <style id="estetica-2026">
+    /* ============================================================
+       ESTÉTICA NUEVA (aprobada por Maxi el 25/11) — va al final del <head>
+       de index.html y soloboom.html y pisa colores, letras y formas.
+       No cambia contenido ni funciones: estados de Twitch/Kick, redes,
+       reproductor, tienda, sorteos y preguntas siguen igual.
+       Guía: docs/GUIA-ESTILO-AZMEYN.md
+       ============================================================ */
+    /* Fuentes livianas (Fontsource, licencia OFL), solo caracteres latinos */
+    @font-face { font-family: "Montserrat"; font-weight: 800; font-style: normal; font-display: swap; src: url(fonts/montserrat-latin-800-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Inter"; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/inter-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Inter"; font-weight: 500 900; font-style: normal; font-display: swap; src: url(fonts/inter-latin-700-normal.woff2) format("woff2"); }
+    :root {
+      --bg: #121416;
+      --panel: rgba(30, 33, 38, 0.55);
+      --panel-2: rgba(255, 255, 255, 0.06);
+      --line: rgba(255, 255, 255, 0.12);
+      --line-hi: rgba(255, 255, 255, 0.22);
+      --fg: #F3F1EC;
+      --muted: #A3A8AE;
+      --accent: #FF3D81;
+      --accent-ink: #17130C;
+      --live: #57C98A;
+      --good: #57C98A;
+      --font-display: "Montserrat", "Segoe UI", Arial, sans-serif;
+      --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --r: 10px;
+      --vidrio: none;               /* en el celu, sin desenfoque en vivo: carga rápido */
+    }
+    @media (min-width: 960px) { :root { --vidrio: blur(14px); } }
+    @media (max-width: 959px) { :root { --panel: rgba(30, 33, 38, 0.82); } }
+
+    /* Fondo: el directo bien difuminado arriba, que se funde a grafito hacia abajo y se mueve lento */
+    body { background: #121416; }
+    body::after {
+      content: ""; position: fixed; inset: -12%; z-index: -2; pointer-events: none;
+      background: url(img/fondo-difuminado.jpg) center top / cover no-repeat;   /* la imagen ya viene desenfocada y oscurecida */
+      animation: deriva 40s ease-in-out infinite alternate;
+    }
+    .app::before {
+      content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background: linear-gradient(180deg, rgba(18, 20, 22, 0.1) 0, rgba(18, 20, 22, 0.4) 45vh, #121416 95vh);
+    }
+    @keyframes deriva { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.1) translate(-3%, 2%); } }
+    .main { background: none; }
+
+    /* Letras: títulos en Montserrat ExtraBold, sin mayúsculas forzadas */
+    h1, h2, h3, .brand b, .sec-h h2, .dc h3, .account h3, .event h3, .card-body h3, .step h3, .cal-status, .card-art .num {
+      font-family: var(--font-display) !important; font-weight: 800 !important; text-transform: none !important; letter-spacing: -0.015em !important;
+    }
+    .brand b { text-transform: uppercase !important; letter-spacing: 0.02em !important; }
+
+    /* Tarjetas tipo vidrio */
+    .player, .vods, .dc, .account, .contact, .pts-box, .card, .step, .quick, .cal, .draw, .faq, .rules, .tickets, .earn-grid > *, .prize, .soc-card {
+      background: var(--panel) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: var(--r) !important;
+      -webkit-backdrop-filter: var(--vidrio); backdrop-filter: var(--vidrio);
+    }
+    .vod, .vod-th, .screen, .card-top { border-radius: 8px; }
+    .player { overflow: hidden; }
+    .card { overflow: hidden; }
+
+    /* Botones apenas redondeados, texto normal */
+    .btn { border-radius: 8px; text-transform: none; letter-spacing: 0; font: 700 15px/1 var(--font-body); }
+    .btn.ghost { border: 1px solid var(--line-hi); }
+    .chip { border-radius: 999px; }
+    .pill { border-radius: 10px; }
+
+    /* Menú: en la compu pasa de la columna izquierda a una barra arriba con los links en línea */
+    .side { background: rgba(18, 20, 22, 0.72); -webkit-backdrop-filter: var(--vidrio); backdrop-filter: var(--vidrio); border-bottom: 1px solid var(--line); }
+    .logo, .logo-wrap { border-radius: 0 !important; background: none !important; object-fit: contain; }
+    .logo-wrap::before { display: none; }
+    .nav a { font: 600 13px/1 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; border-left: 0; border-bottom: 2px solid transparent; border-radius: 0; }
+    .nav a[aria-current="true"], .nav a[aria-current="page"] { background: none !important; color: var(--fg) !important; border-bottom-color: var(--accent) !important; }
+    @media (min-width: 960px) {
+      .app { grid-template-columns: minmax(0, 1fr) !important; }
+      .side {
+        position: sticky; top: 0; height: auto; flex-direction: row; align-items: center; gap: 12px;
+        padding: 14px max(36px, env(safe-area-inset-right, 0px)) 14px max(36px, env(safe-area-inset-left, 0px));
+        border-right: 0; border-bottom: 1px solid var(--line); overflow: visible;
+      }
+      .brand { padding: 0; }
+      .brand small { display: none; }
+      .nav { flex-direction: row; gap: 4px; margin-left: auto; }
+      .grp { display: contents; }
+      .grp-h { display: none; }
+      .nav-bottom { padding-top: 0; border-top: 0; }
+      .nav a { min-height: 40px; padding: 8px 12px; margin: 0; font-size: 13px; }
+      .has-sub { position: relative; display: block; }
+      .sub, .nav a[aria-current="page"] + .sub { display: none; position: absolute; top: 100%; left: 0; z-index: 40; min-width: 220px; margin: 0; padding: 6px; border: 1px solid var(--line); border-radius: 10px; background: rgba(18, 20, 22, 0.96); }
+      .has-sub:hover .sub, .has-sub:focus-within .sub { display: grid; }
+      .sub a { text-transform: none; letter-spacing: 0; font-size: 14px; border-bottom: 0; }
+      .topbar { top: var(--side-h, 69px); }
+      section[id] { scroll-margin-top: calc(var(--side-h, 69px) + var(--top-h, 65px) + 20px); }
+    }
+    .topbar { background: rgba(18, 20, 22, 0.6); }
+
+    /* Cuenta regresiva: tarjeta vidrio con reloj de cajitas (días, horas, min, seg) */
+    .event {
+      clip-path: none !important; background: var(--panel) !important; color: var(--fg) !important;
+      border: 1px solid var(--line); border-radius: var(--r);
+      -webkit-backdrop-filter: var(--vidrio); backdrop-filter: var(--vidrio);
+      animation: sube 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    .event::after { display: none; }
+    .ev-k { color: var(--accent); font: 700 12px/1.2 var(--font-body); letter-spacing: 0.14em; }
+    .event h3 span { color: var(--fg); }
+    .event .ev-date { color: var(--muted); font: 500 14px/1.3 var(--font-body); text-transform: none; letter-spacing: 0; }
+    .event .count { display: block; margin-top: 12px; padding: 0; border-radius: 0; background: none; color: var(--fg); font: 800 22px/1 var(--font-display); text-transform: none; letter-spacing: 0; }
+    .event .count.urgent { animation: none; }
+    .reloj { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .reloj span { display: block; background: rgba(0, 0, 0, 0.28); border: 1px solid var(--line); border-radius: 8px; padding: 10px 0 8px; text-align: center; }
+    .reloj b { display: block; font: 800 clamp(26px, 8vw, 40px)/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--fg); }
+    .reloj b.seg { color: var(--accent); }
+    .reloj small { display: block; margin-top: 4px; font: 700 10px/1 var(--font-body); letter-spacing: 0.14em; color: var(--muted); }
+    .event .btn { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .event .btn.ghost { background: transparent; color: var(--fg); border-color: var(--line-hi); }
+    .event :focus-visible { outline-color: var(--fg); }
+    @keyframes sube { from { opacity: 0; transform: translateY(14px); } }
+
+    /* Imágenes con borde fino */
+    .vod-th img, .screen { border-radius: 8px; }
+    .vod { border: 1px solid var(--line); border-radius: 8px; background: rgba(0, 0, 0, 0.2); }
+
+    /* Canjes: premios en lista (una fila por premio; dos columnas en compu) */
+    .grid { grid-template-columns: minmax(0, 1fr) !important; }
+    @media (min-width: 1100px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+    .card, .card.major { display: grid !important; grid-template-columns: minmax(96px, 130px) minmax(0, 1fr) !important; grid-column: auto !important; }
+    .card .card-top { grid-column: 1 / -1; background: rgba(255, 255, 255, 0.04); border-radius: 0; font: 600 12px/1.2 var(--font-body); }
+    .card .card-art { grid-row: 2; padding: 12px; background: none; align-content: center; }
+    .card-art .num { font-size: 30px !important; color: var(--accent); }
+    .card.cant .num { color: var(--muted); }
+    .art-ic { display: none; }
+    .card .card-body { grid-row: 2; display: grid !important; grid-template-columns: minmax(0, 1fr) auto; column-gap: 14px; row-gap: 6px; align-content: center; padding: 14px 14px 14px 0; }
+    .card .card-body > :not(.btn) { grid-column: 1; }
+    .card .card-body h3 { font-size: 18px !important; }
+    .card .card-body .btn { grid-column: 2; grid-row: 1 / span 4; align-self: center; width: auto; min-width: 0; margin-top: 0; padding: 11px 14px; }
+    .card.can { border-color: var(--accent) !important; box-shadow: 0 0 0 1px rgba(255, 61, 129, 0.35); }
+    .card:hover { transform: none; }
+    @media (max-width: 520px) {
+      .card .card-body { grid-template-columns: minmax(0, 1fr); padding-right: 14px; }
+      .card .card-body .btn { grid-column: 1; grid-row: auto; width: 100%; }
+    }
+    .pts-box input { border-radius: 8px; font-family: var(--font-display); font-weight: 800; background: rgba(0, 0, 0, 0.25); }
+
+    /* La hoja de canje va encima del contenido: fondo sólido, nada transparente (aviso de Tienda, 25/11) */
+    .sheet { background: #1C1F23 !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    /* La franja de arriba del celular (zona del reloj y la batería) también va sólida */
+    body::before { background: #121416 !important; }
+
+    @media (prefers-reduced-motion: reduce) { body::after, .event { animation: none; } }
+  </style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>
@@ -697,7 +850,7 @@
   <header class="side">
     <a class="brand" href="#inicio" aria-label="Azmeyn, ir al inicio">
       <span class="logo-wrap">
-        <img class="logo" id="logo" src="logo.png" alt="" width="44" height="44">
+        <img class="logo" id="logo" src="logo-azmeyn.svg" alt="" width="44" height="44">
         <span class="logo-dot" aria-hidden="true"></span>
       </span>
       <span><b>Azmeyn</b><small id="brand-sub"></small></span>
@@ -962,6 +1115,7 @@
       return {
         over: false,
         label: "Cuenta regresiva",
+        parts: [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60],
         clock: Math.floor(s / 86400) + "d : " + pad(Math.floor(s % 86400 / 3600)) + "h : " + pad(Math.floor(s % 3600 / 60)) + "m : " + pad(s % 60) + "s",
         soon: kick - now < DAY,
         text: left <= 0 ? "Empieza hoy" : left === 1 ? "Empieza mañana" : "Empieza en " + left + " días"
@@ -975,7 +1129,13 @@
   function renderEvent() {
     ei = eventInfo();
     var c = $("event-count");
-    c.textContent = ei ? (ei.clock || ei.text) : "";
+    if (ei && ei.parts) {
+      /* Estética 25/11: reloj de cajitas (solo números que calcula esta página) */
+      var lab = ["DÍAS", "HORAS", "MIN", "SEG"];
+      c.innerHTML = '<span class="reloj">' + ei.parts.map(function (n, i) { return '<span><b' + (i === 3 ? ' class="seg"' : "") + '>' + pad(n) + '</b><small>' + lab[i] + '</small></span>'; }).join("") + '</span>';
+    } else {
+      c.textContent = ei ? (ei.clock || ei.text) : "";
+    }
     c.classList.toggle("urgent", !!(ei && ei.clock && ei.soon));
     if (ei && ei.label) { $("ev-k").textContent = ei.label; }
     if (ei && ei.clock) { c.setAttribute("aria-label", ei.text); } else { c.removeAttribute("aria-label"); }
