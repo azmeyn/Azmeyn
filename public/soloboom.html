@@ -1131,6 +1131,25 @@
     /* Pantalla ancha: el contenido va centrado, no pegado a la izquierda */
     .wrap { margin-left: auto !important; margin-right: auto !important; max-width: 1280px !important; }
   </style>
+<style id="liviana-2026">
+    /* ===== LIVIANA 25/11 noche: que ande fluida en cualquier equipo, incluso los más flojos ===== */
+    /* Nada se anima para siempre pintando sombras o degradados: lo que queda es solo opacidad (la resuelve la placa de video) */
+    @keyframes latir { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .brand[data-live="true"] .logo-dot,
+    .live-chip i,
+    .pill[data-state="live"] .tag::before,
+    .tl li.next .dot { animation: latir 1.8s ease-in-out infinite !important; box-shadow: none !important; }
+    /* Quedan quietos: brillo de texto, destello del sorteo final, "hoy" y reloj urgente, esqueletos y barrido de carga */
+    .cal-status.urgent,
+    .state.is-today,
+    .event .count.urgent,
+    .draw.final.vis::after,
+    .sk-box { animation: none !important; }
+    .screen[data-loading]::after { animation: none !important; display: none; }
+    /* Celulares: sin la capa de fondo a pantalla completa (es lo que más cuesta mezclar en equipos viejos); queda el color liso */
+    @media (max-width: 900px) { body::after { display: none !important; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+  </style>
 </head>
 <body>
 
@@ -1975,25 +1994,32 @@
   /* ---------- Menú lateral: marca la subsección de la tienda que se está viendo ---------- */
   var subLinks = Array.prototype.slice.call(document.querySelectorAll(".sub a"));
   var ticking = false;
+  var lastAct = null;
   function updateSub() {
     ticking = false;
+    /* Primero se lee todo y después se escribe: así el navegador no recalcula el diseño entero en cada cuadro del scroll */
+    var y = window.pageYOffset, vh = window.innerHeight, docH = document.documentElement.scrollHeight;
     var tb = document.querySelector(".topbar").offsetHeight;
-    var line = window.pageYOffset + (window.innerWidth >= 960 ? tb : document.querySelector(".side").offsetHeight) + Math.round(window.innerHeight * 0.25);
+    var line = y + (window.innerWidth >= 960 ? tb : document.querySelector(".side").offsetHeight) + Math.round(vh * 0.25);
     var act = null;
     subLinks.forEach(function (a) {
       var el = $(a.getAttribute("href").slice(1));
-      if (el && el.getBoundingClientRect().top + window.pageYOffset <= line) { act = a; }
+      if (el && el.getBoundingClientRect().top + y <= line) { act = a; }
     });
     /* Al llegar al final de la página queda marcada la última (Preguntas) */
-    if (subLinks.length && window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 4) {
+    if (subLinks.length && vh + y >= docH - 4) {
       act = subLinks[subLinks.length - 1];
     }
-    subLinks.forEach(function (a) {
-      if (a === act) { a.setAttribute("aria-current", "true"); } else { a.removeAttribute("aria-current"); }
-    });
+    /* Solo se toca el menú cuando cambia la sección marcada */
+    if (act !== lastAct) {
+      lastAct = act;
+      subLinks.forEach(function (a) {
+        if (a === act) { a.setAttribute("aria-current", "true"); } else { a.removeAttribute("aria-current"); }
+      });
+    }
     /* Barra de progreso de lectura */
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    $("progress").style.transform = "scaleX(" + (max > 0 ? Math.min(1, Math.max(0, window.pageYOffset / max)) : 0) + ")";
+    var max = docH - vh;
+    $("progress").style.transform = "scaleX(" + (max > 0 ? Math.min(1, Math.max(0, y / max)) : 0) + ")";
   }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(updateSub); } }
   window.addEventListener("scroll", onScroll, { passive: true });

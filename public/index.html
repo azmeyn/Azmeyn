@@ -873,6 +873,25 @@
     /* Pantalla ancha: el contenido va centrado, no pegado a la izquierda */
     .wrap { margin-left: auto !important; margin-right: auto !important; max-width: 1280px !important; }
   </style>
+<style id="liviana-2026">
+    /* ===== LIVIANA 25/11 noche: que ande fluida en cualquier equipo, incluso los más flojos ===== */
+    /* Nada se anima para siempre pintando sombras o degradados: lo que queda es solo opacidad (la resuelve la placa de video) */
+    @keyframes latir { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .brand[data-live="true"] .logo-dot,
+    .live-chip i,
+    .pill[data-state="live"] .tag::before,
+    .tl li.next .dot { animation: latir 1.8s ease-in-out infinite !important; box-shadow: none !important; }
+    /* Quedan quietos: brillo de texto, destello del sorteo final, "hoy" y reloj urgente, esqueletos y barrido de carga */
+    .cal-status.urgent,
+    .state.is-today,
+    .event .count.urgent,
+    .draw.final.vis::after,
+    .sk-box { animation: none !important; }
+    .screen[data-loading]::after { animation: none !important; display: none; }
+    /* Celulares: sin la capa de fondo a pantalla completa (es lo que más cuesta mezclar en equipos viejos); queda el color liso */
+    @media (max-width: 900px) { body::after { display: none !important; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+  </style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>
@@ -1165,7 +1184,16 @@
     if (ei && ei.parts) {
       /* Estética 25/11: reloj de cajitas (solo números que calcula esta página) */
       var lab = ["DÍAS", "HORAS", "MIN", "SEG"];
-      c.innerHTML = '<span class="reloj">' + ei.parts.map(function (n, i) { return '<span><b' + (i === 3 ? ' class="seg"' : "") + '>' + pad(n) + '</b><small>' + lab[i] + '</small></span>'; }).join("") + '</span>';
+      var box = c.firstChild && c.firstChild.className === "reloj" ? c.firstChild : null;
+      if (box && box.children.length === 4) {
+        /* Ya está armado: solo se cambian los números que cambiaron (no se rehace todo cada segundo) */
+        ei.parts.forEach(function (n, i) {
+          var b = box.children[i].firstChild, t = pad(n);
+          if (b.textContent !== t) { b.textContent = t; }
+        });
+      } else {
+        c.innerHTML = '<span class="reloj">' + ei.parts.map(function (n, i) { return '<span><b' + (i === 3 ? ' class="seg"' : "") + '>' + pad(n) + '</b><small>' + lab[i] + '</small></span>'; }).join("") + '</span>';
+      }
     } else {
       c.textContent = ei ? (ei.clock || ei.text) : "";
     }
@@ -1174,7 +1202,7 @@
     if (ei && ei.clock) { c.setAttribute("aria-label", ei.text); } else { c.removeAttribute("aria-label"); }
   }
   renderEvent();
-  setInterval(function () { if (ei && ei.clock) { renderEvent(); } }, 1000);
+  setInterval(function () { if (!document.hidden && ei && ei.clock) { renderEvent(); } }, 1000);
 
   /* ---------- Copiar el mail ---------- */
   $("copy-mail").addEventListener("click", function () {
@@ -1471,9 +1499,13 @@
     else if (window.innerHeight + y >= document.documentElement.scrollHeight - 4) { active = "contacto"; }
     return active;
   }
+  var lastId = null;
   function updateNav() {
     ticking = false;
     var id = activeSection();
+    /* Solo se toca el menú cuando cambia la sección marcada */
+    if (id === lastId) { return; }
+    lastId = id;
     links.forEach(function (a) {
       if (a.getAttribute("href") === "#" + id) { a.setAttribute("aria-current", "true"); }
       else { a.removeAttribute("aria-current"); }
