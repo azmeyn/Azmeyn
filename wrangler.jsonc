@@ -13,6 +13,11 @@
   // No borra las variables cargadas en el panel de Cloudflare al desplegar
   "keep_vars": true,
 "kv_namespaces": [{ "binding": "CHECKINS", "id": "f2675dba0fb3436f9eec3f18aecdd38c" }],
+  // Tickets automáticos (tickets-auto.js): corre cada 5 minutos
+  "triggers": { "crons": ["*/5 * * * *"] },
+  // Enlace interno con el Worker del Panel stream para leer las predicciones de Twitch
+  // (no se puede usar desde internet). Hay que desplegar primero panel-stream-azmeyn.
+  "services": [{ "binding": "PANEL_STREAM", "service": "panel-stream-azmeyn", "entrypoint": "Predicciones" }],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
