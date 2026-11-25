@@ -252,6 +252,11 @@ async function muestra(env, informe) {
   } else {
     informe.muestra.predicciones = "falta el enlace con panel-stream-azmeyn";
   }
+  // Cuántos subs ve hoy (sirve para comprobar el permiso de Twitch antes del primer domingo)
+  try {
+    const subs = await env.PANEL_STREAM.subsActuales();
+    informe.muestra.subs = { cantidad: subs.length, primeros: subs.slice(0, 5) };
+  } catch (e) { informe.muestra.subs = "error: " + (e && e.message ? e.message : "sin detalle"); }
 }
 
 /* --------------------------------- Entrada --------------------------------- */
