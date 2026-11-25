@@ -1098,6 +1098,39 @@
 
     @media (prefers-reduced-motion: reduce) { body::after, .event { animation: none; } }
   </style>
+  <style id="arreglo-2026">
+    /* ===== ARREGLO 25/11 noche: rendimiento y Canjes en pantalla ancha ===== */
+    /* Rendimiento: sin vidrio en vivo ni fondo animado (hacían redibujar toda la página al hacer scroll) */
+    :root { --vidrio: none; --panel: rgba(28, 31, 35, 0.9); }
+    *, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+    body::after { animation: none !important; transform: none !important; inset: 0 !important; }
+    .side { background: rgba(18, 20, 22, 0.96) !important; }
+    .topbar { background: rgba(18, 20, 22, 0.94) !important; }
+
+    /* Canjes: columna de precio fija y ancha, número que nunca se corta */
+    .card, .card.major { grid-template-columns: 150px minmax(0, 1fr) !important; }
+    .card-art .num { font-size: 24px !important; white-space: nowrap; font-variant-numeric: tabular-nums; gap: 6px !important; }
+    .card-art .num svg, .card-art .coin { width: 18px !important; height: 18px !important; flex: none; }
+    .card .card-art { padding: 12px 10px 12px 14px !important; justify-items: start; text-align: left; }
+    /* Franja de arriba liviana */
+    .card .card-top { background: none !important; padding: 10px 14px 0 !important; font: 600 11px/1.2 var(--font-body) !important; letter-spacing: 0.08em; color: var(--muted); }
+    /* Misma altura y mismo botón en todas */
+    .grid { align-items: stretch; }
+    .card .card-body .btn { width: 150px !important; min-width: 150px; justify-content: center; }
+    @media (min-width: 1100px) { .card.major { grid-column: 1 / -1 !important; } }
+    @media (max-width: 520px) {
+      .card, .card.major { grid-template-columns: 110px minmax(0, 1fr) !important; }
+      .card .card-body .btn { width: 100% !important; min-width: 0; }
+      .grid { grid-auto-rows: auto; }
+    }
+    /* Listas de puntos y tickets: el número cerca del texto */
+    .earn, .tickets { max-width: 720px; }
+    .tickets-row { grid-template-columns: minmax(0, 1fr) !important; max-width: 720px; }
+    .rules-col, .rules { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+    html, body { overflow-x: hidden; }
+    /* Pantalla ancha: el contenido va centrado, no pegado a la izquierda */
+    .wrap { margin-left: auto !important; margin-right: auto !important; max-width: 1280px !important; }
+  </style>
 </head>
 <body>
 
