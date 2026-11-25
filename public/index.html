@@ -935,6 +935,18 @@
       .card .card-body .btn { width: 100% !important; min-width: 0; }
     }
   </style>
+<style id="alineado-2026">
+    /* ===== ALINEADO 25/11: la barra de arriba, el contenido y el pie sobre la misma columna ===== */
+    @media (min-width: 1360px) {
+      .side { padding-left: calc(max(0px, (100% - 1560px) / 2) + 56px) !important; padding-right: calc(max(0px, (100% - 1560px) / 2) + 56px) !important; }
+    }
+    /* La barra de arriba vuelve a quedar fija: el recorte lateral va solo en html */
+    html { overflow-x: hidden; }
+    body { overflow: visible !important; }
+    .side { background: #121416 !important; }
+    @media (max-width: 959px) { .side, .topbar .wrap, main .wrap, footer .wrap { padding-left: 20px !important; padding-right: 20px !important; } }
+    @media (min-width: 960px) and (max-width: 1359px) { .side { padding-left: max(36px, calc((100% - 1280px) / 2 + 36px)) !important; padding-right: max(36px, calc((100% - 1280px) / 2 + 36px)) !important; } }
+  </style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>

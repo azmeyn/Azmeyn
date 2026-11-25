@@ -1193,6 +1193,52 @@
       .card .card-body .btn { width: 100% !important; min-width: 0; }
     }
   </style>
+<style id="alineado-2026">
+    /* ===== ALINEADO 25/11: nada pegado a los bordes y todo sobre la misma columna ===== */
+    @media (min-width: 1360px) {
+      .side { padding-left: calc(max(0px, (100% - 1560px) / 2) + 56px) !important; padding-right: calc(max(0px, (100% - 1560px) / 2) + 56px) !important; }
+      main.content, footer .wrap { box-sizing: border-box; width: 100% !important; max-width: 1560px !important; margin-left: auto !important; margin-right: auto !important; padding-left: 56px !important; padding-right: 56px !important; }
+    }
+    /* La barra de arriba vuelve a quedar fija: el recorte lateral va solo en html (en body rompía el "sticky" y la línea de avance quedaba suelta) */
+    html { overflow-x: hidden; }
+    body { overflow: visible !important; }
+    .side { background: #121416 !important; }
+    @media (max-width: 1359px) { footer .wrap { max-width: none !important; } }
+    @media (max-width: 959px) { .side, .topbar .wrap { padding-left: 20px !important; padding-right: 20px !important; } }
+    .cal { max-width: none !important; }
+    /* Margen interno parejo en todos los cuadros */
+    .prize { padding: 20px 24px !important; align-items: center; column-gap: 20px; }
+    .prize b { line-height: 1.05 !important; }
+    .hero-rows .r { padding-left: 24px; padding-right: 24px; }
+    .step, .draw, .pts-box, .quick, .cal, .earn-grid > *, .rules { box-sizing: border-box; padding: 22px 24px !important; }
+    /* Formas de juntar puntos y comandos: dos cuadros del mismo alto, los valores contra el margen derecho */
+    .earn-grid { align-items: stretch !important; gap: 12px !important; }
+    .earn-h { margin: 0; }
+    .earn { max-width: none !important; }
+    .earn li:last-child { border-bottom: 0 !important; padding-bottom: 0; }
+    /* Tickets y reglas: a todo el ancho, mitad y mitad */
+    .tickets-row { max-width: none !important; gap: 12px !important; align-items: stretch !important; }
+    @media (min-width: 900px) { .tickets-row { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+    .tickets { box-sizing: border-box; max-width: none !important; padding: 8px 24px !important; display: grid; align-content: center; }
+    .tickets li { padding: 15px 0; }
+    .tickets li:first-child { border-top: 0 !important; }
+    .tickets li:last-child { border-bottom: 0 !important; }
+    .rules-col, .rules { height: 100%; }
+    .rules { align-content: center; }
+    /* Preguntas: mismo ancho que el resto y la respuesta alineada con la pregunta */
+    .faq-list { max-width: none !important; }
+    .faq summary { padding: 16px 24px; }
+    .q-n { flex: none; width: 24px; }
+    .faq-a { padding: 0 24px 20px 62px; }
+    @media (max-width: 559px) {
+      .prize { padding: 18px 20px !important; }
+      .hero-rows .r { padding-left: 20px; padding-right: 20px; }
+      .step, .draw, .pts-box, .quick, .cal, .earn-grid > *, .rules { padding: 18px 20px !important; }
+      .tickets { padding: 6px 20px !important; }
+      .faq summary { padding: 14px 20px; }
+      .faq-a { padding: 0 20px 18px 20px; }
+    }
+  </style>
 </head>
 <body>
 
