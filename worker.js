@@ -11,6 +11,7 @@
 // muestra "ver canal" en lugar de online/offline. Nunca se rompe la página.
 
 import { handleAvisos } from "./avisos.js";
+import { ticketsAuto, ticketsAutoRuta } from "./tickets-auto.js";
 
 let twitchTokenCache = null; // { value, exp }
 let kickTokenCache = null;   // { value, exp }
@@ -285,6 +286,13 @@ async function ticketsList(url, env) {
   });
 }
 
+/* Lo que necesita tickets-auto.js de este archivo (para no duplicar la lógica de tickets) */
+const HELPERS = {
+  EVENT_START: EVENT_START, EVENT_DAYS: EVENT_DAYS,
+  dayIndex: dayIndex, cleanUser: cleanUser, same: same,
+  loadRec: loadRec, saveRec: saveRec, sePoints: sePoints
+};
+
 /* ------------------------------ Handler ------------------------------ */
 async function live(request, env, ctx) {
   // Caché de 30 segundos para no consultar a Twitch y Kick en cada visita
@@ -325,10 +333,20 @@ export default {
         if (url.pathname === "/api/presente") { return await presente(url, env); }
         if (url.pathname === "/api/ticket-add") { return await ticketAdd(url, env); }
         if (url.pathname === "/api/tickets") { return await ticketsList(url, env); }
+        if (url.pathname === "/api/tickets-auto") { return await ticketsAutoRuta(url, env, HELPERS); }
       } catch (e) {
         return plain("Error interno, probá de nuevo en un rato", 500);
       }
     }
     return env.ASSETS.fetch(request);
+  },
+
+  // Cada 5 minutos (ver "triggers" en wrangler.jsonc): tickets por canje y por predicciones.
+  async scheduled(event, env, ctx) {
+    const idx = dayIndex(argDay(0));
+    if (idx < 0 || idx > EVENT_DAYS) { return; } // solo durante el torneo (y el día siguiente, por las dudas)
+    ctx.waitUntil(ticketsAuto(env, HELPERS, false).then(function (inf) {
+      if (inf.errores.length) { console.log("tickets-auto: " + inf.errores.join(" | ")); }
+    }));
   }
 };
