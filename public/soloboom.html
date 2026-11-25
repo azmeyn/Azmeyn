@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Mi tienda de puntos · SoloBoom 6 · Azmeyn</title>
-  <meta name="description" content="Mi tienda personal de puntos, premios y sorteos para mi directo durante el SoloBoom Challenge 6. No es una tienda del evento.">
+  <title>Canjes · AZMEYN</title>
+  <meta name="description" content="Juntá puntos mirando mi directo en Twitch y canjealos por premios. Sorteos todos los domingos del SoloBoom Challenge 6.">
   <meta name="theme-color" content="#ff3d81">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_AR">
-  <meta property="og:title" content="Mi tienda de puntos · SoloBoom 6">
-  <meta property="og:description" content="Mirá mi directo en Twitch, juntá puntos para canjear premios y participá por +USD 170 en premios y sorteos durante el SoloBoom 6.">
+  <meta property="og:title" content="Canjes · AZMEYN">
+  <meta property="og:description" content="Mirá mi directo, juntá puntos y canjealos. Más de USD 170 en premios y sorteos durante el SoloBoom 6.">
   <meta property="og:site_name" content="Azmeyn">
   <meta property="og:url" content="https://azmeyn.com/soloboom.html">
   <link rel="canonical" href="https://azmeyn.com/soloboom.html">
@@ -930,6 +930,20 @@
       .fx { opacity: 1; transform: none; }
       .chk path { stroke-dashoffset: 0; }
     }
+
+    /* ===== Estilo AZMEYN compartido con OBS (25/11) ===== */
+    :root { --r: 10px; }
+    .card, .step, .draw, .faq, .pts-box, .quick, .rules, .cal, .sheet-in, .tickets, .earn, .soc, .prize { border-radius: var(--r); }
+    .card { overflow: hidden; }
+    .btn { border-radius: var(--r); font-family: var(--font-display); font-size: 17px; letter-spacing: .06em; }
+    .card-body h3 { font: 700 24px/1.05 var(--font-display); letter-spacing: .01em; }
+    .card-art .num { font-family: var(--font-display); }
+    .sec-h h2::before { content: "/"; color: var(--accent); margin-right: 8px; }
+    h1#titulo { font-family: var(--font-display); }
+    @media (max-width: 560px) {
+      .card-art .art-ic { display: none; }
+      .card-body p:empty { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -953,10 +967,10 @@
         <p class="grp-h">Directo</p>
         <a href="index.html#inicio">Inicio</a>
         <div class="has-sub">
-          <a href="soloboom.html" aria-current="page">Mi tienda · SoloBoom 6</a>
+          <a href="soloboom.html" aria-current="page">SoloBoom 6</a>
           <div class="sub">
             <a href="#como">Cómo funciona</a>
-            <a href="#tienda">Premios</a>
+            <a href="#tienda">Canjes</a>
             <a href="#sorteos">Sorteos</a>
             <a href="#faq">Preguntas</a>
           </div>
@@ -1012,9 +1026,9 @@
       <!-- HERO + CALENDARIO -->
       <section class="hero" aria-labelledby="titulo">
         <div class="hero-copy">
-          <p class="eyebrow">Mi tienda personal · SoloBoom Challenge 6 · 30/11 al 20/12</p>
-          <h1 id="titulo">Mi tienda de puntos</h1>
-          <p class="lede">Es mi tienda personal para el SoloBoom, no la del torneo. Mirá mi directo en Twitch, juntá puntos para canjear premios y acumulá tickets en el chat para los sorteos.</p>
+          <p class="eyebrow">SoloBoom Challenge 6 · 30/11 al 20/12</p>
+          <h1 id="titulo">Canjes</h1>
+          <p class="lede">Mirá el directo en Twitch, juntá puntos y canjealos acá. Con <code>!presente</code> sumás tickets para los sorteos.</p>
           <div class="prize">
             <b>+USD 170</b>
             <span>en premios y sorteos durante el torneo</span>
@@ -1025,19 +1039,19 @@
             <div class="r"><span class="k">Domingo 20/12</span><span class="v usd">USD 60</span><span class="t">en el sorteo final</span></div>
           </div>
           <div class="cta">
-            <a class="btn" href="#tienda">Ir a los premios</a>
+            <a class="btn" href="#tienda">Ver los canjes</a>
             <a class="btn ghost" href="#como">Cómo funciona</a>
           </div>
         </div>
 
         <section class="cal" aria-labelledby="cal-h">
           <div class="cal-head">
-            <h2 id="cal-h" class="cal-label">Calendario del evento</h2>
+            <h2 id="cal-h" class="cal-label">Calendario</h2>
             <span class="cal-next" id="next"></span>
           </div>
           <p class="cal-status" id="status">SoloBoom Challenge 6</p>
           <ol class="tl" id="cal" aria-label="Hitos del torneo y de los sorteos"></ol>
-          <p class="cal-foot">Todos los horarios son de Argentina (ARG).</p>
+          <p class="cal-foot">Horarios de Argentina.</p>
         </section>
       </section>
 
@@ -1045,32 +1059,32 @@
 
       <section id="como" aria-labelledby="como-h">
         <div class="sec-h"><h2 id="como-h">Cómo funciona</h2></div>
-        <p class="sec-p">Los puntos los suma el bot de mi canal mientras mirás el directo en Twitch (los puntos, tickets y comandos funcionan únicamente en Twitch, no en Kick). Escribí <code>!puntos</code> en el chat para ver cuántos tenés.</p>
+        <p class="sec-p">Los puntos los suma el bot mientras mirás el directo en Twitch. En Kick no corren. Escribí <code>!puntos</code> en el chat para ver cuántos tenés.</p>
 
         <div class="how sec-body">
           <article class="step">
             <span class="n" aria-hidden="true">01</span>
             <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
-            <h3>Ganá puntos viendo</h3>
-            <p>Sumás +60 puntos por hora mirando el directo en Twitch. No hace falta escribir en el chat.</p>
+            <h3>Mirá y sumá</h3>
+            <p>+60 puntos por hora mirando el directo en Twitch. No hace falta escribir.</p>
           </article>
           <article class="step">
             <span class="n" aria-hidden="true">02</span>
             <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg></span>
-            <h3>Registrá tu presencia</h3>
-            <p>Escribí <code>!presente</code> una vez por día en el chat de Twitch para sumar puntos y un ticket para los sorteos.</p>
+            <h3>Pasá lista</h3>
+            <p>Escribí <code>!presente</code> una vez por día: sumás puntos y un ticket.</p>
           </article>
           <article class="step">
             <span class="n" aria-hidden="true">03</span>
             <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v9H5v-9"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg></span>
-            <h3>Cambialos en la tienda</h3>
-            <p>Elegí un premio, copiá el comando y pegalo en mi chat de Twitch. Lo confirmo en vivo.</p>
+            <h3>Canjeá</h3>
+            <p>Elegí un premio, copiá el comando y pegalo en el chat de Twitch. Lo confirmo en vivo.</p>
           </article>
           <article class="step">
             <span class="n" aria-hidden="true">04</span>
             <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V7z"/></svg></span>
-            <h3>Jugá los sorteos</h3>
-            <p>Cada domingo hay un sorteo semanal y el domingo 20/12, día de cierre, también el sorteo final con todos tus tickets.</p>
+            <h3>Entrá a los sorteos</h3>
+            <p>Uno cada domingo y el final el 20/12, con todos tus tickets.</p>
           </article>
         </div>
 
@@ -1078,30 +1092,30 @@
           <div>
             <h3 class="earn-h">Formas de juntar puntos</h3>
             <ul class="earn">
-              <li><div class="what">Mirar el directo en Twitch<span>Mientras estés conectado al stream</span></div><span class="val">+60 / hora</span></li>
-              <li><div class="what">Check-in diario con <code>!presente</code><span>Una vez por día en el chat de Twitch</span></div><span class="val">+100</span></li>
-              <li><div class="what">Racha de 3 días seguidos<span>Tres días seguidos con <code>!presente</code></span></div><span class="val">+300</span></li>
-              <li><div class="what">Acertar una predicción<span>Se gana participando y acertando las predicciones del chat en vivo</span></div><span class="val">+200</span></li>
+              <li><div class="what">Mirar el directo en Twitch<span>Con el directo abierto</span></div><span class="val">+60 / hora</span></li>
+              <li><div class="what"><code>!presente</code> todos los días<span>Una vez por día, en el chat de Twitch</span></div><span class="val">+100</span></li>
+              <li><div class="what">Racha de 3 días<span>Tres <code>!presente</code> seguidos</span></div><span class="val">+300</span></li>
+              <li><div class="what">Acertar una predicción<span>Votás en el directo y la pegás</span></div><span class="val">+200</span></li>
             </ul>
           </div>
 
           <aside class="quick" aria-labelledby="quick-h">
             <h3 id="quick-h">Comandos rápidos</h3>
-            <p>Copialos y pegalos en el chat de mi canal. Funcionan solo en Twitch, no en Kick.</p>
+            <p>Copialos y pegalos en el chat de Twitch. En Kick no andan.</p>
             <div class="quick-row">
               <code>!puntos</code>
-              <span class="d">Ver cuántos puntos tenés</span>
+              <span class="d">Cuántos puntos tenés</span>
               <button class="btn ghost sm" type="button" data-quick="!puntos">Copiar</button>
             </div>
             <div class="quick-row">
               <code>!presente</code>
-              <span class="d">Check-in diario</span>
+              <span class="d">Pasar lista del día</span>
               <button class="btn ghost sm" type="button" data-quick="!presente">Copiar</button>
             </div>
             <div class="quick-row">
               <code>!canjear [premio]</code>
-              <span class="d">Elegí un premio para copiar su comando</span>
-              <a class="btn ghost sm" href="#tienda">Ir a premios →</a>
+              <span class="d">Elegís el premio y copiás el comando</span>
+              <a class="btn ghost sm" href="#tienda">Ver canjes →</a>
             </div>
             <p class="quick-status" id="quick-msg" role="status" aria-live="polite"></p>
           </aside>
@@ -1110,13 +1124,13 @@
 
       <!-- TIENDA / PREMIOS -->
       <section id="tienda" aria-labelledby="tienda-h">
-        <div class="sec-h"><h2 id="tienda-h">Premios</h2></div>
-        <p class="sec-p">Los premios con stock limitado se entregan por orden de canje.</p>
+        <div class="sec-h"><h2 id="tienda-h">Canjes</h2></div>
+        <p class="sec-p">Los que tienen stock se entregan por orden de llegada.</p>
         <div class="sec-body">
           <div class="pts-box">
             <label for="pts">Mis puntos</label>
             <input id="pts" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
-            <small>Escribí lo que te muestra <code>!puntos</code> en Twitch y te marco lo que te alcanza.</small>
+            <small>Poné lo que te dice <code>!puntos</code> y te marco lo que te alcanza.</small>
             <div class="pts-side">
               <span class="pts-count" id="pts-count" aria-live="polite"></span>
               <button class="btn ghost sm" type="button" id="pts-clear" hidden>Limpiar</button>
@@ -1131,46 +1145,46 @@
       <!-- SORTEOS -->
       <section id="sorteos" aria-labelledby="sorteos-h">
         <div class="sec-h"><h2 id="sorteos-h">Sorteos</h2></div>
-        <p class="sec-p">Tres sorteos semanales y uno final. Los ganadores se eligen en vivo al cierre del stream del día.</p>
+        <p class="sec-p">Tres semanales y uno final. Los ganadores salen en vivo al cerrar el directo.</p>
         <div class="draws sec-body">
           <article class="draw" data-draw="6">
             <div class="draw-top"><p class="when">Domingo 6/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 1</h3>
-            <p>RP o skins. Participan los tickets de la semana 1.</p>
+            <p>RP o skins. Entran los tickets de la semana 1.</p>
             <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
           </article>
           <article class="draw" data-draw="13">
             <div class="draw-top"><p class="when">Domingo 13/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 2</h3>
-            <p>RP o skins. Participan los tickets de la semana 2.</p>
+            <p>RP o skins. Entran los tickets de la semana 2.</p>
             <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
           </article>
           <article class="draw" data-draw="20">
             <div class="draw-top"><p class="when">Domingo 20/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 3</h3>
-            <p>RP o skins. Participan los tickets de la semana 3.</p>
+            <p>RP o skins. Entran los tickets de la semana 3.</p>
             <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
           </article>
           <article class="draw final" data-draw="20f">
-            <div class="draw-top"><p class="when">Domingo 20/12 · día de cierre del torneo</p><span class="state">Próximo</span></div>
+            <div class="draw-top"><p class="when">Domingo 20/12 · cierre del torneo</p><span class="state">Próximo</span></div>
             <h3>Sorteo final</h3>
-            <p>RP o skins. Todos los tickets que juntaste durante las tres semanas van a una ruleta digital que giro en vivo.</p>
+            <p>RP o skins. Todos tus tickets de las tres semanas van a una ruleta que giro en vivo.</p>
             <p class="draw-amt"><strong class="amt">USD 60</strong><span>de pozo</span></p>
           </article>
         </div>
 
         <div class="tickets-row">
           <ul class="tickets">
-            <li><span>Check-in diario con <code>!presente</code></span><span class="val">1 ticket</span></li>
+            <li><span><code>!presente</code> del día</span><span class="val">1 ticket</span></li>
             <li><span>Acertar 3 predicciones en el mismo día</span><span class="val">1 ticket</span></li>
-            <li><span>Canje en tienda (800 pts · máx. 3/semana)</span><span class="val">1 ticket</span></li>
+            <li><span>Canje de ticket (800 pts, hasta 3 por semana)</span><span class="val">1 ticket</span></li>
           </ul>
           <div class="rules-col">
             <aside class="rules">
               <span class="k">Bonus y reglas</span>
-              <p><b>Suscriptores:</b> si estás suscripto a mi canal de Twitch, tus tickets valen x2 en la ruleta del sorteo final.</p>
-              <p><b>Un semanal por persona:</b> quien gana un sorteo semanal no puede ganar otro semanal. El sorteo final no tiene esa restricción.</p>
-              <p><b>Para cobrar RP o skins:</b> agregame en LoL como <code>OTK Azmeyn#OTK</code> (LAS) cuando puedas. Riot pide 7 días de amistad para regalar, así que si todavía no cumplimos, no pasa nada: te guardo el premio y te lo entrego después. En BR solo puedo regalar RP.</p>
+              <p><b>Subs:</b> +2 tickets por semana, que entran al semanal y al final.</p>
+              <p><b>Un semanal por persona:</b> si ganaste uno, no entrás a los otros semanales. Al final sí entrás.</p>
+              <p><b>Para cobrar RP o skins:</b> agregame en LoL como <code>OTK Azmeyn#OTK</code> (LAS). En BR solo regalo RP.</p>
             </aside>
           </div>
         </div>
@@ -1179,23 +1193,23 @@
       <!-- PREGUNTAS FRECUENTES (FAQ) -->
       <section id="faq" aria-labelledby="faq-h">
         <div class="sec-h"><h2 id="faq-h">Preguntas frecuentes</h2></div>
-        <p class="sec-p">Dudas rápidas sobre los puntos, los tickets de sorteo y cómo reclamar cada canje en mi canal de Twitch.</p>
+        <p class="sec-p">Lo que más me preguntan.</p>
         <div class="faq-list sec-body">
           <details class="faq" name="faq" open>
-            <summary><span class="q-n">01</span><h3>¿Puedo acumular más de un ticket para el mismo sorteo?</h3><span class="chev" aria-hidden="true"></span></summary>
-            <div class="faq-a"><p>Sí. Sumás tickets todos los días con <code>!presente</code>, acertando 3 predicciones en el mismo día o canjeando hasta 3 tickets extra por semana en la sección Premios (800 puntos cada uno).</p></div>
+            <summary><span class="q-n">01</span><h3>¿Puedo tener más de un ticket?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Sí. Sumás con <code>!presente</code> todos los días, acertando 3 predicciones en el mismo día o canjeando hasta 3 tickets por semana (800 puntos cada uno).</p></div>
           </details>
           <details class="faq" name="faq">
-            <summary><span class="q-n">02</span><h3>¿Cómo se canjea un premio de la tienda?</h3><span class="chev" aria-hidden="true"></span></summary>
-            <div class="faq-a"><p>Hacé clic en «Canjear» en el premio que quieras y copiá el comando <code>!canjear</code> para pegarlo en el chat de <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">twitch.tv/azmeyn</a>. Lo verifico y confirmo en vivo (el sistema funciona únicamente en Twitch, no en Kick). Para coordinar entregas o revisiones, sumate a mi <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a>.</p></div>
+            <summary><span class="q-n">02</span><h3>¿Cómo canjeo un premio?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Tocá «Canjear», copiá el comando y pegalo en el chat de <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">twitch.tv/azmeyn</a>. Lo confirmo en vivo. Solo anda en Twitch. Para coordinar la entrega, pasá por el <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a>.</p></div>
           </details>
           <details class="faq" name="faq">
-            <summary><span class="q-n">03</span><h3>¿Cómo funcionan los tickets del sorteo final?</h3><span class="chev" aria-hidden="true"></span></summary>
-            <div class="faq-a"><p>Los tickets que ganás (con <code>!presente</code>, con predicciones o canjeándolos en la tienda) se acumulan en tu cuenta. El día del sorteo final, todos van a una ruleta digital que giro en vivo y cada ticket es una chance. Si estás suscripto al canal de Twitch, tenés doble chance: tus tickets valen x2.</p></div>
+            <summary><span class="q-n">03</span><h3>¿Cómo funciona el sorteo final?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Todos los tickets que juntás (con <code>!presente</code>, predicciones o canjes) se guardan. El 20/12 van todos a una ruleta que giro en vivo y cada ticket es una chance. Si sos sub, sumás 2 tickets extra por semana.</p></div>
           </details>
           <details class="faq" name="faq">
-            <summary><span class="q-n">04</span><h3>¿Cuándo y cómo se entregan los premios de RP o skins?</h3><span class="chev" aria-hidden="true"></span></summary>
-            <div class="faq-a"><p>Los sorteos semanales se definen en vivo al cierre del stream de los domingos 6/12, 13/12 y 20/12, y ese mismo 20/12, día de cierre del torneo, se sortea el pozo final de USD 60 con todos los tickets acumulados. Los premios se regalan desde el cliente de LoL, así que Riot pide que seamos amigos hace 7 días o más y que estemos en el mismo servidor: agregame como <code>OTK Azmeyn#OTK</code> en LAS (en BR solo puedo regalar RP). Si querés ir adelantando, agregame antes del 29/11 para el sorteo del 6/12, del 6/12 para el del 13/12 y del 13/12 para el del 20/12; si no llegás, no pierdas el premio, te lo entrego igual más adelante. Si ganás, pasame tu nombre#tag y servidor por el canal #reclamar-canje de mi <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a> dentro de las 48 h; si todavía no cumplimos los 7 días, te guardo el premio y te lo regalo apenas se cumplan.</p></div>
+            <summary><span class="q-n">04</span><h3>¿Cuándo me llega el RP o la skin?</h3><span class="chev" aria-hidden="true"></span></summary>
+            <div class="faq-a"><p>Los semanales salen en vivo al cerrar el directo los domingos 6/12, 13/12 y 20/12. El 20/12 también va el final de USD 60. Los regalo desde el cliente de LoL: agregame como <code>OTK Azmeyn#OTK</code> en LAS (en BR solo RP). Riot pide 7 días de amistad, así que cuanto antes me agregues, mejor; si no llegás, te lo guardo. Si ganás, pasame tu nombre#tag y servidor por #reclamar-canje en el <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a> dentro de las 48 h.</p></div>
           </details>
         </div>
       </section>
@@ -1204,7 +1218,7 @@
 
     <footer>
       <div class="wrap foot-in">
-        <p>© 2026 Azmeyn · Sitio personal para el SoloBoom Challenge 6. No es una página oficial del evento ni está respaldada por Riot Games. Los premios dependen de las reglas del torneo y de las condiciones de Riot Games en tu región. Confirmo cada canje en el chat de Twitch antes de entregarlo.</p>
+        <p>© 2026 AZMEYN · Es mi tienda, no la del torneo. No es una página oficial del SoloBoom ni de Riot Games. Los premios dependen de las reglas del torneo y de lo que Riot permita en tu región. Confirmo cada canje en el chat de Twitch antes de entregarlo.</p>
         <nav class="foot-links" aria-label="Redes">
           <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer" data-link="twitch">Twitch</a>
           <a href="https://kick.com/azmeyn" target="_blank" rel="noopener noreferrer" data-link="kick">Kick</a>
@@ -1235,10 +1249,10 @@
     </div>
     <ol class="sheet-steps">
       <li>Copiá el comando</li>
-      <li>Pegalo en mi chat de Twitch</li>
+      <li>Pegalo en el chat de Twitch</li>
       <li>Esperá mi confirmación</li>
     </ol>
-    <p class="sheet-note">Solo funciona en Twitch. Si no se copia solo, seleccionalo y copialo a mano.</p>
+    <p class="sheet-note">Solo anda en Twitch. Si no se copia solo, copialo a mano.</p>
     <p class="sheet-msg" id="msg" role="status" aria-live="polite"></p>
   </div>
 </div>
@@ -1276,7 +1290,7 @@
   var ITEMS = [
     { id: "dominadas", cat: "directo", name: "10 dominadas", desc: "", cost: 500, stock: null, limit: null },
     { id: "campeon", cat: "directo", name: "Elegí mi campeón", desc: "Elegís con qué campeón de mi pool juego la próxima ranked. Las runas y los hechizos los elijo yo.", cost: 1500, stock: null, limit: "1 por día" },
-    { id: "ticket", cat: "sorteos", name: "Ticket extra de sorteo", desc: "+1 ticket para el sorteo semanal y también se acumula para el sorteo final.", cost: 800, stock: null, limit: "Hasta 3 por semana" },
+    { id: "ticket", cat: "sorteos", name: "Ticket extra de sorteo", desc: "+1 ticket para el sorteo de la semana. También suma para el final.", cost: 800, stock: null, limit: "Hasta 3 por semana" },
     { id: "rol", cat: "comunidad", name: "VIP en Discord", desc: "", cost: 500, stock: null, limit: "1 por persona" },
     { id: "vip", cat: "comunidad", name: "VIP en Twitch", desc: "", cost: 1200, stock: 10, limit: "1 por persona" },
     { id: "rp5", cat: "rp", name: "RP o skin por USD 5", desc: "Skin o RP regalado a tu cuenta de LAS (en BR, solo RP).", cost: 5000, stock: 6, limit: "1 por persona" },
@@ -1316,7 +1330,7 @@
     if (!btn) { return; }
     if (!btn.getAttribute("data-t")) { btn.setAttribute("data-t", btn.textContent); }
     btn.classList.add("copied");
-    btn.textContent = "¡Copiado! ✓";
+    btn.textContent = "Copiado ✓";
     clearTimeout(btn._t);
     btn._t = setTimeout(function () {
       btn.classList.remove("copied");
@@ -1336,7 +1350,7 @@
           sel = true;
         } catch (e) {}
       }
-      setMsg(msgEl, "No se pudo copiar solo." + (sel ? " Quedó seleccionado." : ""), false);
+      setMsg(msgEl, "No se copió solo." + (sel ? " Ya quedó marcado, copialo vos." : ""), false);
     }
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1371,13 +1385,13 @@
   function milestones() {
     var weekly = DRAWS.filter(function (d) { return !d.final; });
     var fin = DRAWS.filter(function (d) { return d.final; })[0];
-    var list = [{ day: 0, title: "Arranca el torneo", sub: "Inicio · 18:00 hs ARG", start: true }];
+    var list = [{ day: 0, title: "Arranca el torneo", sub: "18:00 hs ARG", start: true }];
     weekly.forEach(function (d, i) {
       var both = !!fin && fin.day === d.day;
       list.push({
         day: d.day,
         title: both ? "Semanal " + (i + 1) + " y sorteo final" : "Sorteo semanal " + (i + 1),
-        sub: both ? "Cierre del torneo · 18:00 hs ARG" : "Al cierre del stream",
+        sub: both ? "Cierre del torneo · 18:00 hs ARG" : "Al cerrar el directo",
         amt: d.label,
         more: both ? fin.label + " final" : "",
         final: both
@@ -1431,7 +1445,7 @@
       paintClock();
     } else if (idx >= TOTAL_DAYS) {
       status.classList.remove("clock", "urgent");
-      status.textContent = "El evento terminó";
+      status.textContent = "Se terminó el torneo";
     } else if (idx === TOTAL_DAYS - 1) {
       status.classList.remove("clock", "urgent");
       status.textContent = "Último día: sorteo final";
@@ -1450,9 +1464,9 @@
       var kd = dateOf(0);
       nx.textContent = "Arranca el " + WEEKDAYS[kd.w] + " " + kd.d + "/" + kd.m + " · 18:00 ARG";
     } else if (next === undefined) {
-      nx.textContent = "Los sorteos terminaron";
+      nx.textContent = "Ya se sortearon todos";
     } else if (todayDraw) {
-      nx.textContent = "Hoy hay sorteo · al cierre del stream";
+      nx.textContent = "Hoy hay sorteo, al cerrar el directo";
     } else {
       var nd = dateOf(next);
       nx.textContent = "Próximo sorteo: " + WEEKDAYS[nd.w] + " " + nd.d + "/" + nd.m;
@@ -1614,7 +1628,7 @@
         $("pts-next-t").textContent = "Próximo premio: " + above.name + " · te faltan " + fmt(above.cost - pts) + " pts";
         $("pts-bar-i").style.width = Math.round(Math.min(1, Math.max(0, (pts - base) / (above.cost - base))) * 100) + "%";
       } else {
-        $("pts-next-t").textContent = "Te alcanza para todo. ¡Elegí tu premio!";
+        $("pts-next-t").textContent = "Te alcanza para todo. Elegí.";
         $("pts-bar-i").style.width = "100%";
       }
     } else {
@@ -1667,7 +1681,7 @@
     if (lastTrigger) { try { lastTrigger.focus(); } catch (e) {} }
   }
   $("copy").addEventListener("click", function () {
-    copyText($("cmd").textContent, $("msg"), "¡Listo! Pegalo en mi chat de Twitch y esperá mi confirmación.", $("cmd"), $("copy"), function () {
+    copyText($("cmd").textContent, $("msg"), "Copiado. Pegalo en el chat de Twitch y te lo confirmo en vivo.", $("cmd"), $("copy"), function () {
       /* Celebración corta: el borde de la hoja pasa a verde y aparece un tilde animado */
       $("sheet").classList.add("done");
       var chk = document.createElement("span");
