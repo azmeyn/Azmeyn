@@ -16,11 +16,10 @@ const PLATAFORMAS = {
 
 // Frases de entrada para Discord. Se elige una según el título, así cada video queda distinto
 // pero el mismo título siempre da el mismo texto (vista previa y publicación coinciden).
+// Las eligió Maxi (25/11). Hay solo dos a propósito: mejor pocas que suenen a él.
 const INTROS_DISCORD = [
-  "Salió video nuevo en {plat} 👀",
-  "Subí uno nuevo a {plat}, pasen a verlo 🔥",
-  "Clip fresquito en {plat} 🎬",
-  "Nuevo en {plat}, miren esto 👇"
+  "Subí un video nuevo a {plat}",
+  "Video nuevo en {plat}"
 ];
 
 function respuesta(obj, status) {
@@ -65,9 +64,12 @@ function validarLink(link, plataforma) {
 function textoDiscord(v) {
   const p = PLATAFORMAS[v.plataforma];
   const intro = INTROS_DISCORD[hash(v.titulo) % INTROS_DISCORD.length].replace("{plat}", p.nombre);
-  const lineas = [p.emoji + " " + intro, "**" + v.titulo + "**"];
+  const lineas = [intro, "**" + v.titulo + "**"];
   if (v.gancho) { lineas.push("_" + v.gancho + "_"); }
   lineas.push(v.link);
+  // La mención a todos va siempre al final y la pone el código; el título y el gancho no pueden meterla
+  // (limpiarTexto neutraliza @everyone y @here).
+  lineas.push("@everyone");
   return lineas.join("\n");
 }
 
@@ -99,7 +101,7 @@ async function avisar(request, env) {
     r = await fetch(env.DISCORD_WEBHOOK_VIDEOS, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ content: texto, allowed_mentions: { parse: [] } })
+      body: JSON.stringify({ content: texto, allowed_mentions: { parse: ["everyone"] } })
     });
   } catch (e) {
     return respuesta({ ok: false, error: "No pude conectar con Discord" }, 502);
