@@ -892,6 +892,49 @@
     @media (max-width: 900px) { body::after { display: none !important; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
   </style>
+  <style id="barra-unica">
+    /* Barra única (26/11): Twitch y Kick con su estado, y las redes a la derecha, todo en la barra de arriba.
+       Se saca la palabra «Directos» y la segunda barra. En celular queda como antes. */
+    @media (min-width: 1360px) {
+      .sb-k { display: none !important; }
+      .side .statusbar { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; padding: 0 !important; margin-left: 28px; }
+      .side .statusbar .sb-sep { height: 26px; align-self: center; margin: 0 6px; }
+      .topbar { display: none !important; }
+      .side { --side-h: 69px; }
+    }
+  </style>
+  <style id="aire-2026">
+    /* Aire (26/11): Canjes menos apretado y el inicio más grande en compu */
+    @media (min-width: 1360px) {
+      .wrap { max-width: 1560px !important; padding-left: 56px !important; padding-right: 56px !important; }
+      body { font-size: 17px; }
+      .hero-grid { gap: 28px !important; }
+      .event { padding: 36px 32px 32px !important; }
+      .event h3 { font-size: 38px !important; }
+      .event .reloj b { font-size: 32px !important; }
+      .event .reloj { gap: 5px !important; }
+      .event .ev-p { font-size: 17px; }
+      .sec-h h2 { font-size: 34px !important; }
+    }
+    /* Canjes: tarjetas con más espacio adentro */
+    .grid { gap: 18px !important; }
+    .card, .card.major { grid-template-columns: 170px minmax(0, 1fr) !important; }
+    .card .card-top { padding: 16px 22px 0 !important; }
+    .card .card-art { padding: 18px 14px 18px 22px !important; }
+    .card-art .num { font-size: 28px !important; }
+    .card .card-body { padding: 18px 24px 22px 0 !important; row-gap: 12px !important; column-gap: 20px !important; }
+    .card .card-body h3 { font-size: 21px !important; line-height: 1.2 !important; margin-bottom: 2px; }
+    .card .card-body p { font-size: 15.5px; line-height: 1.5; }
+    .card .tags { gap: 8px !important; margin-top: 4px; }
+    .card .tag { padding: 7px 12px !important; font-size: 12.5px !important; }
+    .card .afford { margin-top: 4px; }
+    .card .card-body .btn { width: 168px !important; min-width: 168px; min-height: 50px; font-size: 15px; }
+    @media (max-width: 520px) {
+      .card, .card.major { grid-template-columns: 120px minmax(0, 1fr) !important; }
+      .card .card-body { padding: 16px 16px 18px 0 !important; }
+      .card .card-body .btn { width: 100% !important; min-width: 0; }
+    }
+  </style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>
@@ -1520,5 +1563,20 @@
   updateNav();
 })();
 </script>
+  <script id="barra-unica-js">
+  /* Mueve la barra de estado (mismos elementos, sin duplicar nada) a la barra de arriba en compu, y la devuelve en celular */
+  (function () {
+    var sb = document.querySelector(".statusbar"), side = document.querySelector(".side"), nav = side && side.querySelector(".nav"), wrap = document.querySelector(".topbar .wrap");
+    if (!sb || !side || !nav || !wrap) { return; }
+    var mq = window.matchMedia("(min-width: 1360px)");
+    function place() {
+      if (mq.matches) { if (sb.parentNode !== side) { side.insertBefore(sb, nav); } }
+      else if (sb.parentNode !== wrap) { wrap.appendChild(sb); }
+      document.documentElement.style.setProperty("--side-h", side.offsetHeight + "px");
+    }
+    place();
+    if (mq.addEventListener) { mq.addEventListener("change", place); } else { mq.addListener(place); }
+  })();
+  </script>
 </body>
 </html>
