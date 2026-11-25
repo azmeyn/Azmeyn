@@ -11,6 +11,9 @@
       "service binding", que no se puede usar desde internet) las predicciones de Twitch ya
       resueltas. A cada persona que acertó le suma +200 puntos en StreamElements y, cuando junta
       3 aciertos en el mismo día (hora ARG), 1 ticket (máximo 1 por día).
+
+   3) SUBS: cada domingo a las 12:00 ARG suma +2 tickets de esa semana a cada sub actual de Twitch
+      (una vez por semana y por persona).
       Ojo: Twitch solo informa hasta 10 personas por opción (las que más puntos de canal apostaron).
 
    Ventana: solo cuenta lo que pasó entre el 30/11 18:00 y el 20/12 18:00 (hora ARG). Lo anterior
@@ -33,7 +36,9 @@ const ACIERTOS_PARA_TICKET = 3;
 const VENTANA_HORAS = 48;          // cuánto para atrás mira el Activity feed en cada vuelta
 const DIAS_RECUERDO = 70;          // cuánto tiempo se recuerda un canje o predicción ya procesado
 const HORA_INICIO_ARG = 18;        // el torneo arranca a las 18:00 ARG del primer día (y cierra igual el último)
-const LATIDO_HORAS = 6;            // sin novedades, el informe guardado se renueva como mucho cada tanto (ahorra escrituras de KV)
+const SUBS_TICKETS = 2;            // tickets por semana para cada sub (decisión D3, 25/11)
+const HORA_SUBS_ARG = 12;          // se suman el domingo de cada semana a esta hora (antes del sorteo)
+const LATIDO_HORAS = 6;           // sin novedades, el informe guardado se renueva como mucho cada tanto (ahorra escrituras de KV)
 
 function argDayOf(iso) {
   return new Date(Date.parse(iso) - 3 * 3600000).toISOString().slice(0, 10);
@@ -185,6 +190,48 @@ async function procesarPredicciones(env, h, prueba, informe) {
   }
 }
 
+/* ---------------------------- Subs: +2 tickets por semana ----------------------------
+   Cada domingo del torneo a las 12:00 ARG (antes del sorteo del cierre) le suma +2 tickets
+   de esa semana a cada sub actual de Twitch. Una sola vez por semana y por persona: queda
+   anotado en la ficha (rec.s) y en el KV (subs:N). Si el cron se saltea un domingo, lo
+   recupera en la vuelta siguiente. La lista sale de panel-stream-azmeyn (permiso
+   channel:read:subscriptions de Twitch). */
+async function procesarSubs(env, h, prueba, informe) {
+  if (!env.PANEL_STREAM || typeof env.PANEL_STREAM.subsActuales !== "function") {
+    informe.subs.nota = "falta subsActuales en panel-stream-azmeyn";
+    return;
+  }
+  const ahora = Date.now();
+  const v = ventana(h);
+  if (ahora < v.inicio) { informe.subs.nota = "el torneo todavía no empezó"; return; }
+  const base = Date.parse(h.EVENT_START + "T03:00:00Z");           // 00:00 ARG del primer día
+  let subs = null;
+  for (let w = 1; w <= 3; w++) {
+    const cuando = base + (7 * w - 1) * 86400000 + HORA_SUBS_ARG * 3600000;   // domingo de la semana w, 12:00 ARG
+    if (ahora < cuando) { continue; }
+    if (await env.CHECKINS.get("subs:" + w)) { continue; }
+    // La lista de cada semana se guarda la primera vez: si la vuelta se corta, el reintento usa la misma.
+    let lista = prueba ? null : await env.CHECKINS.get("subs:" + w + ":lista", "json");
+    if (!lista) {
+      if (!subs) { subs = (await env.PANEL_STREAM.subsActuales()).map(h.cleanUser).filter(Boolean); }
+      lista = subs;
+      if (!prueba) { await env.CHECKINS.put("subs:" + w + ":lista", JSON.stringify(lista), { expirationTtl: DIAS_RECUERDO * 86400 }); }
+    }
+    informe.subs.semanas.push(w);
+    for (const user of lista) {
+      const rec = await h.loadRec(env, user);
+      rec.s = Object.assign({}, rec.s);
+      if (rec.s[w]) { continue; }
+      informe.subs.sumados.push({ usuario: user, semana: w });
+      if (prueba) { continue; }
+      rec.s[w] = true;
+      rec.w[w] = (rec.w[w] || 0) + SUBS_TICKETS;
+      await h.saveRec(env, user, rec);
+    }
+    if (!prueba) { await env.CHECKINS.put("subs:" + w, "ok", { expirationTtl: DIAS_RECUERDO * 86400 }); }
+  }
+}
+
 /* Solo en modo prueba: lo que ven StreamElements y Twitch en los últimos 7 días, sin importar
    las fechas del torneo. Sirve para comprobar antes del 30/11 que los datos llegan bien. */
 async function muestra(env, informe) {
@@ -214,6 +261,7 @@ export async function ticketsAuto(env, h, prueba) {
     hora: new Date(Date.now()).toISOString(),
     canjes: { vistos: 0, sumados: [], devueltos: [], fueraDeFecha: [], raros: [], otrosItems: {} },
     predicciones: { vistas: 0, procesadas: [] },
+    subs: { semanas: [], sumados: [], nota: null },
     errores: []
   };
   if (!env.CHECKINS) { informe.errores.push("falta el KV CHECKINS"); return informe; }
@@ -223,12 +271,13 @@ export async function ticketsAuto(env, h, prueba) {
   }
   try { await procesarCanjes(env, h, prueba, informe); } catch (e) { informe.errores.push("canjes: " + e.message); }
   try { await procesarPredicciones(env, h, prueba, informe); } catch (e) { informe.errores.push("predicciones: " + e.message); }
+  try { await procesarSubs(env, h, prueba, informe); } catch (e) { informe.errores.push("subs: " + (e && e.message ? e.message : "sin detalle")); }
   if (prueba) { await muestra(env, informe); }
   if (!prueba) {
     // Se guarda solo si pasó algo, o si el último informe es viejo (así se ve que el cron sigue vivo
     // sin gastar una escritura de KV cada 5 minutos).
     const hubo = informe.canjes.sumados.length || informe.canjes.devueltos.length || informe.canjes.fueraDeFecha.length ||
-      informe.canjes.raros.length || informe.predicciones.procesadas.length || informe.errores.length;
+      informe.canjes.raros.length || informe.predicciones.procesadas.length || informe.subs.sumados.length || informe.errores.length;
     let viejo = true;
     if (!hubo) {
       const previo = await env.CHECKINS.get("auto:ultimo", "json");
