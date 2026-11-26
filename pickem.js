@@ -50,7 +50,8 @@ export function leerCodigo(codigo) {
 
 export async function pickem(url, env, h) {
   if (!env.CHECKINS || !env.PRESENTE_KEY) { return h.plain("El pick'em todavía no está configurado"); }
-  const codigo = (url.searchParams.get("c") || "").trim();
+  // El comando manda "-" cuando no escriben nada después de !pickem (StreamElements no contesta si va vacío)
+  const codigo = (url.searchParams.get("c") || "").trim().replace(/^-$/, "");
   // Sin código no se guarda nada: el enlace se contesta sin pedir la clave
   if (!codigo) { return h.plain("Pick'em del SoloBoom: completalo en azmeyn.com/pickem y pegá acá lo que te da"); }
   if (!h.same(url.searchParams.get("key"), env.PRESENTE_KEY)) { return h.plain("No autorizado", 401); }
