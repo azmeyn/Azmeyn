@@ -12,6 +12,7 @@
 
 import { handleAvisos } from "./avisos.js";
 import { ticketsAuto, ticketsAutoRuta } from "./tickets-auto.js";
+import { pickem, pickemLista } from "./pickem.js";
 
 let twitchTokenCache = null; // { value, exp }
 let kickTokenCache = null;   // { value, exp }
@@ -309,7 +310,7 @@ async function ticketsList(url, env) {
 const HELPERS = {
   EVENT_START: EVENT_START, EVENT_DAYS: EVENT_DAYS,
   dayIndex: dayIndex, cleanUser: cleanUser, same: same,
-  loadRec: loadRec, saveRec: saveRec, sePoints: sePoints, kvPut: kvPut
+  loadRec: loadRec, saveRec: saveRec, sePoints: sePoints, kvPut: kvPut, plain: plain
 };
 
 /* ------------------------------ Handler ------------------------------ */
@@ -353,6 +354,8 @@ export default {
         if (url.pathname === "/api/ticket-add") { return await ticketAdd(url, env); }
         if (url.pathname === "/api/tickets") { return await ticketsList(url, env); }
         if (url.pathname === "/api/tickets-auto") { return await ticketsAutoRuta(url, env, HELPERS); }
+        if (url.pathname === "/api/pickem") { return await pickem(url, env, HELPERS); }
+        if (url.pathname === "/api/pickem-lista") { return await pickemLista(url, env, HELPERS); }
       } catch (e) {
         return plain("Error interno, probá de nuevo en un rato", 500);
       }
