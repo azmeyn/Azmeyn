@@ -1049,6 +1049,15 @@
     .contact > div:first-child { display: flex; align-items: center; gap: 14px; }
     .contact .ic-caja { flex: none; }
 </style>
+<style id="contacto-celu">
+    /* Celular (26/11): el ícono de Contacto va en la línea de los botones, así la tarjeta no crece */
+    @media (max-width: 600px) {
+      .contact { position: relative; }
+      .contact > div:first-child { display: block !important; }
+      .contact .ic-caja { position: absolute; right: 16px; bottom: 35px; width: 34px !important; height: 34px !important; }
+    }
+    @media (max-width: 374px) { .contact .ic-caja { display: none !important; } }
+</style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>
