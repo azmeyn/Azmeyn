@@ -1327,6 +1327,21 @@
     }
     @media (prefers-reduced-motion: reduce) { .card.fx, .step.fx, .draw.fx { transition: none !important; transform: none !important; } }
   </style>
+<style id="animaciones-2026">
+    /* Animaciones de Canjes (26/11): solo mover y aparecer (las resuelve la placa de video). Nada se mueve sin parar. */
+    @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+      .card, .step, .draw { transition: transform 0.16s ease, border-color 0.16s ease !important; }
+      .card:hover, .step:hover, .draw:hover { transform: translateY(-3px) !important; }
+      .card .art-ic { transition: transform 0.2s ease; }
+      .card:hover .art-ic { transform: rotate(-8deg) scale(1.12); }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .sec-h.az-espera h2 { opacity: 0; transform: translateX(-24px); }
+      .sec-h.az-espera::after { transform: scaleX(0); }
+      .sec-h h2 { transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); }
+      .sec-h::after { transform-origin: left; transition: transform 0.7s 0.15s cubic-bezier(0.2, 0.7, 0.2, 1); }
+    }
+  </style>
 </head>
 <body>
 
@@ -2285,6 +2300,19 @@
     }
     place();
     if (mq.addEventListener) { mq.addEventListener("change", place); } else { mq.addListener(place); }
+  })();
+  </script>
+  <script id="animaciones-2026-js">
+  /* Los títulos entran al llegar con el scroll, una sola vez. Si algo falla, se ven igual, sin animar. */
+  (function () {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
+    if (!("IntersectionObserver" in window)) { return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.remove("az-espera"); io.unobserve(e.target); } });
+    }, { threshold: 0.4 });
+    Array.prototype.forEach.call(document.querySelectorAll(".sec-h"), function (h) {
+      if (h.getBoundingClientRect().top > window.innerHeight) { h.classList.add("az-espera"); io.observe(h); }
+    });
   })();
   </script>
 </body>
