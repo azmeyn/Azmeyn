@@ -653,7 +653,7 @@
     .contact { display: grid; gap: 18px; padding: 28px 22px; background: var(--panel); border: 1px solid var(--line); }
     @media (min-width: 900px) { .contact { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 32px; } }
     .contact h3 { font: 700 32px/1 var(--font-display); text-transform: uppercase; letter-spacing: 0.03em; }
-    .contact p { color: var(--muted); margin-top: 8px; max-width: 54ch; }
+    .contact p { color: var(--muted); margin-top: 0; max-width: 54ch; }
     .contact-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
     .copy-msg { flex-basis: 100%; font: 500 12px/1.3 var(--font-mono); color: var(--muted); }
     .copy-msg:empty { display: none; }
@@ -1148,7 +1148,6 @@
           <div class="sec-h"><h2 id="contacto-h">Contacto</h2></div>
           <div class="contact sec-body">
             <div>
-              <h3>¿Hablamos?</h3>
               <p>Para colaboraciones o propuestas, escribime a <a id="mail-link" href="mailto:azmeynmgmt@gmail.com">azmeynmgmt@gmail.com</a>.</p>
             </div>
             <div class="contact-cta">
