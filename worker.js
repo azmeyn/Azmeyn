@@ -13,6 +13,7 @@
 import { handleAvisos } from "./avisos.js";
 import { ticketsAuto, ticketsAutoRuta } from "./tickets-auto.js";
 import { pickem, pickemLista } from "./pickem.js";
+import { pickemVuelta, pickemTabla, pickemDatos } from "./pickem-resolver.js";
 
 let twitchTokenCache = null; // { value, exp }
 let kickTokenCache = null;   // { value, exp }
@@ -356,6 +357,8 @@ export default {
         if (url.pathname === "/api/tickets-auto") { return await ticketsAutoRuta(url, env, HELPERS); }
         if (url.pathname === "/api/pickem") { return await pickem(url, env, HELPERS); }
         if (url.pathname === "/api/pickem-lista") { return await pickemLista(url, env, HELPERS); }
+        if (url.pathname === "/api/pickem-tabla") { return await pickemTabla(env); }
+        if (url.pathname === "/api/pickem-datos") { return await pickemDatos(url, env, HELPERS); }
       } catch (e) {
         return plain("Error interno, probá de nuevo en un rato", 500);
       }
@@ -367,6 +370,8 @@ export default {
   async scheduled(event, env, ctx) {
     const idx = dayIndex(argDay(0));
     if (idx < 0 || idx > EVENT_DAYS) { return; } // solo durante el torneo (y el día siguiente, por las dudas)
+    // Pick'em: lee las partidas y el rango, y resuelve solo
+    ctx.waitUntil(pickemVuelta(env, HELPERS).catch(function (e) { console.log("pickem: " + (e && e.message)); }));
     ctx.waitUntil(ticketsAuto(env, HELPERS, false).then(function (inf) {
       if (inf.errores.length) { console.log("tickets-auto: " + inf.errores.join(" | ")); }
     }));

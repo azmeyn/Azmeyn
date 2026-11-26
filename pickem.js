@@ -76,7 +76,7 @@ export async function pickem(url, env, h) {
   // Si no cambió nada no se escribe: repetir el mismo código no gasta la cuota del KV
   if (JSON.stringify([guardado.semana, guardado.final]) !== antes) {
     guardado.cuando = new Date(ahora).toISOString();
-    await h.kvPut(env, clave, JSON.stringify(guardado));
+    await h.kvPut(env, clave, JSON.stringify(guardado), { metadata: { semana: guardado.semana, final: guardado.final } });
   }
 
   const s = Object.keys(guardado.semana).length, f = Object.keys(guardado.final).length;
