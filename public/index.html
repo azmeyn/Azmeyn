@@ -1027,6 +1027,15 @@
       #pickem .pk-fin > .btn { width: 100%; justify-content: center; }
     }
   </style>
+  <style id="nav-pickem">
+    /* Con el boton Pick'em, el menu se aprieta un poco en pantallas medianas para que entre */
+    @media (min-width: 960px) and (max-width: 1599px) { .side .nav { gap: 0 !important; } .side .nav a { font-size: 12px !important; letter-spacing: 0.03em !important; padding-left: 8px !important; padding-right: 8px !important; } }
+    #pickem .pk-tabla { border-top: 1px solid var(--line); padding: 20px 28px 24px; }
+    #pickem .pk-tabla[hidden] { display: none; }
+    #pickem .pk-tabla ol { margin: 12px 0 0; padding-left: 22px; display: grid; gap: 4px; font-variant-numeric: tabular-nums; }
+    #pickem .pk-tabla details { margin-top: 14px; color: var(--muted); font-size: 14px; }
+    @media (max-width: 760px) { #pickem .pk-tabla { padding: 16px; } }
+  </style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>
@@ -1059,6 +1068,7 @@
       </div>
       <div class="grp">
         <p class="grp-h">Comunidad</p>
+        <a href="#pickem">Pick'em</a>
         <a href="#discord">Discord</a>
         <a href="#cuentas">Mis cuentas</a>
       </div>
@@ -1172,6 +1182,8 @@
               </div>
               <button class="btn" type="button" id="pk-abrir" aria-expanded="false" aria-controls="pk-form">Hacer mi pick'em</button>
             </div>
+
+            <div class="pk-tabla" id="pk-tabla" hidden></div>
 
             <div class="pk-form" id="pk-form" hidden>
               <ol class="pk-pasos"><li>Contestá</li><li>Armá tu código</li><li>Pegalo en mi chat de Twitch</li></ol>
@@ -1665,7 +1677,7 @@
     var tb = document.querySelector(".topbar").offsetHeight;
     var line = y + (window.innerWidth >= 960 ? tb : document.querySelector(".side").offsetHeight) + 40;
     var active = "inicio";
-    ["discord", "cuentas", "contacto"].forEach(function (id) {
+    ["pickem", "discord", "cuentas", "contacto"].forEach(function (id) {
       if (docTop(id) <= line) { active = id; }
     });
     if (y < 4) { active = "inicio"; }
@@ -1852,6 +1864,35 @@
   window.addEventListener("hashchange", porEnlace);
   [].forEach.call(document.querySelectorAll('a[href="#pickem"]'), function (a) { a.addEventListener("click", function () { mostrar(true); }); });
   porEnlace();
+
+  // La tabla se resuelve sola en el servidor: aparece cuando cierra la primera semana
+  var FIN_SEMANA = Date.parse("2026-12-07T03:00:00Z");
+  function pintarTabla(t) {
+    if (!t || !t.tabla || !t.tabla.length) { return; }
+    var caja = $("pk-tabla");
+    caja.textContent = "";
+    caja.appendChild(el("h3", {}, t.etapa === "final" ? "Resultado final" : "Tabla de la primera semana"));
+    var ol = el("ol");
+    t.tabla.slice(0, 10).forEach(function (f) { ol.appendChild(el("li", {}, f.usuario + " · " + f.puntos + (f.puntos === 1 ? " punto" : " puntos"))); });
+    caja.appendChild(ol);
+    var det = el("details"), lista = el("ul");
+    det.appendChild(el("summary", {}, "Respuestas correctas"));
+    P.forEach(function (q) {
+      var v = t.respuestas[q[0]];
+      if (v === undefined) { return; }
+      if (q[2] === "sn") { v = v === "s" ? "Sí" : "No"; }
+      if (q[2] === "rango") { v = RANGOS[v]; }
+      if (q[2] === "dec") { v = String(v).replace(".", ","); }
+      lista.appendChild(el("li", {}, q[3] + " " + v));
+    });
+    det.appendChild(lista);
+    caja.appendChild(det);
+    caja.hidden = false;
+  }
+  if (Date.now() >= FIN_SEMANA) {
+    fetch("/api/pickem-tabla").then(function (r) { return r.json(); }).then(pintarTabla).catch(function () {});
+  }
+  window.pintarPickem = pintarTabla;
 
   function valor(q) {
     var c = $("pk-" + q[0]), tipo = q[2];

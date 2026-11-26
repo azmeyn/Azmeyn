@@ -1348,6 +1348,15 @@
     @media (min-width: 560px) { .hero-rows .r { grid-template-columns: 160px 140px minmax(0, 1fr) !important; } }
     #cal .a { font-size: 13px !important; }
   </style>
+  <style id="nav-pickem">
+    /* Con el boton Pick'em, el menu se aprieta un poco en pantallas medianas para que entre */
+    @media (min-width: 960px) and (max-width: 1599px) { .side .nav { gap: 0 !important; } .side .nav a { font-size: 12px !important; letter-spacing: 0.03em !important; padding-left: 8px !important; padding-right: 8px !important; } }
+    #pickem .pk-tabla { border-top: 1px solid var(--line); padding: 20px 28px 24px; }
+    #pickem .pk-tabla[hidden] { display: none; }
+    #pickem .pk-tabla ol { margin: 12px 0 0; padding-left: 22px; display: grid; gap: 4px; font-variant-numeric: tabular-nums; }
+    #pickem .pk-tabla details { margin-top: 14px; color: var(--muted); font-size: 14px; }
+    @media (max-width: 760px) { #pickem .pk-tabla { padding: 16px; } }
+  </style>
 </head>
 <body>
 
@@ -1381,6 +1390,7 @@
       </div>
       <div class="grp">
         <p class="grp-h">Comunidad</p>
+        <a href="index.html#pickem">Pick'em</a>
         <a href="index.html#discord">Discord</a>
         <a href="index.html#cuentas">Mis cuentas</a>
       </div>
