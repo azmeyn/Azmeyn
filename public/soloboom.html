@@ -1266,6 +1266,67 @@
       .cal .tl .a { grid-row: 1; }
     }
   </style>
+  <style id="chiches-2026">
+    /* Detalles de Canjes (26/11): vuelven los íconos, las franjas y los brillos, sin nada que pinte todo el tiempo.
+       Solo colores fijos y efectos al pasar el mouse. No toca columnas, márgenes ni alineación. */
+
+    /* Columna del precio: rayas finas, tinte rosa y el ícono de la categoría de fondo */
+    .card .card-art, .card.major .card-art {
+      position: relative; overflow: hidden; align-self: stretch; align-content: center;
+      background: linear-gradient(160deg, rgba(255, 61, 129, 0.16), rgba(255, 61, 129, 0.02) 70%) !important;
+      border-right: 1px solid var(--line);
+    }
+    .card .card-art .art-ic { display: block !important; width: 84px; height: 84px; right: -14px; bottom: -14px; opacity: 0.12; }
+    .card.can .card-art .art-ic, .card.major .card-art .art-ic { color: var(--accent); opacity: 0.28; }
+    .card.major .card-art .art-ic { width: 70px; height: 70px; right: -20px; bottom: -22px; opacity: 0.2; }
+    .card .card-body { padding-left: 20px !important; }
+    .card, .card.major { grid-template-rows: auto 1fr; }
+
+    /* Franja de arriba: vuelve a marcarse, con un punto rosa */
+    .card .card-top { background: linear-gradient(90deg, rgba(255, 61, 129, 0.14), rgba(255, 255, 255, 0.03) 60%) !important; padding: 10px 22px !important; border-bottom: 1px solid var(--line); }
+    .card .card-top > span:first-child::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 50%; background: var(--accent); vertical-align: 1px; }
+    .card.cant .card-top > span:first-child::before { background: var(--muted); }
+
+    /* Las que te alcanzan se encienden; las demás siguen apagadas */
+    .card.can { box-shadow: 0 0 0 1px rgba(255, 61, 129, 0.55) !important; }   /* borde marcado, sin sombra difusa (es lo caro de dibujar) */
+
+    /* Premio mayor: marco y fondo propios */
+    .card.major { border-color: rgba(255, 61, 129, 0.65) !important; background: linear-gradient(100deg, #47222f, #1c1f23 55%) !important; }
+    .card.major .card-top { background: var(--accent) !important; color: var(--accent-ink); font-weight: 700 !important; }
+    .card.major .card-top .stock { color: var(--accent-ink) !important; }
+    .card.major .card-top > span:first-child::before { background: var(--accent-ink); }
+    .card.major.cant { opacity: 0.8; }
+
+    /* Cartel de premios, pasos y sorteo final */
+    .prize { background: linear-gradient(110deg, #52243a, #1c1f23 60%) !important; border-color: rgba(255, 61, 129, 0.45) !important; }
+    .step { position: relative; overflow: hidden; border-top: 3px solid var(--accent) !important; }
+    .step .n { color: var(--accent) !important; opacity: 0.55; }
+    .draw.final { border-color: rgba(255, 61, 129, 0.6) !important; background: linear-gradient(110deg, #4d2337, #1c1f23 60%) !important; }
+
+    /* Al pasar el mouse (solo en compu): se marca el borde, sin movimientos (al hacer scroll no dispara animaciones) */
+    @media (hover: hover) {
+      .card:hover, .step:hover, .draw:hover { border-color: var(--accent) !important; transform: none !important; }
+    }
+    .card, .step, .draw { transition: none !important; }
+    .card.fx, .step.fx, .draw.fx { transition: opacity 0.3s ease, transform 0.3s ease !important; }
+    /* Cuadros sólidos: sin transparencias que haya que mezclar en cada cuadro del scroll */
+    :root { --panel: #1c1f23; }
+    /* Celulares y tablets: degradados reemplazados por colores lisos */
+    @media (max-width: 900px) {
+      .card .card-art, .card.major .card-art { background: #2a1f27 !important; }
+      .card .card-top { background: #23252a !important; }
+      .card.major .card-top { background: var(--accent) !important; }
+      .card.major { background: #1c1f23 !important; }
+      .prize, .draw.final { background: #231a21 !important; }
+    }
+    @media (max-width: 520px) {
+      .card .card-art, .card.major .card-art { padding-left: 10px !important; padding-right: 6px !important; }
+      .card .card-art .num { font-size: 20px !important; gap: 4px !important; }
+      .card .card-art .num svg, .card .card-art .coin { width: 14px !important; height: 14px !important; }
+      .card .card-body { padding-left: 14px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) { .card.fx, .step.fx, .draw.fx { transition: none !important; transform: none !important; } }
+  </style>
 </head>
 <body>
 
