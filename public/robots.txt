@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://azmeyn.com/sitemap.xml

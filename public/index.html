@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Azmeyn</title>
-  <meta name="description" content="Directos de LoL.">
+  <meta name="description" content="Juntá puntos mirando el stream y canjealos por premios.">
   <meta name="theme-color" content="#121416">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Azmeyn">
-  <meta property="og:description" content="Directos de LoL.">
+  <meta property="og:description" content="Juntá puntos mirando el stream y canjealos por premios.">
   <meta property="og:locale" content="es_AR">
   <meta property="og:site_name" content="Azmeyn">
   <meta property="og:url" content="https://azmeyn.com/">
@@ -19,25 +19,61 @@
   <meta property="og:image:alt" content="Azmeyn">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://azmeyn.com/og.png?v=3">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" href="fonts/montserrat-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Azmeyn",
-    "description": "Jugador de League of Legends y creador de contenido.",
-    "sameAs": [
-      "https://www.twitch.tv/azmeyn",
-      "https://kick.com/azmeyn",
-      "https://discord.gg/wr52zNaXzr",
-      "https://www.instagram.com/az.meyn/",
-      "https://www.tiktok.com/@azmeyn",
-      "https://www.youtube.com/@azmeyn"
-    ]
-  }
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://azmeyn.com/#web",
+      "url": "https://azmeyn.com/",
+      "name": "Azmeyn",
+      "alternateName": [
+        "AZMEYN",
+        "azmeyn.com"
+      ],
+      "inLanguage": "es-AR",
+      "publisher": {
+        "@id": "https://azmeyn.com/#azmeyn"
+      }
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://azmeyn.com/#inicio",
+      "url": "https://azmeyn.com/",
+      "isPartOf": {
+        "@id": "https://azmeyn.com/#web"
+      },
+      "mainEntity": {
+        "@id": "https://azmeyn.com/#azmeyn"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://azmeyn.com/#azmeyn",
+      "name": "Azmeyn",
+      "alternateName": "AZMEYN",
+      "url": "https://azmeyn.com/",
+      "image": "https://azmeyn.com/favicon-192.png",
+      "description": "Jugador de League of Legends y creador de contenido.",
+      "sameAs": [
+        "https://www.twitch.tv/azmeyn",
+        "https://kick.com/azmeyn",
+        "https://www.youtube.com/@azmeyn",
+        "https://www.tiktok.com/@azmeyn",
+        "https://www.instagram.com/az.meyn/",
+        "https://x.com/pasaroncosasxd",
+        "https://discord.gg/wr52zNaXzr"
+      ]
+    }
+  ]
+}
   </script>
   <style>
     /* Fuentes propias (carpeta fonts/): no dependen de Google y cargan con swap */
