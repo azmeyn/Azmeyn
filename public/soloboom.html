@@ -9,7 +9,7 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_AR">
   <meta property="og:title" content="Canjes · AZMEYN">
-  <meta property="og:description" content="Mirá mi directo, juntá puntos y canjealos. Más de USD 170 en premios y sorteos durante el SoloBoom 6.">
+  <meta property="og:description" content="Mirá mi directo, juntá puntos y canjealos. Más de 12.200 RP en premios y sorteos durante el SoloBoom 6.">
   <meta property="og:site_name" content="Azmeyn">
   <meta property="og:url" content="https://azmeyn.com/soloboom.html">
   <link rel="canonical" href="https://azmeyn.com/soloboom.html">
@@ -1342,6 +1342,12 @@
       .sec-h::after { transform-origin: left; transition: transform 0.7s 0.15s cubic-bezier(0.2, 0.7, 0.2, 1); }
     }
   </style>
+  <style id="premios-rp">
+    /* Los montos en RP son largos: la columna del monto se ensancha */
+    .hero-rows .v { white-space: nowrap; }
+    @media (min-width: 560px) { .hero-rows .r { grid-template-columns: 160px 140px minmax(0, 1fr) !important; } }
+    #cal .a { font-size: 13px !important; }
+  </style>
 </head>
 <body>
 
@@ -1427,13 +1433,13 @@
           <h1 id="titulo">Canjes</h1>
           <p class="lede">Mirá el directo en Twitch, juntá puntos y canjealos acá. Con <code>!presente</code> sumás tickets para los sorteos.</p>
           <div class="prize">
-            <b>+USD 170</b>
+            <b>+12.200 RP</b>
             <span>en premios y sorteos durante el torneo</span>
           </div>
           <div class="hero-rows">
             <div class="r"><span class="k">Cada hora</span><span class="v">+60</span><span class="t">puntos mirando el directo en Twitch</span></div>
-            <div class="r"><span class="k">Cada domingo</span><span class="v usd">USD 20</span><span class="t">en el sorteo semanal (6, 13 y 20/12)</span></div>
-            <div class="r"><span class="k">Domingo 20/12</span><span class="v usd">USD 60</span><span class="t">en el sorteo final</span></div>
+            <div class="r"><span class="k">Cada domingo</span><span class="v usd">1.350 RP</span><span class="t">en el sorteo semanal (6, 13 y 20/12)</span></div>
+            <div class="r"><span class="k">Domingo 20/12</span><span class="v usd">3.250 RP</span><span class="t">en el sorteo final</span></div>
           </div>
           <div class="cta">
             <a class="btn" href="#tienda">Ver los canjes</a>
@@ -1548,25 +1554,25 @@
             <div class="draw-top"><p class="when">Domingo 6/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 1</h3>
             <p>RP o skins. Entran los tickets de la semana 1.</p>
-            <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
+            <p class="draw-amt"><strong class="amt">1.350 RP</strong><span>en premios</span></p>
           </article>
           <article class="draw" data-draw="13">
             <div class="draw-top"><p class="when">Domingo 13/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 2</h3>
             <p>RP o skins. Entran los tickets de la semana 2.</p>
-            <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
+            <p class="draw-amt"><strong class="amt">1.350 RP</strong><span>en premios</span></p>
           </article>
           <article class="draw" data-draw="20">
             <div class="draw-top"><p class="when">Domingo 20/12</p><span class="state">Próximo</span></div>
             <h3>Sorteo semanal 3</h3>
             <p>RP o skins. Entran los tickets de la semana 3.</p>
-            <p class="draw-amt"><strong class="amt">USD 20</strong><span>en premios</span></p>
+            <p class="draw-amt"><strong class="amt">1.350 RP</strong><span>en premios</span></p>
           </article>
           <article class="draw final" data-draw="20f">
             <div class="draw-top"><p class="when">Domingo 20/12 · cierre del torneo</p><span class="state">Próximo</span></div>
             <h3>Sorteo final</h3>
             <p>RP o skins. Todos tus tickets de las tres semanas van a una ruleta que giro en vivo.</p>
-            <p class="draw-amt"><strong class="amt">USD 60</strong><span>de pozo</span></p>
+            <p class="draw-amt"><strong class="amt">3.250 RP</strong><span>de pozo</span></p>
           </article>
         </div>
 
@@ -1605,7 +1611,7 @@
           </details>
           <details class="faq" name="faq">
             <summary><span class="q-n">04</span><h3>¿Cuándo me llega el RP o la skin?</h3><span class="chev" aria-hidden="true"></span></summary>
-            <div class="faq-a"><p>Los semanales salen en vivo al cerrar el directo los domingos 6/12, 13/12 y 20/12. El 20/12 también va el final de USD 60. Los regalo desde el cliente de LoL: agregame como <code>OTK Azmeyn#OTK</code> en LAS (en BR solo RP). Riot pide 7 días de amistad, así que cuanto antes me agregues, mejor; si no llegás, te lo guardo. Si ganás, pasame tu nombre#tag y servidor por #reclamar-canje en el <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a> dentro de las 48 h.</p></div>
+            <div class="faq-a"><p>Los semanales salen en vivo al cerrar el directo los domingos 6/12, 13/12 y 20/12. El 20/12 también va el final de 3.250 RP. Los regalo desde el cliente de LoL: agregame como <code>OTK Azmeyn#OTK</code> en LAS (en BR solo RP). Riot pide 7 días de amistad, así que cuanto antes me agregues, mejor; si no llegás, te lo guardo. Si ganás, pasame tu nombre#tag y servidor por #reclamar-canje en el <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a> dentro de las 48 h.</p></div>
           </details>
         </div>
       </section>
@@ -1666,10 +1672,10 @@
      from = primer día en que cuentan los tickets de ese sorteo.
      Alimenta el calendario y el estado de cada sorteo (Próximo / Activo / Finalizado). */
   var DRAWS = [
-    { day: 6, from: 0, label: "USD 20" },
-    { day: 13, from: 7, label: "USD 20" },
-    { day: 20, from: 14, label: "USD 20" },
-    { day: 20, from: 0, label: "USD 60", final: true }
+    { day: 6, from: 0, label: "1.350 RP" },
+    { day: 13, from: 7, label: "1.350 RP" },
+    { day: 20, from: 14, label: "1.350 RP" },
+    { day: 20, from: 0, label: "3.250 RP", final: true }
   ];
   var WEEKDAYS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 
@@ -1689,8 +1695,8 @@
     { id: "ticket", cat: "sorteos", name: "Ticket extra de sorteo", desc: "+1 ticket para el sorteo de la semana. También suma para el final.", cost: 800, stock: null, limit: "Hasta 3 por semana" },
     { id: "rol", cat: "comunidad", name: "VIP en Discord", desc: "", cost: 500, stock: null, limit: "1 por persona" },
     { id: "vip", cat: "comunidad", name: "VIP en Twitch", desc: "", cost: 1200, stock: 10, limit: "1 por persona" },
-    { id: "rp5", cat: "rp", name: "RP o skin por USD 5", desc: "Skin o RP regalado a tu cuenta de LAS (en BR, solo RP).", cost: 5000, stock: 6, limit: "1 por persona" },
-    { id: "skin10", cat: "rp", name: "RP o skin por USD 10", desc: "Skin o RP de mayor valor regalado a tu cuenta de LAS (en BR, solo RP).", cost: 10000, stock: 2, limit: "1 por persona", major: true }
+    { id: "rp5", cat: "rp", name: "Skin de 750 RP", desc: "Skin o RP regalado a tu cuenta de LAS (en BR, solo RP).", cost: 5000, stock: 3, limit: "1 por persona" },
+    { id: "skin10", cat: "rp", name: "Skin de 1.350 RP", desc: "Skin o RP de mayor valor regalado a tu cuenta de LAS (en BR, solo RP).", cost: 10000, stock: 2, limit: "1 por persona", major: true }
   ];
 
   var COIN = '<svg class="coin" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#ff3d81"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#1a0210" stroke-width="2"/></svg>';
@@ -2278,10 +2284,10 @@
     function step(t) {
       if (t0 === null) { t0 = t; }
       var k = Math.min(1, (t - t0) / 800);
-      el.textContent = "+USD " + Math.round(total * (1 - Math.pow(1 - k, 3)));
+      el.textContent = "+" + Math.round(total * (1 - Math.pow(1 - k, 3))).toLocaleString("de-DE") + " RP";
       if (k < 1) { requestAnimationFrame(step); }
     }
-    el.textContent = "+USD 0";
+    el.textContent = "+0 RP";
     requestAnimationFrame(step);
   })();
 })();
