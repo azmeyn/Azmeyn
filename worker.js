@@ -13,7 +13,7 @@
 import { handleAvisos } from "./avisos.js";
 import { ticketsAuto, ticketsAutoRuta } from "./tickets-auto.js";
 import { pickem, pickemLista } from "./pickem.js";
-import { pickemVuelta, pickemTabla, pickemDatos } from "./pickem-resolver.js";
+import { pickemVuelta, pickemTabla, pickemDatos, pickemPrueba, pickemEstado } from "./pickem-resolver.js";
 
 let twitchTokenCache = null; // { value, exp }
 let kickTokenCache = null;   // { value, exp }
@@ -359,6 +359,7 @@ export default {
         if (url.pathname === "/api/pickem-lista") { return await pickemLista(url, env, HELPERS); }
         if (url.pathname === "/api/pickem-tabla") { return await pickemTabla(env); }
         if (url.pathname === "/api/pickem-datos") { return await pickemDatos(url, env, HELPERS); }
+        if (url.pathname === "/api/pickem-estado") { return await pickemEstado(env); }
       } catch (e) {
         return plain("Error interno, probá de nuevo en un rato", 500);
       }
@@ -368,6 +369,8 @@ export default {
 
   // Cada 5 minutos (ver "triggers" en wrangler.jsonc): tickets por canje y por predicciones.
   async scheduled(event, env, ctx) {
+    // Pick'em: antes del torneo solo prueba la clave de Riot (sin clave no hace nada)
+    ctx.waitUntil(pickemPrueba(env, HELPERS).catch(function (e) { console.log("pickem-prueba: " + (e && e.message)); }));
     const idx = dayIndex(argDay(0));
     if (idx < 0 || idx > EVENT_DAYS) { return; } // solo durante el torneo (y el día siguiente, por las dudas)
     // Pick'em: lee las partidas y el rango, y resuelve solo

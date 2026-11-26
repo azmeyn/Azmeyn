@@ -6,14 +6,19 @@
    Necesita el secreto RIOT_API_KEY. Sin él no hace nada y lo deja anotado.
 
      /api/pickem-tabla                    pública: tabla y respuestas ya resueltas
+     /api/pickem-estado                   pública: si hay clave de Riot y qué dio la última prueba
      /api/pickem-datos?key=ADMIN_KEY      lo que leyó de Riot. Con &q18=12&q19=s se cargan a mano
-                                          las dos que dependen de la tabla oficial del torneo. */
+                                          las dos que dependen de la tabla oficial del torneo.
+
+   Antes del torneo el mismo cron prueba la clave con la cuenta del torneo y anota el resultado
+   (se escribe solo si cambia, y una vez por día). */
 import { PREGUNTAS } from "./pickem.js";
 
 export const INICIO = Date.parse("2026-11-30T21:00:00Z");       // 30/11 18:00 ARG
 export const FIN_SEMANA = Date.parse("2026-12-07T03:00:00Z");   // termina el domingo 6/12 ARG
 export const FIN = Date.parse("2026-12-20T21:00:00Z");          // 20/12 18:00 ARG
 const CUENTA = "TE LA SACO#SB6";
+const CONOCIDA = "OTK Azmeyn#OTK";    // cuenta que ya existe, solo para probar la clave
 const PLATAFORMA = "la2";
 const COLA = 420;                      // SoloQ
 const NUEVAS_POR_VUELTA = 8;           // la vuelta del cron comparte con los tickets las 50 llamadas del plan gratis
@@ -44,8 +49,19 @@ export function altura(r) {
 
 async function riot(env, host, ruta) {
   const r = await fetch("https://" + host + ".api.riotgames.com" + ruta, { headers: { "X-Riot-Token": env.RIOT_API_KEY } });
-  if (!r.ok) { throw new Error("Riot respondió " + r.status); }
+  if (!r.ok) { throw Object.assign(new Error("Riot respondió " + r.status), { status: r.status }); }
   return r.json();
+}
+
+const rutaCuenta = (cuenta) => {
+  const i = cuenta.lastIndexOf("#");
+  return "/riot/account/v1/accounts/by-riot-id/" + encodeURIComponent(cuenta.slice(0, i)) + "/" + encodeURIComponent(cuenta.slice(i + 1));
+};
+// Las dos consultas que necesita el pick'em: que la cuenta exista y que se pueda leer su rango
+async function mirarCuenta(env, cuenta) {
+  const a = await riot(env, "americas", rutaCuenta(cuenta));
+  // Si falla el rango, la cuenta sí existe: el error sale sin código para no confundirlo con un 404 de cuenta
+  await riot(env, PLATAFORMA, "/lol/league/v4/entries/by-puuid/" + a.puuid).catch((e) => { throw new Error("rango: " + e.message); });
 }
 
 async function campeones(env) {
@@ -66,9 +82,8 @@ export async function leerDatos(env) {
 
 async function actualizarDatos(env, d, ahora) {
   const cuenta = env.PICKEM_RIOT_ID || CUENTA;
-  const i = cuenta.lastIndexOf("#");
   if (!d.puuid || d.cuenta !== cuenta) {
-    const a = await riot(env, "americas", "/riot/account/v1/accounts/by-riot-id/" + encodeURIComponent(cuenta.slice(0, i)) + "/" + encodeURIComponent(cuenta.slice(i + 1)));
+    const a = await riot(env, "americas", rutaCuenta(cuenta));
     d.puuid = a.puuid; d.cuenta = cuenta;
   }
   // Rango primero: si algo falla después, el rango más alto ya quedó anotado
@@ -246,6 +261,37 @@ export async function pickemVuelta(env, h) {
   await armarTabla(env, d, ahora, h);
 }
 
+// Prueba de la clave antes del torneo. Si la cuenta del torneo no aparece (404), se mira una que
+// ya existe: así se distingue "la clave no anda" de "la cuenta del torneo todavía no está".
+export async function probarRiot(env) {
+  const cuenta = env.PICKEM_RIOT_ID || CUENTA;
+  const falla = (e) => "falla: " + String(e && e.message || "error");
+  try { await mirarCuenta(env, cuenta); return { riot: "ok", cuentaTorneo: "ok", cuenta: cuenta }; }
+  catch (e) { if (e.status !== 404) { return { riot: falla(e), cuentaTorneo: "sin comprobar", cuenta: cuenta }; } }
+  try { await mirarCuenta(env, CONOCIDA); return { riot: "ok", cuentaTorneo: "no aparece (404)", cuenta: cuenta }; }
+  catch (e) { return { riot: falla(e), cuentaTorneo: "no aparece (404)", cuenta: cuenta }; }
+}
+
+export async function pickemPrueba(env, h) {
+  const ahora = Date.now();
+  if (!env.CHECKINS || !env.RIOT_API_KEY || ahora >= INICIO) { return; }
+  const r = await probarRiot(env);
+  const dia = new Date(ahora - 3 * 3600000).toISOString().slice(0, 10);   // fecha de Argentina
+  const previa = await env.CHECKINS.get("pkd:prueba", "json");
+  if (previa && previa.dia === dia && previa.riot === r.riot && previa.cuentaTorneo === r.cuentaTorneo && previa.cuenta === r.cuenta) { return; }
+  await h.kvPut(env, "pkd:prueba", JSON.stringify(Object.assign(r, { dia: dia, cuando: new Date(ahora).toISOString() })));
+}
+
+export async function pickemEstado(env) {
+  const prueba = env.CHECKINS ? await env.CHECKINS.get("pkd:prueba", "json") : null;
+  const d = env.CHECKINS ? await env.CHECKINS.get("pkd:datos", "json") : null;
+  return new Response(JSON.stringify({
+    clave: !!env.RIOT_API_KEY,
+    prueba: prueba,
+    torneo: d ? { error: d.error || null, partidas: Object.keys(d.partidas || {}).length } : null
+  }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
+}
+
 export async function pickemTabla(env) {
   const t = env.CHECKINS ? await env.CHECKINS.get("pkd:tabla") : null;
   return new Response(t || "{}", { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=60" } });
@@ -265,10 +311,9 @@ export async function pickemDatos(url, env, h) {
   if (url.searchParams.get("probar") === "1") {
     if (!env.RIOT_API_KEY) { prueba = "falta el secreto RIOT_API_KEY"; }
     else {
-      const cuenta = env.PICKEM_RIOT_ID || CUENTA, i = cuenta.lastIndexOf("#");
+      const cuenta = env.PICKEM_RIOT_ID || CUENTA;
       try {
-        const a = await riot(env, "americas", "/riot/account/v1/accounts/by-riot-id/" + encodeURIComponent(cuenta.slice(0, i)) + "/" + encodeURIComponent(cuenta.slice(i + 1)));
-        await riot(env, PLATAFORMA, "/lol/league/v4/entries/by-puuid/" + a.puuid);
+        await mirarCuenta(env, cuenta);
         prueba = "ok: la clave anda y encontró la cuenta " + cuenta;
       } catch (e) { prueba = "falla con " + cuenta + ": " + (e && e.message); }
     }

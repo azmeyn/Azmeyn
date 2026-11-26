@@ -50,11 +50,12 @@ export function leerCodigo(codigo) {
 
 export async function pickem(url, env, h) {
   if (!env.CHECKINS || !env.PRESENTE_KEY) { return h.plain("El pick'em todavía no está configurado"); }
+  const codigo = (url.searchParams.get("c") || "").trim();
+  // Sin código no se guarda nada: el enlace se contesta sin pedir la clave
+  if (!codigo) { return h.plain("Pick'em del SoloBoom: completalo en azmeyn.com/pickem y pegá acá lo que te da"); }
   if (!h.same(url.searchParams.get("key"), env.PRESENTE_KEY)) { return h.plain("No autorizado", 401); }
   const user = h.cleanUser(url.searchParams.get("user"));
   if (!user) { return h.plain("No pude leer tu usuario, probá de nuevo"); }
-  const codigo = (url.searchParams.get("c") || "").trim();
-  if (!codigo) { return h.plain("Pick'em del SoloBoom: completalo en azmeyn.com/pickem y pegá acá lo que te da"); }
 
   const ahora = Date.now();
   if (ahora < ABRE) { return h.plain("@" + user + " el pick'em abre el 29/11"); }
