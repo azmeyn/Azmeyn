@@ -260,9 +260,22 @@ export async function pickemDatos(url, env, h) {
   if (q18 && /^\d{1,4}$/.test(q18)) { d.manual.q18 = q18; cambio = true; }
   if (q19 === "s" || q19 === "n") { d.manual.q19 = q19; cambio = true; }
   if (cambio) { await h.kvPut(env, "pkd:datos", JSON.stringify(d)); await armarTabla(env, d, Date.now(), h); }
+  // &probar=1: comprueba ahora mismo la clave de Riot y que la cuenta exista (sirve antes del torneo)
+  let prueba;
+  if (url.searchParams.get("probar") === "1") {
+    if (!env.RIOT_API_KEY) { prueba = "falta el secreto RIOT_API_KEY"; }
+    else {
+      const cuenta = env.PICKEM_RIOT_ID || CUENTA, i = cuenta.lastIndexOf("#");
+      try {
+        const a = await riot(env, "americas", "/riot/account/v1/accounts/by-riot-id/" + encodeURIComponent(cuenta.slice(0, i)) + "/" + encodeURIComponent(cuenta.slice(i + 1)));
+        await riot(env, PLATAFORMA, "/lol/league/v4/entries/by-puuid/" + a.puuid);
+        prueba = "ok: la clave anda y encontró la cuenta " + cuenta;
+      } catch (e) { prueba = "falla con " + cuenta + ": " + (e && e.message); }
+    }
+  }
   const p = jugadas(d, FIN);
   return new Response(JSON.stringify({
-    cuenta: d.cuenta || null, error: d.error, partidas: p.length, victorias: p.filter((x) => x.gano).length,
+    prueba: prueba, cuenta: d.cuenta || null, error: d.error, partidas: p.length, victorias: p.filter((x) => x.gano).length,
     pendientes: d.pendientes || 0, rango: d.rango, rangoMasAlto: d.maximo, semana: d.semana, final: d.final,
     aMano: d.manual, respuestas: respuestas(d, Date.now())
   }, null, 2), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
