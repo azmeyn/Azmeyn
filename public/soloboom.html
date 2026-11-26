@@ -42,8 +42,8 @@
       --muted: #b4bac8;
       --accent: #ff3d81;
       --accent-ink: #1a0210;
-      --good: #4fd1a1;
-      --live: #4fd1a1;
+      --good: #57c98a;
+      --live: #57c98a;
       --off: #e5484d;
       --side-w: 264px;
       --font-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
@@ -382,7 +382,7 @@
     .btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
     .btn.ghost:hover { border-color: var(--accent); color: var(--accent); filter: none; }
     /* Feedback al copiar: verde y un rebote corto */
-    .btn.copied, .btn.ghost.copied:hover { background: #4fd1a1; border-color: #4fd1a1; color: #06241a; filter: none; animation: pop 0.45s ease; }
+    .btn.copied, .btn.ghost.copied:hover { background: #57c98a; border-color: #57c98a; color: #06241a; filter: none; animation: pop 0.45s ease; }
     @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.07); } 100% { transform: scale(1); } }
     .btn.sm { padding: 11px 14px; min-height: 40px; font-size: 13px; }
     .btn:disabled {
@@ -1357,6 +1357,15 @@
     #pickem .pk-tabla details { margin-top: 14px; color: var(--muted); font-size: 14px; }
     @media (max-width: 760px) { #pickem .pk-tabla { padding: 16px; } }
   </style>
+<style id="iguales-2026">
+    /* Cuenta regresiva en cajitas, igual que la portada (26/11) */
+    .cal .cal-status.clock { display: block; width: 100%; font-size: 22px !important; }
+    .cal .reloj { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .cal .reloj > span { display: block; background: rgba(0,0,0,.28); border: 1px solid var(--line); border-radius: 8px; padding: 10px 0 8px; text-align: center; }
+    .cal .reloj b { display: block; font: 800 32px/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--fg); }
+    .cal .reloj b.seg { color: var(--accent); }
+    .cal .reloj small { display: block; margin-top: 4px; font: 700 10px/1 var(--font-body); letter-spacing: .14em; color: var(--muted); }
+</style>
 </head>
 <body>
 
@@ -1786,7 +1795,15 @@
     var s = Math.floor(ms / 1000);
     el.classList.add("clock");
     el.classList.toggle("urgent", ms < DAY);
-    el.textContent = Math.floor(s / 86400) + "d : " + pad(Math.floor(s % 86400 / 3600)) + "h : " + pad(Math.floor(s % 3600 / 60)) + "m : " + pad(s % 60) + "s";
+    var parts = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
+    var box = el.firstChild && el.firstChild.className === "reloj" ? el.firstChild : null;
+    if (box) {
+      /* ya armado: solo cambian los numeros que cambiaron */
+      parts.forEach(function (n, i) { var b = box.children[i].firstChild, v = pad(n); if (b.textContent !== v) { b.textContent = v; } });
+    } else {
+      var lab = ["D\u00CDAS", "HORAS", "MIN", "SEG"];
+      el.innerHTML = '<span class="reloj">' + parts.map(function (n, i) { return '<span><b' + (i === 3 ? ' class="seg"' : "") + '>' + pad(n) + '</b><small>' + lab[i] + '</small></span>'; }).join("") + '</span>';
+    }
   }
   setInterval(function () { if (clockOn) { paintClock(); } }, 1000);
 
