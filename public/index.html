@@ -978,6 +978,55 @@
     @keyframes az-tic { from { opacity: 0.35; transform: translateY(-6px); } }
     @keyframes az-llamado { 50% { transform: scale(1.14); } }
   </style>
+  <style id="pickem-estilo">
+    /* Pick'em: la misma tarjeta, líneas y botones que el resto de la portada */
+    #pickem .pk { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+    #pickem .pk-top { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 28px; }
+    #pickem .pk-ic { width: 72px; height: 72px; display: grid; place-items: center; border-radius: 10px; background: rgba(255, 61, 129, 0.14); color: var(--accent); }
+    #pickem .pk-ic svg { width: 38px; height: 38px; }
+    #pickem h3 { font: 800 28px/1.1 var(--font-display); }
+    #pickem .pk-txt p { margin-top: 8px; color: var(--muted); max-width: 60ch; }
+    #pickem .pk-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    #pickem .pk-tags span { border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; color: var(--muted); }
+    #pickem .pk-form { border-top: 1px solid var(--line); padding: 24px 28px 28px; }
+    #pickem .pk-form[hidden], #pickem .pk-lista[hidden], #pickem .pk-salida[hidden] { display: none; }
+    #pickem .pk-pasos { display: flex; flex-wrap: wrap; gap: 8px 28px; list-style: none; margin: 0 0 20px; padding: 0; counter-reset: pk; }
+    #pickem .pk-pasos li { counter-increment: pk; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    #pickem .pk-pasos li::before { content: counter(pk); width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 13px; }
+    #pickem .pk-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--line); }
+    #pickem .pk-tabs button { background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); font: 700 15px/1 var(--font-body); padding: 12px 6px; margin-right: 14px; cursor: pointer; }
+    #pickem .pk-tabs button b { font-variant-numeric: tabular-nums; margin-left: 6px; font-size: 12px; }
+    #pickem .pk-tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+    #pickem .pk-nota { margin: 14px 0; color: var(--muted); font-size: 14px; }
+    #pickem .pk-lista { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    #pickem .pk-lista li { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255, 255, 255, 0.025); }
+    #pickem .pk-lista li.hecha { border-color: rgba(255, 61, 129, 0.6); }
+    #pickem .pk-lista li.cerrada { opacity: 0.55; }
+    #pickem .pk-lista label, #pickem .pk-lista .pk-p { font-weight: 700; font-size: 15px; line-height: 1.4; }
+    #pickem .pk-lista small { display: block; margin-top: 4px; font-weight: 400; color: var(--muted); font-size: 13px; }
+    #pickem input, #pickem select { width: 100%; min-width: 0; font: 15px var(--font-body); color: var(--fg); background: #101215; border: 1px solid var(--line); border-radius: 8px; padding: 11px 12px; }
+    #pickem .pk-sn { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    #pickem .pk-sn button { font: 700 15px/1 var(--font-body); color: var(--fg); background: #101215; border: 1px solid var(--line); border-radius: 8px; padding: 12px; cursor: pointer; }
+    #pickem .pk-sn button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    #pickem input:focus-visible, #pickem select:focus-visible, #pickem button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    #pickem .pk-fin { margin-top: 20px; display: grid; gap: 12px; justify-items: start; }
+    #pickem .pk-salida { width: 100%; display: grid; gap: 10px; padding: 16px; border: 1px solid var(--accent); border-radius: 8px; }
+    #pickem .pk-salida a { color: var(--accent); }
+    #pickem output { display: block; background: #101215; border-radius: 8px; padding: 12px; overflow-wrap: anywhere; font-family: ui-monospace, Consolas, monospace; font-size: 14px; user-select: all; }
+    #pickem .pk-copiar { display: flex; align-items: center; gap: 12px; }
+    #pickem .pk-aviso { color: var(--muted); font-size: 14px; }
+    @media (max-width: 760px) {
+      #pickem .pk-top { grid-template-columns: 56px minmax(0, 1fr); gap: 16px; padding: 20px; align-items: start; }
+      #pickem .pk-ic { width: 56px; height: 56px; }
+      #pickem .pk-ic svg { width: 30px; height: 30px; }
+      #pickem .pk-top > .btn { grid-column: 1 / -1; width: 100%; justify-content: center; }
+      #pickem h3 { font-size: 22px; }
+      #pickem .pk-form { padding: 18px 16px 20px; }
+      #pickem .pk-lista { grid-template-columns: minmax(0, 1fr); }
+      #pickem input, #pickem select { font-size: 16px; }
+      #pickem .pk-fin > .btn { width: 100%; justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>
@@ -1096,6 +1145,7 @@
                 </div>
                 <div class="event-cta">
                   <a class="btn" href="soloboom.html">Ver los canjes</a>
+                  <a class="btn ghost" href="#pickem">Hacer mi pick'em</a>
                   <a class="btn ghost" href="https://soloboom.net/#que-es" target="_blank" rel="noopener noreferrer">Info oficial del torneo ↗</a>
                 </div>
               </aside>
@@ -1105,6 +1155,44 @@
                 <h3>Últimos directos</h3>
                 <div class="vod-row" id="vod-row"><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span></div>
               </div>
+            </div>
+          </div>
+        </section>
+
+                <!-- ===== PICK'EM ===== -->
+        <section class="sec" id="pickem" aria-labelledby="pickem-h">
+          <div class="sec-h"><h2 id="pickem-h">Pick'em</h2></div>
+          <div class="pk sec-body">
+            <div class="pk-top">
+              <span class="pk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M9 20h6M10 17h4"/></svg></span>
+              <div class="pk-txt">
+                <h3>Adiviná cómo me va</h3>
+                <p>25 preguntas sobre mi SoloBoom. Gana el que más puntos junta; si hay empate, sorteo en vivo.</p>
+                <span class="pk-tags"><span>750 RP, o en pesos si sos de Argentina</span><span>Primera semana: hasta el 30/11 18:00</span><span>Finales: hasta el 13/12</span></span>
+              </div>
+              <button class="btn" type="button" id="pk-abrir" aria-expanded="false" aria-controls="pk-form">Hacer mi pick'em</button>
+            </div>
+
+            <div class="pk-form" id="pk-form" hidden>
+              <ol class="pk-pasos"><li>Contestá</li><li>Armá tu código</li><li>Pegalo en mi chat de Twitch</li></ol>
+              <div class="pk-tabs" role="tablist" aria-label="Preguntas">
+                <button type="button" role="tab" id="pk-tab-semana" aria-controls="pk-semana" aria-selected="true">Primera semana <b>0/10</b></button>
+                <button type="button" role="tab" id="pk-tab-final" aria-controls="pk-final" aria-selected="false">Todo el torneo <b>0/15</b></button>
+              </div>
+              <p class="pk-nota" id="pk-nota"></p>
+              <ul class="pk-lista" id="pk-semana" role="tabpanel" aria-labelledby="pk-tab-semana"></ul>
+              <ul class="pk-lista" id="pk-final" role="tabpanel" aria-labelledby="pk-tab-final" hidden></ul>
+              <div class="pk-fin">
+                <button class="btn" type="button" id="pk-armar">Armar mi código</button>
+                <p class="pk-aviso" id="pk-falta" role="status"></p>
+                <div class="pk-salida" id="pk-salida" hidden>
+                  <p>Pegá esto en el chat de <a href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">twitch.tv/azmeyn</a>:</p>
+                  <output id="pk-codigo"></output>
+                  <div class="pk-copiar"><button class="btn ghost" type="button" id="pk-copiar">Copiar</button><span class="pk-aviso" id="pk-copiado" role="status"></span></div>
+                  <p class="pk-aviso">El bot te confirma cuántas guardó. Si cambiás algo, armá el código y pegalo de nuevo.</p>
+                </div>
+              </div>
+              <datalist id="pk-campeones"></datalist>
             </div>
           </div>
         </section>
@@ -1549,7 +1637,7 @@
   /* ---------- Entrada suave al hacer scroll (una sola vez, escalonada) ---------- */
   (function () {
     var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var list = document.querySelectorAll(".dc, .account, .contact");
+    var list = document.querySelectorAll(".pk, .dc, .account, .contact");
     if (reduced || !("IntersectionObserver" in window)) { return; }
     Array.prototype.forEach.call(list, function (el) { el.classList.add("fx"); });
     var io = new IntersectionObserver(function (entries) {
@@ -1635,5 +1723,171 @@
     });
   })();
   </script>
+<script id="pickem-js">
+/* ---------- Pick'em: las preguntas se arman recién al abrirlo (la portada no carga de más) ---------- */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $("pk-form"), abrir = $("pk-abrir");
+  if (!form) { return; }
+  var CIERRA_SEMANA = Date.parse("2026-11-30T21:00:00Z"), CIERRA_FINAL = Date.parse("2026-12-14T03:00:00Z");
+  // El orden es el mismo que en pickem.js
+  var P = [
+    ["q02","semana","num","¿Cuántas partidas gano la primera semana?"],
+    ["q03","semana","num","¿Cuántas partidas juego la primera semana?"],
+    ["q04","semana","sn","¿Termino la primera semana con más victorias que derrotas?"],
+    ["q05","semana","camp","¿Qué campeón juego más la primera semana?"],
+    ["q06","semana","num","¿Cuántos campeones distintos juego la primera semana?"],
+    ["q07","semana","sn","¿Hago un pentakill la primera semana?"],
+    ["q08","semana","num","¿Cuál es mi mejor racha de victorias la primera semana?"],
+    ["q09","semana","rango","¿En qué rango estoy el domingo 6/12?"],
+    ["q11","semana","num","¿Cuántas kills tiene mi mejor partida de la primera semana?"],
+    ["q12","semana","num","¿Cuántas veces muero en mi peor partida de la primera semana?"],
+    ["q13","final","rango","¿En qué rango termino el torneo?"],
+    ["q14","final","num","¿Con cuántos LP termino?"],
+    ["q15","final","rango","¿Cuál es el rango más alto que toco?"],
+    ["q16","final","num","¿Con qué porcentaje de victorias termino?"],
+    ["q17","final","num","¿Cuántas partidas juego en total?"],
+    ["q18","final","num","¿En qué puesto de mi tabla termino?","Según la tabla oficial. Si no sale, se anula."],
+    ["q19","final","sn","¿Termino en el top 10?","Según la tabla oficial. Si no sale, se anula."],
+    ["q20","final","num","¿Cuál es mi racha de victorias más larga?"],
+    ["q21","final","num","¿Cuál es mi peor racha de derrotas?"],
+    ["q22","final","camp","¿Cuál es mi campeón más jugado?"],
+    ["q23","final","camp","¿Con qué campeón gano más seguido?","Cuentan los que jugué 5 veces o más."],
+    ["q24","final","num","¿Cuántos campeones distintos juego en todo el torneo?"],
+    ["q25","final","num","¿Cuántos pentakills hago en total?"],
+    ["q27","final","dec","¿Con qué KDA promedio termino?","Kills más asistencias, dividido muertes. Un decimal."],
+    ["q28","final","num","¿Cuántos minutos dura mi partida más larga?"]
+  ];
+  var RANGOS = ["Platino o menos","Esmeralda IV","Esmeralda III","Esmeralda II","Esmeralda I","Diamante IV","Diamante III","Diamante II","Diamante I","Maestro","Gran Maestro","Retador"];
+  var armado = false, previas = {};
+  try { previas = JSON.parse(localStorage.getItem("pickem-sb6") || "{}"); } catch (e) {}
+
+  function el(tag, attrs, txt) { var n = document.createElement(tag); for (var k in attrs) { n.setAttribute(k, attrs[k]); } if (txt) { n.textContent = txt; } return n; }
+  function crudo(q) {
+    var c = $("pk-" + q[0]);
+    if (q[2] === "sn") { var b = c.querySelector('[aria-pressed="true"]'); return b ? b.getAttribute("data-v") : ""; }
+    return c.value.trim();
+  }
+  function contar() {
+    ["semana", "final"].forEach(function (bloque) {
+      var total = 0, hechas = 0;
+      P.forEach(function (q) {
+        if (q[1] !== bloque) { return; }
+        total++;
+        var lleno = crudo(q) !== "";
+        if (lleno) { hechas++; }
+        $("pk-" + q[0]).closest("li").classList.toggle("hecha", lleno);
+      });
+      $("pk-tab-" + bloque).querySelector("b").textContent = hechas + "/" + total;
+    });
+  }
+  function armar() {
+    if (armado) { return; }
+    armado = true;
+    P.forEach(function (q) {
+      var id = "pk-" + q[0], tipo = q[2], li = el("li"), txt = el(tipo === "sn" ? "div" : "label", { class: "pk-p" }, q[3]), campo;
+      if (tipo !== "sn") { txt.setAttribute("for", id); }
+      if (q[4]) { txt.appendChild(el("small", {}, q[4])); }
+      li.appendChild(txt);
+      if (tipo === "sn") {
+        campo = el("div", { class: "pk-sn", id: id, role: "group", "aria-label": q[3] });
+        [["s", "Sí"], ["n", "No"]].forEach(function (o) {
+          var b = el("button", { type: "button", "data-v": o[0], "aria-pressed": previas[q[0]] === o[0] ? "true" : "false" }, o[1]);
+          b.addEventListener("click", function () {
+            [].forEach.call(campo.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+            contar();
+          });
+          campo.appendChild(b);
+        });
+      } else if (tipo === "rango") {
+        campo = el("select", { id: id });
+        campo.appendChild(el("option", { value: "" }, "Elegí un rango"));
+        RANGOS.forEach(function (r, i) { campo.appendChild(el("option", { value: String(i) }, r)); });
+        campo.value = previas[q[0]] || "";
+      } else {
+        var attrs = { id: id, autocomplete: "off" };
+        if (tipo === "camp") { attrs.list = "pk-campeones"; attrs.placeholder = "Nombre del campeón"; attrs.maxlength = "20"; }
+        else { attrs.inputmode = tipo === "dec" ? "decimal" : "numeric"; attrs.placeholder = tipo === "dec" ? "3,2" : "Un número"; attrs.maxlength = "4"; }
+        campo = el("input", attrs);
+        campo.value = previas[q[0]] || "";
+      }
+      li.appendChild(campo);
+      $("pk-" + q[1]).appendChild(li);
+      if (q[1] === "semana" && Date.now() >= CIERRA_SEMANA) {
+        li.className = "cerrada";
+        [].forEach.call(li.querySelectorAll("input,select,button"), function (x) { x.disabled = true; });
+      }
+    });
+    form.addEventListener("input", contar);
+    form.addEventListener("change", contar);
+    contar();
+    // Lista de campeones para autocompletar (si no carga, se escribe a mano)
+    fetch("https://ddragon.leagueoflegends.com/api/versions.json").then(function (r) { return r.json(); })
+      .then(function (v) { return fetch("https://ddragon.leagueoflegends.com/cdn/" + v[0] + "/data/es_AR/champion.json"); })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { Object.keys(j.data).forEach(function (k) { $("pk-campeones").appendChild(el("option", { value: j.data[k].name })); }); })
+      .catch(function () {});
+  }
+
+  function pestana(bloque) {
+    ["semana", "final"].forEach(function (b) {
+      $("pk-tab-" + b).setAttribute("aria-selected", b === bloque ? "true" : "false");
+      $("pk-" + b).hidden = b !== bloque;
+    });
+    $("pk-nota").textContent = bloque === "final" ? "Cierran el 13/12 a las 23:59. Se resuelven el 20/12. En las de número gana el que queda más cerca."
+      : Date.now() >= CIERRA_SEMANA ? "Ya cerraron. Se resuelven el domingo 6/12."
+        : "Cierran el 30/11 a las 18:00. Se resuelven el domingo 6/12. En las de número gana el que queda más cerca.";
+  }
+  function mostrar(si) {
+    if (si) { armar(); }
+    form.hidden = !si;
+    abrir.setAttribute("aria-expanded", si ? "true" : "false");
+    abrir.textContent = si ? "Cerrar" : "Hacer mi pick'em";
+  }
+  abrir.addEventListener("click", function () { mostrar(form.hidden); });
+  $("pk-tab-semana").addEventListener("click", function () { pestana("semana"); });
+  $("pk-tab-final").addEventListener("click", function () { pestana("final"); });
+  pestana(Date.now() >= CIERRA_SEMANA ? "final" : "semana");
+  function porEnlace() { if (location.hash === "#pickem") { mostrar(true); } }
+  window.addEventListener("hashchange", porEnlace);
+  [].forEach.call(document.querySelectorAll('a[href="#pickem"]'), function (a) { a.addEventListener("click", function () { mostrar(true); }); });
+  porEnlace();
+
+  function valor(q) {
+    var c = $("pk-" + q[0]), tipo = q[2];
+    if (c.disabled || (c.querySelector && c.querySelector("button:disabled"))) { return ""; }
+    var v = crudo(q);
+    if (!v) { return ""; }
+    if (tipo === "camp") { v = v.normalize("NFD").toLowerCase().replace(/[^a-z]/g, "").slice(0, 16); return v.length > 1 ? v : null; }
+    if (tipo === "dec") { var m = v.replace(",", ".").match(/^(\d{1,2})(?:\.(\d))?\d*$/); return m ? m[1] + (m[2] ? "_" + m[2] : "") : null; }
+    if (tipo === "num") { return /^\d{1,4}$/.test(v) ? v : null; }
+    return v;
+  }
+  $("pk-armar").addEventListener("click", function () {
+    if (Date.now() >= CIERRA_FINAL) { $("pk-falta").textContent = "El pick'em ya cerró."; return; }
+    var vals = [], mal = null, vacias = 0, guardar = {};
+    P.forEach(function (q) {
+      var v = valor(q), cerrada = $("pk-" + q[0]).closest("li").classList.contains("cerrada");
+      if (v === null) { mal = mal || q; v = ""; }
+      if (v === "" && !cerrada) { vacias++; }
+      vals.push(v);
+      guardar[q[0]] = crudo(q);
+    });
+    try { localStorage.setItem("pickem-sb6", JSON.stringify(guardar)); } catch (e) {}
+    if (mal) { $("pk-salida").hidden = true; pestana(mal[1]); $("pk-falta").textContent = "Revisá esta: " + mal[3]; $("pk-" + mal[0]).focus(); return; }
+    if (vals.every(function (v) { return v === ""; })) { $("pk-salida").hidden = true; $("pk-falta").textContent = "Contestá al menos una."; return; }
+    $("pk-codigo").textContent = "!pickem p1." + vals.join(".");
+    $("pk-salida").hidden = false;
+    $("pk-copiado").textContent = "";
+    $("pk-falta").textContent = vacias ? "Te quedaron " + vacias + " sin contestar. Podés mandarlo igual y completar después." : "";
+  });
+  $("pk-copiar").addEventListener("click", function () {
+    var t = $("pk-codigo").textContent;
+    var listo = function () { $("pk-copiado").textContent = "Copiado."; };
+    var amano = function () { var r = document.createRange(); r.selectNodeContents($("pk-codigo")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); $("pk-copiado").textContent = "Marcado: copialo a mano."; };
+    if (navigator.clipboard) { navigator.clipboard.writeText(t).then(listo, amano); } else { amano(); }
+  });
+})();
+</script>
 </body>
 </html>
