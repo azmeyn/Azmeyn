@@ -92,6 +92,9 @@
     /* La barra de estado queda fija arriba: se le suma aire para que nunca tape un título */
     section[id] { scroll-margin-top: calc(var(--side-h, 53px) + 20px); }
     @media (min-width: 960px) { section[id] { scroll-margin-top: calc(var(--top-h, 65px) + 24px); } }
+    section[tabindex="-1"]:focus { outline: none; }
+    /* Celular: el logo queda quieto y el menú se corre por debajo */
+    @media (max-width: 959px) { .side .brand { position: sticky; left: 0; z-index: 2; align-self: stretch; margin-block: -8px; padding-block: 8px; background: #121416; box-shadow: -24px 0 0 #121416, 10px 0 0 #121416; } }
     p { text-wrap: pretty; }
     .skip {
       position: absolute; left: 12px; top: -60px; z-index: 60;
@@ -1459,6 +1462,13 @@
   logoEl.addEventListener("load", function () { logoEl.classList.remove("bad"); });
   if (logoEl.complete && logoEl.naturalWidth === 0) { logoBad(); }
   var titleOff = document.title;
+  /* El nombre de la pestaña sigue a la sección que se está viendo */
+  var SECCIONES = { pickem: "Pick'em", discord: "Discord", cuentas: "Mis cuentas", contacto: "Contacto" };
+  var enVivo = false, seccionVista = "inicio";
+  function ponerTitulo() {
+    var n = SECCIONES[seccionVista];
+    document.title = (enVivo ? "● " : "") + (n ? n + " · AZMEYN" : enVivo ? "En vivo · Azmeyn" : titleOff);
+  }
   /* Bajo el logo: "En vivo en Twitch", "En vivo en Kick" o "En vivo · Twitch y Kick" si prendo en las dos */
   function setBrandLive(list) {
     var on = list.length > 0;
@@ -1467,7 +1477,8 @@
     chip.hidden = !on;
     if (on) { chip.setAttribute("href", URLS[list[0]]); }
     $("brand-sub").textContent = list.length === 2 ? "En vivo · Twitch y Kick" : on ? "En vivo en " + NAMES[list[0]] : "";
-    document.title = on ? "● En vivo · Azmeyn" : titleOff;
+    enVivo = on;
+    ponerTitulo();
   }
 
   /* ---------- Estado en la interfaz ---------- */
@@ -1698,21 +1709,32 @@
 
   function docTop(id) { return $(id).getBoundingClientRect().top + window.pageYOffset; }
   function activeSection() {
-    var y = window.pageYOffset;
-    var tb = document.querySelector(".topbar").offsetHeight;
-    var line = y + (window.innerWidth >= 960 ? tb : document.querySelector(".side").offsetHeight) + 40;
+    var y = window.pageYOffset, vh = window.innerHeight;
+    /* La marca cambia cuando la sección ya ocupa buena parte de la pantalla. Se mide desde donde
+       queda una sección al tocarla en el menú (debajo de lo que está fijo arriba, en cualquier ancho) */
+    var marco = parseFloat(getComputedStyle($("pickem")).scrollMarginTop) || 80;
+    var line = y + marco + Math.min(240, (vh - marco) * 0.35);
     var active = "inicio";
     ["pickem", "discord", "cuentas", "contacto"].forEach(function (id) {
       if (docTop(id) <= line) { active = id; }
     });
     if (y < 4) { active = "inicio"; }
-    else if (window.innerHeight + y >= document.documentElement.scrollHeight - 4) { active = "contacto"; }
+    else if (vh + y >= document.documentElement.scrollHeight - 4) { active = "contacto"; }
     return active;
   }
   var lastId = null;
+  /* Al tocar una sección queda marcada esa (aunque la página no dé para subirla del todo) hasta que se mueva a mano */
+  var fijada = null, yFijada = null, quieto = null, llego = false;
+  /* La barra del navegador nunca muestra "#": solo el Pick'em tiene dirección propia (azmeyn.com/pickem) */
+  function ponerDireccion(id) {
+    var ruta = id === "pickem" ? "/pickem" : "/";
+    if (location.pathname !== ruta || location.hash) {
+      try { history.replaceState(history.state, "", ruta + location.search); } catch (e) {}
+    }
+  }
   function updateNav() {
     ticking = false;
-    var id = activeSection();
+    var id = fijada || activeSection();
     /* Solo se toca el menú cuando cambia la sección marcada */
     if (id === lastId) { return; }
     lastId = id;
@@ -1720,13 +1742,76 @@
       if (a.getAttribute("href") === "#" + id) { a.setAttribute("aria-current", "true"); }
       else { a.removeAttribute("aria-current"); }
     });
+    seccionVista = id;
+    ponerTitulo();
+    mostrarEnMenu(id === "inicio" ? null : document.querySelector('.nav a[href="#' + id + '"]'));
+    if (llego) { ponerDireccion(id); }
+  }
+  /* Celular: el menú se corre de costado. Se acomoda para que se vea la opción marcada */
+  function mostrarEnMenu(a) {
+    var barra = document.querySelector(".side");
+    if (barra.scrollWidth <= barra.clientWidth + 2) { return; }
+    if (!a) { barra.scrollLeft = 0; return; }
+    var libre = document.querySelector(".brand").getBoundingClientRect().right + 12;
+    var r = a.getBoundingClientRect();
+    if (r.left < libre || r.right > barra.clientWidth - 12) { barra.scrollLeft += r.left - libre; }
   }
   function onScroll() {
+    if (fijada) {
+      if (yFijada === null) { esperarQuieto(); }
+      else if (Math.abs(window.pageYOffset - yFijada) > 40) { fijada = null; }
+    }
     if (!ticking) { ticking = true; requestAnimationFrame(updateNav); }
   }
+  function esperarQuieto() {
+    clearTimeout(quieto);
+    quieto = setTimeout(function () { yFijada = window.pageYOffset; }, 180);
+  }
+  function soltar() { if (fijada) { fijada = null; onScroll(); } }
+  function irA(id, alLlegar) {
+    var destino = $(id);
+    if (id === "inicio" || SECCIONES[id]) { fijada = id; yFijada = null; esperarQuieto(); }
+    if (id === "inicio") { window.scrollTo({ top: 0, behavior: alLlegar ? "instant" : "auto" }); }
+    else { destino.scrollIntoView(alLlegar ? { behavior: "instant", block: "start" } : { block: "start" }); }
+    if (!alLlegar) {
+      /* El teclado sigue desde la sección, como con un enlace común */
+      destino.setAttribute("tabindex", "-1");
+      destino.focus({ preventScroll: true });
+    }
+    updateNav();
+    if (llego) { ponerDireccion(fijada || lastId); }
+  }
+  /* Enlaces dentro de la portada: se baja hasta la sección sin escribir "#" en la dirección */
+  document.addEventListener("click", function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a || a.classList.contains("skip")) { return; }
+    var id = a.getAttribute("href").slice(1);
+    if (!id || !$(id)) { return; }
+    e.preventDefault();
+    irA(id, false);
+  });
+  /* Si se entra con un enlace viejo (/#discord, /#pickem), se va a la sección y se limpia la dirección */
+  function llegada() {
+    var id = location.hash.slice(1);
+    llego = true;
+    if (id === "contenido-principal") { return; }
+    if (id && $(id)) { irA(id, true); }
+    lastId = null;
+    updateNav();
+  }
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("wheel", soltar, { passive: true });
+  window.addEventListener("touchmove", soltar, { passive: true });
   window.addEventListener("resize", onScroll);
-  window.addEventListener("load", updateNav);
+  /* Se espera a que el resto de la página haya leído la dirección (el Pick'em se abre solo) */
+  document.addEventListener("DOMContentLoaded", llegada);
+  window.addEventListener("hashchange", function () { setTimeout(llegada, 0); });
+  window.addEventListener("load", function () {
+    /* Cuando termina de cargar cambian las alturas: se vuelve a acomodar la sección pedida */
+    if (fijada) { $(fijada).scrollIntoView({ behavior: "instant", block: "start" }); yFijada = null; esperarQuieto(); }
+    updateNav();
+  });
   updateNav();
 })();
 </script>

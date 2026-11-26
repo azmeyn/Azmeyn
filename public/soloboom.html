@@ -87,6 +87,9 @@
     /* La barra de estado queda fija arriba: se le suma aire para que nunca tape un título */
     section[id] { scroll-margin-top: calc(var(--side-h, 53px) + 20px); }
     @media (min-width: 960px) { section[id] { scroll-margin-top: calc(var(--top-h, 65px) + 24px); } }
+    section[tabindex="-1"]:focus { outline: none; }
+    /* Celular: el logo queda quieto y el menú se corre por debajo */
+    @media (max-width: 959px) { .side .brand { position: sticky; left: 0; z-index: 2; align-self: stretch; margin-block: -8px; padding-block: 8px; background: #121416; box-shadow: -24px 0 0 #121416, 10px 0 0 #121416; } }
     p { text-wrap: pretty; }
     .skip {
       position: absolute; left: 12px; top: -60px; z-index: 60;
@@ -2178,6 +2181,13 @@
   logoEl.addEventListener("load", function () { logoEl.classList.remove("bad"); });
   if (logoEl.complete && logoEl.naturalWidth === 0) { logoBad(); }
   var titleOff = document.title;
+  /* El nombre de la pestaña sigue a la sección que se está viendo (arriba de todo queda el de la página) */
+  var SECCIONES = { como: "Cómo funciona", tienda: "Canjes", sorteos: "Sorteos", faq: "Preguntas" };
+  var enVivo = false, seccionVista = null;
+  function ponerTitulo() {
+    var n = SECCIONES[seccionVista];
+    document.title = (enVivo ? "● " : "") + (n ? n + " · AZMEYN" : enVivo ? "En vivo · Azmeyn" : titleOff);
+  }
 
   document.querySelectorAll("[data-link]").forEach(function (a) {
     a.setAttribute("href", URLS[a.getAttribute("data-link")]);
@@ -2204,7 +2214,8 @@
     if (anyLive) { chip.setAttribute("href", URLS[livePfs[0]]); }
     /* "En vivo en Twitch", "En vivo en Kick" o "En vivo · Twitch y Kick" si prendo en las dos */
     $("brand-sub").textContent = livePfs.length === 2 ? "En vivo · Twitch y Kick" : anyLive ? "En vivo en " + NAMES[livePfs[0]] : "";
-    document.title = anyLive ? "● En vivo · Azmeyn" : titleOff;
+    enVivo = anyLive;
+    ponerTitulo();
     useAvatar(data);
   }
   function refreshLive() {
@@ -2221,12 +2232,14 @@
   var subLinks = Array.prototype.slice.call(document.querySelectorAll(".sub a"));
   var ticking = false;
   var lastAct = null;
+  /* Al tocar una sección queda marcada esa (aunque la página no dé para subirla del todo) hasta que se mueva a mano */
+  var fijada = null, yFijada = null, quieto = null;
   function updateSub() {
     ticking = false;
     /* Primero se lee todo y después se escribe: así el navegador no recalcula el diseño entero en cada cuadro del scroll */
     var y = window.pageYOffset, vh = window.innerHeight, docH = document.documentElement.scrollHeight;
-    var tb = document.querySelector(".topbar").offsetHeight;
-    var line = y + (window.innerWidth >= 960 ? tb : document.querySelector(".side").offsetHeight) + Math.round(vh * 0.25);
+    var marco = parseFloat(getComputedStyle($("tienda")).scrollMarginTop) || 80;
+    var line = y + marco + Math.min(240, (vh - marco) * 0.35);
     var act = null;
     subLinks.forEach(function (a) {
       var el = $(a.getAttribute("href").slice(1));
@@ -2236,21 +2249,85 @@
     if (subLinks.length && vh + y >= docH - 4) {
       act = subLinks[subLinks.length - 1];
     }
+    if (fijada) { act = subLinks.filter(function (a) { return a.getAttribute("href") === "#" + fijada; })[0] || act; }
+    var vista = act ? act.getAttribute("href").slice(1) : null;
+    if (vista !== seccionVista) { seccionVista = vista; ponerTitulo(); }
     /* Solo se toca el menú cuando cambia la sección marcada */
     if (act !== lastAct) {
       lastAct = act;
       subLinks.forEach(function (a) {
         if (a === act) { a.setAttribute("aria-current", "true"); } else { a.removeAttribute("aria-current"); }
       });
+      mostrarEnMenu(act || document.querySelector('.nav a[aria-current="page"]'));
     }
     /* Barra de progreso de lectura */
     var max = docH - vh;
     $("progress").style.transform = "scaleX(" + (max > 0 ? Math.min(1, Math.max(0, y / max)) : 0) + ")";
   }
-  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(updateSub); } }
+  /* Celular: el menú se corre de costado. Se acomoda para que se vea la opción marcada */
+  function mostrarEnMenu(a) {
+    var barra = document.querySelector(".side");
+    if (!a || barra.scrollWidth <= barra.clientWidth + 2) { return; }
+    var libre = document.querySelector(".brand").getBoundingClientRect().right + 12;
+    var r = a.getBoundingClientRect();
+    if (!r.width) { return; }
+    if (r.left < libre || r.right > barra.clientWidth - 12) { barra.scrollLeft += r.left - libre; }
+  }
+  function onScroll() {
+    if (fijada) {
+      if (yFijada === null) { esperarQuieto(); }
+      else if (Math.abs(window.pageYOffset - yFijada) > 40) { fijada = null; }
+    }
+    if (!ticking) { ticking = true; requestAnimationFrame(updateSub); }
+  }
+  function esperarQuieto() {
+    clearTimeout(quieto);
+    quieto = setTimeout(function () { yFijada = window.pageYOffset; }, 180);
+  }
+  function soltar() { if (fijada) { fijada = null; onScroll(); } }
+  /* La barra del navegador nunca muestra "#": se baja hasta la sección y la dirección queda limpia */
+  function limpiarDireccion() {
+    if (location.hash) {
+      try { history.replaceState(history.state, "", location.pathname + location.search); } catch (e) {}
+    }
+  }
+  function irA(id, alLlegar) {
+    var destino = $(id);
+    if (SECCIONES[id]) { fijada = id; yFijada = null; esperarQuieto(); }
+    destino.scrollIntoView(alLlegar ? { behavior: "instant", block: "start" } : { block: "start" });
+    if (!alLlegar) {
+      /* El teclado sigue desde la sección, como con un enlace común */
+      destino.setAttribute("tabindex", "-1");
+      destino.focus({ preventScroll: true });
+    }
+    limpiarDireccion();
+    updateSub();
+  }
+  document.addEventListener("click", function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a || a.classList.contains("skip")) { return; }
+    var id = a.getAttribute("href").slice(1);
+    if (!id || !$(id)) { return; }
+    e.preventDefault();
+    irA(id, false);
+  });
+  /* Si se entra con un enlace a una sección (soloboom#sorteos), se va ahí y se limpia la dirección */
+  function llegada() {
+    var id = location.hash.slice(1);
+    if (id && id !== "contenido-principal" && $(id)) { irA(id, true); }
+  }
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("wheel", soltar, { passive: true });
+  window.addEventListener("touchmove", soltar, { passive: true });
   window.addEventListener("resize", onScroll);
-  window.addEventListener("load", updateSub);
+  /* Se espera a que estén armados el calendario y la tienda */
+  document.addEventListener("DOMContentLoaded", llegada);
+  window.addEventListener("hashchange", llegada);
+  window.addEventListener("load", function () {
+    if (fijada) { $(fijada).scrollIntoView({ behavior: "instant", block: "start" }); yFijada = null; esperarQuieto(); }
+    updateSub();
+  });
   updateSub();
 
   refreshLive();
