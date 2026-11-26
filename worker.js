@@ -158,8 +158,21 @@ async function loadRec(env, user) {
   rec.w = Object.assign({ 1: 0, 2: 0, 3: 0 }, rec.w);
   return rec;
 }
+// El KV de Cloudflare acepta una sola escritura por segundo en la misma clave (si no, error 429).
+// Por eso cada escritura se reintenta con una pausa.
+async function kvPut(env, key, value, opts) {
+  for (let intento = 1; ; intento++) {
+    try { return await env.CHECKINS.put(key, value, opts); }
+    catch (e) {
+      if (intento >= 4) { throw e; }
+      await new Promise(function (ok) { setTimeout(ok, 1100); });
+    }
+  }
+}
 async function saveRec(env, user, rec) {
-  await env.CHECKINS.put("u:" + user, JSON.stringify(rec), { metadata: rec });
+  rec.v = (rec.v || 0) + 1;   // número de versión: sirve para saber qué copia es la más nueva
+  // En la metadata va solo lo que usa la lista de tickets (tiene un límite de tamaño chico)
+  await kvPut(env, "u:" + user, JSON.stringify(rec), { metadata: { w: rec.w } });
 }
 async function sePoints(env, user, amount) {
   const r = await fetch(SE_POINTS_URL + encodeURIComponent(env.SE_CHANNEL_ID) + "/" + encodeURIComponent(user) + "/" + amount, {
@@ -215,7 +228,13 @@ async function presente(url, env) {
   try {
     await sePoints(env, user, pts);
   } catch (e) {
-    await saveRec(env, user, before);
+    // Se deshace solo el presente: si mientras tanto se sumó un ticket por otro lado, no se pisa
+    const leida = await loadRec(env, user);
+    const actual = (leida.v || 0) > (rec.v || 0) ? leida : rec;
+    actual.last = before.last;
+    actual.streak = before.streak;
+    actual.w[week] = Math.max(0, (actual.w[week] || 0) - 1);
+    await saveRec(env, user, actual);
     return plain("@" + user + " no pude sumar tus puntos ahora, probá de nuevo en un rato");
   }
   return plain("@" + user + " presente ✅ +" + pts + " pts" +
@@ -261,9 +280,9 @@ async function ticketsList(url, env) {
       rec.w = Object.assign({ 1: 0, 2: 0, 3: 0 }, rec.w);
       const user = k.name.slice(2);
       let t = wk === "all" ? totalOf(rec) : (rec.w[wk] || 0);
-      // Solo el sorteo final duplica a los suscriptores
+      // Sin duplicar a nadie: a los subs ya les suma +2 tickets por semana tickets-auto.js
       const isSub = subs.indexOf(user) >= 0;
-      const eff = wk === "all" && isSub ? t * 2 : t;
+      const eff = t;
       if (t > 0) { rows.push({ user: user, tickets: t, effective: eff, sub: isSub }); }
     });
     cursor = page.list_complete ? undefined : page.cursor;
@@ -290,7 +309,7 @@ async function ticketsList(url, env) {
 const HELPERS = {
   EVENT_START: EVENT_START, EVENT_DAYS: EVENT_DAYS,
   dayIndex: dayIndex, cleanUser: cleanUser, same: same,
-  loadRec: loadRec, saveRec: saveRec, sePoints: sePoints
+  loadRec: loadRec, saveRec: saveRec, sePoints: sePoints, kvPut: kvPut
 };
 
 /* ------------------------------ Handler ------------------------------ */

@@ -38,7 +38,37 @@ const DIAS_RECUERDO = 70;          // cuánto tiempo se recuerda un canje o pred
 const HORA_INICIO_ARG = 18;        // el torneo arranca a las 18:00 ARG del primer día (y cierra igual el último)
 const SUBS_TICKETS = 2;            // tickets por semana para cada sub (decisión D3, 25/11)
 const HORA_SUBS_ARG = 12;          // se suman el domingo de cada semana a esta hora (antes del sorteo)
-const LATIDO_HORAS = 6;           // sin novedades, el informe guardado se renueva como mucho cada tanto (ahorra escrituras de KV)
+const MAX_PAGOS_VUELTA = 30;       // el plan gratis corta a las 50 llamadas externas por vuelta
+const LATIDO_HORAS = 6;         // sin novedades, el informe guardado se renueva como mucho cada tanto (ahorra escrituras de KV)
+
+// El KV puede tardar en mostrar lo recién escrito: durante una vuelta se recuerda lo que se
+// guardó y se usa esa copia si es más nueva (rec.v) que la que devuelve el KV. Así no se pisa
+// un ticket con otro, ni un !presente que haya entrado en el medio.
+function conMemoria(h) {
+  const fichas = new Map();
+  const copia = function (o) { return JSON.parse(JSON.stringify(o)); };
+  return Object.assign({}, h, {
+    loadRec: async function (env, user) {
+      const leida = await h.loadRec(env, user);
+      const mia = fichas.get(user);
+      return mia && (mia.v || 0) > (leida.v || 0) ? copia(mia) : leida;
+    },
+    saveRec: async function (env, user, rec) {
+      await h.saveRec(env, user, rec);
+      fichas.set(user, copia(rec));
+    }
+  });
+}
+
+// true = StreamElements respondió con un error (no sumó nada, se puede reintentar).
+// false = no hubo respuesta: no se sabe si sumó.
+function contestoQueNo(e) { return /respondió \d/.test(String(e && e.message)); }
+
+// Lo que hay que mirar a mano queda en el informe y en una lista aparte que no se pisa
+function aRevisar(informe, texto) {
+  informe.revisar.push(texto);
+  informe.errores.push("revisar a mano " + texto);
+}
 
 function argDayOf(iso) {
   return new Date(Date.parse(iso) - 3 * 3600000).toISOString().slice(0, 10);
@@ -91,34 +121,54 @@ async function procesarCanjes(env, h, prueba, informe) {
     const user = h.cleanUser(a.data.username);
     const id = String(a._id || "");
     if (!user || !id) { informe.canjes.raros.push({ id: id, usuario: a.data.username || null }); continue; }
-    if (await env.CHECKINS.get("canje:" + id)) { continue; }
+    const anotado = await env.CHECKINS.get("canje:" + id);
+    if (anotado && anotado !== "reintentar") { continue; }
 
     const ts = Date.parse(a.createdAt);
+    if (isNaN(ts)) { informe.canjes.raros.push({ id: id, usuario: user }); continue; }
     const idx = h.dayIndex(argDayOf(a.createdAt));
     if (!(ts >= v.inicio && ts <= v.fin) || idx < 0 || idx >= h.EVENT_DAYS) { informe.canjes.fueraDeFecha.push(user); continue; }
     const week = Math.floor(idx / 7) + 1;
 
     const rec = await h.loadRec(env, user);
     rec.c = Object.assign({ 1: 0, 2: 0, 3: 0 }, rec.c);
+    if ((rec.cx || []).indexOf(id) >= 0) {   // ya sumado en una vuelta que se cortó antes de marcarlo
+      if (!prueba) { await h.kvPut(env, "canje:" + id, "ok", { expirationTtl: DIAS_RECUERDO * 86400 }); }
+      continue;
+    }
     if (rec.c[week] >= TOPE_CANJE_SEMANA) {
       if (!prueba) {
-        // Primero se devuelve y recién después se marca como hecho: si StreamElements falla,
-        // el canje queda pendiente y se reintenta en la próxima vuelta (no se pierden los 800 pts).
+        // Se anota ANTES de devolver, así nunca se devuelve dos veces. Si StreamElements contesta
+        // que no, queda para reintentar; si no contesta, queda para revisar a mano.
+        const marcar = function (valor) {
+          return h.kvPut(env, "canje:" + id, valor, { expirationTtl: DIAS_RECUERDO * 86400 });
+        };
+        await marcar("devolviendo");
         try { await h.sePoints(env, user, COSTO_TICKET); }
-        catch (e) { informe.errores.push("no pude devolver 800 pts a " + user + " (se reintenta en la próxima vuelta)"); continue; }
-        await env.CHECKINS.put("canje:" + id, "devuelto", { expirationTtl: DIAS_RECUERDO * 86400 });
+        catch (e) {
+          if (contestoQueNo(e)) {
+            await marcar("reintentar");
+            informe.errores.push("no pude devolver 800 pts a " + user + " (se reintenta en la próxima vuelta)");
+          } else {
+            await marcar("revisar");
+            aRevisar(informe, "los 800 pts a devolver a " + user + " (StreamElements no contestó)");
+          }
+          continue;
+        }
+        await marcar("devuelto");
       }
       informe.canjes.devueltos.push({ usuario: user, semana: week });
       continue;
     }
     informe.canjes.sumados.push({ usuario: user, semana: week });
     if (!prueba) {
-      // Primero se marca el canje como hecho y después se suma: si algo falla en el medio,
-      // es preferible no duplicar tickets (queda en el informe para revisarlo).
-      await env.CHECKINS.put("canje:" + id, "ok", { expirationTtl: DIAS_RECUERDO * 86400 });
+      // El ticket y la anotación del canje se guardan juntos en la ficha (rec.cx) y recién
+      // después se marca el canje: si algo falla en el medio, no se pierde ni se duplica.
       rec.c[week] += 1;
       rec.w[week] = (rec.w[week] || 0) + 1;
+      rec.cx = (rec.cx || []).concat(id).slice(-12);
       await h.saveRec(env, user, rec);
+      await h.kvPut(env, "canje:" + id, "ok", { expirationTtl: DIAS_RECUERDO * 86400 });
     }
   }
 }
@@ -133,7 +183,9 @@ async function procesarPredicciones(env, h, prueba, informe) {
   const preds = await env.PANEL_STREAM.prediccionesResueltas();
   informe.predicciones.vistas = preds.length;
   const simulados = {}; // solo en modo prueba: aciertos acumulados por persona y día
-  for (const p of preds) {
+  let pagos = 0;        // llamadas de pago hechas en esta vuelta
+  const hora = function (p) { return Date.parse(p.ended_at || p.created_at) || 0; };
+  for (const p of preds.slice().sort(function (a, b) { return hora(a) - hora(b); })) {   // de la más vieja a la más nueva
     const cuando = p.ended_at || p.created_at;
     const ts = Date.parse(cuando);
     if (!(ts >= v.inicio && ts <= v.fin)) { continue; }
@@ -141,24 +193,39 @@ async function procesarPredicciones(env, h, prueba, informe) {
     const idx = h.dayIndex(day);
     if (idx < 0 || idx >= h.EVENT_DAYS) { continue; }
     const clave = "pred:" + p.id;
-    const estado = Object.assign({ hechos: [], pagados: [], completa: false }, (await env.CHECKINS.get(clave, "json")) || {});
+    const estado = Object.assign({ hechos: [], pagando: [], pagados: [], revisar: [], completa: false },
+      (await env.CHECKINS.get(clave, "json")) || {});
     if (estado.completa) { continue; }
     const guardar = function () {
-      return env.CHECKINS.put(clave, JSON.stringify(estado), { expirationTtl: DIAS_RECUERDO * 86400 });
+      return h.kvPut(env, clave, JSON.stringify(estado), { expirationTtl: DIAS_RECUERDO * 86400 });
     };
     const week = Math.floor(idx / 7) + 1;
-    const ganadores = (p.ganadores || []).map(h.cleanUser).filter(Boolean);
+    const ganadores = (p.ganadores || []).map(h.cleanUser)
+      .filter(function (u, i, todos) { return u && todos.indexOf(u) === i; });   // sin nombres repetidos
     const resumen = { titulo: p.title, dia: day, ganadores: ganadores.length, tope10: !!p.tope10, tickets: [] };
+    const pendientes = ganadores.filter(function (u) {
+      return estado.pagados.indexOf(u) < 0 && estado.revisar.indexOf(u) < 0 && estado.pagando.indexOf(u) < 0;
+    });
+    // Si hay mucho atrasado, lo que no entra queda entero para la vuelta siguiente (en orden)
+    if (!prueba && pagos > 0 && pagos + pendientes.length > MAX_PAGOS_VUELTA) { break; }
 
-    let faltan = false;
+    // Paso 1: contar el acierto (y el ticket, si corresponde). La ficha recuerda qué predicciones
+    // ya contó (pd.ids), así un corte a mitad de camino nunca cuenta dos veces.
+    const marca = String(p.id).slice(-8);
     for (const user of ganadores) {
-      // Paso 1: contar el acierto (y el ticket, si corresponde). Se anota ANTES de pagar los
-      // puntos, así un corte a mitad de camino nunca duplica el ticket.
-      if (estado.hechos.indexOf(user) < 0) {
-        const rec = await h.loadRec(env, user);
-        const sim = user + "|" + day;
-        let pd = prueba && simulados[sim] ? simulados[sim] : (rec.pd && rec.pd.day === day ? rec.pd : { day: day, n: 0, t: false });
+      if (estado.hechos.indexOf(user) >= 0) { continue; }
+      const rec = await h.loadRec(env, user);
+      // Una predicción de un día anterior que aparece tarde no pisa la cuenta del día más nuevo
+      if (!prueba && rec.pd && rec.pd.day > day) {
+        aRevisar(informe, "el acierto atrasado de " + user + " del " + day + " (ver si le corresponde ticket)");
+        estado.hechos.push(user);
+        continue;
+      }
+      const sim = user + "|" + day;
+      let pd = prueba && simulados[sim] ? simulados[sim] : (rec.pd && rec.pd.day === day ? rec.pd : { day: day, n: 0, t: false });
+      if ((pd.ids || []).indexOf(marca) < 0) {
         pd.n += 1;
+        pd.ids = (pd.ids || []).concat(marca).slice(-30);
         let ticket = false;
         if (pd.n >= ACIERTOS_PARA_TICKET && !pd.t) { pd.t = true; ticket = true; }
         if (ticket) { resumen.tickets.push(user); }
@@ -166,26 +233,44 @@ async function procesarPredicciones(env, h, prueba, informe) {
         rec.pd = pd;
         if (ticket) { rec.w[week] = (rec.w[week] || 0) + 1; }
         await h.saveRec(env, user, rec);
-        estado.hechos.push(user);
-        await guardar();
       }
-      if (prueba) { continue; }
-      // Paso 2: pagar los +200. Si StreamElements falla, queda pendiente y se reintenta en la próxima vuelta.
-      if (estado.pagados.indexOf(user) < 0) {
+      estado.hechos.push(user);
+    }
+    if (prueba) { informe.predicciones.procesadas.push(resumen); continue; }
+
+    // Paso 2: pagar los +200. Antes de pagar se anota a quiénes ("pagando") y después cómo salió:
+    // dos escrituras por predicción. Si una vuelta se corta en el medio, no se vuelve a pagar a
+    // ciegas: esos nombres quedan en "revisar" para mirarlos a mano.
+    if (estado.pagando.length) {
+      aRevisar(informe, "los +200 de " + estado.pagando.join(", ") + " (una vuelta se cortó mientras pagaba)");
+      estado.revisar = estado.revisar.concat(estado.pagando);
+      estado.pagando = [];
+    }
+    let faltan = false;
+    if (pendientes.length) {
+      pagos += pendientes.length;
+      estado.pagando = pendientes;
+      await guardar();
+      for (const user of pendientes) {
         try {
           await h.sePoints(env, user, PTS_ACIERTO);
           estado.pagados.push(user);
-          await guardar();
         } catch (e) {
-          faltan = true;
-          informe.errores.push("no pude sumar +200 a " + user + " (se reintenta en la próxima vuelta)");
+          if (contestoQueNo(e)) {
+            // StreamElements contestó que no: se puede reintentar sin riesgo de pagar dos veces
+            faltan = true;
+            informe.errores.push("no pude sumar +200 a " + user + " (se reintenta en la próxima vuelta)");
+          } else {
+            // Sin respuesta no se sabe si sumó o no: mejor revisarlo a mano que pagar doble
+            estado.revisar.push(user);
+            aRevisar(informe, "los +200 de " + user + " (StreamElements no contestó)");
+          }
         }
       }
+      estado.pagando = [];
     }
-    if (!prueba && !faltan) {
-      estado.completa = true;
-      await guardar();
-    }
+    estado.completa = !faltan;
+    await guardar();
     informe.predicciones.procesadas.push(resumen);
   }
 }
@@ -215,7 +300,7 @@ async function procesarSubs(env, h, prueba, informe) {
     if (!lista) {
       if (!subs) { subs = (await env.PANEL_STREAM.subsActuales()).map(h.cleanUser).filter(Boolean); }
       lista = subs;
-      if (!prueba) { await env.CHECKINS.put("subs:" + w + ":lista", JSON.stringify(lista), { expirationTtl: DIAS_RECUERDO * 86400 }); }
+      if (!prueba) { await h.kvPut(env, "subs:" + w + ":lista", JSON.stringify(lista), { expirationTtl: DIAS_RECUERDO * 86400 }); }
     }
     informe.subs.semanas.push(w);
     for (const user of lista) {
@@ -228,7 +313,7 @@ async function procesarSubs(env, h, prueba, informe) {
       rec.w[w] = (rec.w[w] || 0) + SUBS_TICKETS;
       await h.saveRec(env, user, rec);
     }
-    if (!prueba) { await env.CHECKINS.put("subs:" + w, "ok", { expirationTtl: DIAS_RECUERDO * 86400 }); }
+    if (!prueba) { await h.kvPut(env, "subs:" + w, "ok", { expirationTtl: DIAS_RECUERDO * 86400 }); }
   }
 }
 
@@ -267,17 +352,26 @@ export async function ticketsAuto(env, h, prueba) {
     canjes: { vistos: 0, sumados: [], devueltos: [], fueraDeFecha: [], raros: [], otrosItems: {} },
     predicciones: { vistas: 0, procesadas: [] },
     subs: { semanas: [], sumados: [], nota: null },
-    errores: []
+    errores: [],
+    revisar: []
   };
   if (!env.CHECKINS) { informe.errores.push("falta el KV CHECKINS"); return informe; }
   if (!env.SE_JWT || !env.SE_CHANNEL_ID) {
     informe.errores.push("faltan SE_JWT o SE_CHANNEL_ID");
     return informe;
   }
+  h = conMemoria(h);
   try { await procesarCanjes(env, h, prueba, informe); } catch (e) { informe.errores.push("canjes: " + e.message); }
   try { await procesarPredicciones(env, h, prueba, informe); } catch (e) { informe.errores.push("predicciones: " + e.message); }
   try { await procesarSubs(env, h, prueba, informe); } catch (e) { informe.errores.push("subs: " + (e && e.message ? e.message : "sin detalle")); }
   if (prueba) { await muestra(env, informe); }
+  if (!prueba && informe.revisar.length) {
+    try {
+      const previos = (await env.CHECKINS.get("auto:revisar", "json")) || [];
+      const nuevos = informe.revisar.map(function (t) { return informe.hora + " · " + t; });
+      await h.kvPut(env, "auto:revisar", JSON.stringify(previos.concat(nuevos).slice(-50)), { expirationTtl: DIAS_RECUERDO * 86400 });
+    } catch (e) { informe.errores.push("no pude guardar la lista para revisar"); }
+  }
   if (!prueba) {
     // Se guarda solo si pasó algo, o si el último informe es viejo (así se ve que el cron sigue vivo
     // sin gastar una escritura de KV cada 5 minutos).
@@ -289,7 +383,7 @@ export async function ticketsAuto(env, h, prueba) {
       viejo = !previo || !(Date.now() - Date.parse(previo.hora) < LATIDO_HORAS * 3600000);
     }
     if (hubo || viejo) {
-      await env.CHECKINS.put("auto:ultimo", JSON.stringify(informe), { expirationTtl: DIAS_RECUERDO * 86400 });
+      await h.kvPut(env, "auto:ultimo", JSON.stringify(informe), { expirationTtl: DIAS_RECUERDO * 86400 });
     }
   }
   return informe;
@@ -302,6 +396,7 @@ export async function ticketsAutoRuta(url, env, h) {
   let cuerpo;
   if (url.searchParams.get("ultimo") === "1") {
     cuerpo = (await env.CHECKINS.get("auto:ultimo", "json")) || { nota: "todavía no corrió ninguna vuelta" };
+    cuerpo.paraRevisarAMano = (await env.CHECKINS.get("auto:revisar", "json")) || [];
   } else {
     // Por defecto es PRUEBA (no suma nada). Para correr de verdad hay que pedirlo con &ejecutar=1.
     const real = url.searchParams.get("ejecutar") === "1" && url.searchParams.get("prueba") !== "1";
