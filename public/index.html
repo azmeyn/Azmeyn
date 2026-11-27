@@ -1264,6 +1264,10 @@
       .f2-vent.flota .tabs { gap: 2px; }
       .f2-vent.flota .tab, .f2-vent.flota .f2-vcab button { width: 32px; height: 28px; min-height: 28px; border-radius: 999px; }
       .f2-vent.flota .screen { width: 320px; height: 180px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55); }
+      .f2-vent.flota .poster { gap: 6px; padding: 8px; }
+      .f2-vent.flota .poster .play { width: 48px; height: 48px; margin: 0; }
+      .f2-vent.flota .poster-t { font-size: 14px; margin: 0; }
+      .f2-vent.flota .poster-s { display: none; }
       body.f2-lugar .hero > .vods, body.f2-lugar main .sec, body.f2-lugar footer { margin-right: var(--f2-hueco, 0px); }
     }
 
@@ -1296,6 +1300,18 @@
       .f2-stats div { padding: 7px 4px; }
       .f2 .btn { min-height: 40px; }
     }
+    .f2-tienda, .f2-pick { background: linear-gradient(135deg, #4a2231, #1c1f23 62%); border: 2px solid var(--accent); }
+    .f2 h2.f2-tit { display: flex; align-items: center; gap: 11px; font-size: 20px; line-height: 1.15; text-transform: uppercase !important; }
+    .f2 .f2-tit i { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 8px; background: rgba(255, 61, 129, 0.18); border: 1px solid rgba(255, 61, 129, 0.45); color: var(--accent); }
+    .f2 .f2-tit i svg { width: 22px; height: 22px; color: var(--accent); }
+    .f2 h3.f2-sub { margin: 0; font-size: 13px; }
+    .f2 .f2-rondas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .f2 .f2-rondas li { flex-direction: column; justify-content: center; gap: 3px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; background: rgba(0, 0, 0, 0.28); }
+    .f2-rondas span { font: 800 13px/1.2 var(--font-display); }
+    .f2-rondas b { font: 700 12.5px/1.3 var(--font-body); }
+    .f2 .f2-pick > p.f2-num { font: 800 clamp(40px, 11vw, 50px)/1 var(--font-display); }
+    .f2 .f2-pick > p.f2-gris { font-size: 13px; line-height: 1.4; }
+    @media (min-width: 1100px) and (max-height: 820px) { .f2 .f2-pick > p.f2-num, .f2 .f2-tienda > p.f2-num { font-size: 40px; } }
   </style>
 </head>
 <body>
@@ -1355,9 +1371,6 @@
             <span class="tag"><span class="t-a">···</span><span class="t-b"></span></span>
           </a>
           <span class="sb-sep" aria-hidden="true"></span>
-          <a class="soc" href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer" aria-label="Discord" title="Discord">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12a1 1 0 1 0 0 .01M15 12a1 1 0 1 0 0 .01"/><path d="M7.5 7.5c3.5-1 5.5-1 9 0"/><path d="M7 16.5c3.5 1 6.5 1 10 0"/><path d="M15.5 17c0 1 1.5 3 2 3 1.5 0 2.833-1.667 3.5-3 .667-1.667.5-5.833-1.5-11.5-1.457-1.015-3-1.34-4.5-1.5l-.972 1.923a11.913 11.913 0 0 0-4.053 0L9 4c-1.5.16-3.043.485-4.5 1.5-2 5.667-2.167 9.833-1.5 11.5.667 1.333 2 3 3.5 3 .5 0 2-2 2-3"/></svg>
-          </a>
           <a class="soc" href="https://www.youtube.com/@azmeyn" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg>
           </a>
@@ -1382,10 +1395,10 @@
           <h1 class="sr-only" id="titulo">Azmeyn</h1>
           <div class="f2">
             <article class="f2-card f2-tienda" aria-labelledby="f2-tienda-h">
-              <p class="f2-eti" id="f2-tienda-h">Tienda · Sorteos y canjes</p>
+              <h2 class="f2-tit" id="f2-tienda-h"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l1 12H4zM9 10V7a3 3 0 0 1 6 0v3"/></svg></i>Tienda · Sorteos y canjes</h2>
               <p class="f2-num">+15.800 RP</p>
               <p class="f2-gris">en premios, sorteos y Pick'em durante el torneo</p>
-              <h2 class="f2-sub">Sorteos</h2>
+              <h3 class="f2-sub">Sorteos</h3>
               <ol class="f2-fechas">
                 <li data-hasta="2026-11-30T18:00:00-03:00"><i aria-hidden="true"></i><span><small>lun 30/11</small><b>Arranca el torneo</b></span><em></em></li>
                 <li data-hasta="2026-12-06T23:59:00-03:00"><i aria-hidden="true"></i><span><small>dom 6/12</small><b>Sorteo semanal 1</b></span><em>1.350 RP</em></li>
@@ -1393,7 +1406,7 @@
                 <li data-hasta="2026-12-20T23:59:00-03:00"><i aria-hidden="true"></i><span><small>dom 20/12</small><b>Sorteo semanal 3</b></span><em>1.350 RP</em></li>
                 <li class="fin" data-hasta="2026-12-20T23:59:00-03:00"><i aria-hidden="true">★</i><span><small>dom 20/12</small><b>Sorteo final</b></span><em>3.250 RP</em></li>
               </ol>
-              <h2 class="f2-sub">Canjes</h2>
+              <h3 class="f2-sub">Canjes</h3>
               <div class="f2-canjes">
                 <a class="f2-canje mayor" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7C9 2 5 5 12 7c7-2 3-5 0 0"/></svg></i><span><b>Skin de 1.820 RP</b><em>10.000 puntos</em><small>skin o RP</small></span></a>
                 <a class="f2-canje" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7C9 2 5 5 12 7c7-2 3-5 0 0"/></svg></i><span><b>Skin de 1.350 RP</b><em>5.000 puntos</em><small>skin o RP</small></span></a>
@@ -1406,14 +1419,17 @@
             </article>
 
             <article class="f2-card f2-pick" aria-labelledby="f2-pick-h">
-              <h2 id="f2-pick-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M9 20h6M10 17h4"/></svg>Pick'em del SoloBoom</h2>
+              <h2 class="f2-tit" id="f2-pick-h"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M9 20h6M10 17h4"/></svg></i>Pick'em del SoloBoom</h2>
+              <p class="f2-num">2.245 RP</p>
+              <p class="f2-gris">para los 3 mejores. Si sos de Argentina, todos los premios se pueden cobrar en pesos.</p>
+              <h3 class="f2-sub">Premios</h3>
               <ol class="f2-podio">
                 <li class="oro"><small>1.º</small><b>975</b><span>RP</span></li>
                 <li><small>2.º</small><b>750</b><span>RP</span></li>
                 <li><small>3.º</small><b>520</b><span>RP</span></li>
               </ol>
-              <p>Gana tu mejor ronda, por porcentaje de aciertos. Premio para los 3 mejores; los empates van a sorteo en vivo.</p>
-              <p class="f2-pesos">Si sos de Argentina, todos los premios se pueden cobrar en pesos.</p>
+              <p>Gana tu mejor ronda, por porcentaje de aciertos. Los empates van a sorteo en vivo.</p>
+              <h3 class="f2-sub">Cierres</h3>
               <div class="f2-cuenta-atras">
                 <p class="f2-eti" id="f2-pk-que">La semana 1 cierra en</p>
                 <div id="f2-pk-reloj" role="timer"></div>
@@ -1965,11 +1981,14 @@
     $("f2-mini-s").textContent = vivo ? "Miralo acá" : state.twitch === false && vods.length ? "Ver el último directo" : "Tocá y miralo acá";
   }
   var vent = $("f2-vent"), caja = $("f2-dir"), volverA = null, grande = false;
+  /* asomado: bajó solo a la esquina sin que le dieran play. descartado: lo cerraron estando en la esquina */
+  var asomado = false, descartado = false;
   /* En compu, al bajar, el video sigue chico en la esquina; en celu y pantallas chicas se queda en su lugar */
   var puedeSeguir = window.matchMedia("(min-width: 1200px) and (min-height: 560px)");
   /* Las secciones de abajo se corren lo justo para que el video chico (320 px) no las tape */
   function dejarLugar() {
-    var si = !vent.hidden && puedeSeguir.matches;
+    /* en compu el lugar se deja desde el principio, así nada se mueve de costado al bajar */
+    var si = puedeSeguir.matches && !descartado;
     if (si) {
       var w = document.querySelector("main .wrap");
       var libre = document.documentElement.clientWidth - w.getBoundingClientRect().right + parseFloat(getComputedStyle(w).paddingRight);
@@ -1977,13 +1996,31 @@
     }
     document.body.classList.toggle("f2-lugar", si);
   }
+  /* recién pasa a la esquina cuando su lugar ya no se ve y la portada no queda debajo de él */
+  function yaBajo() {
+    var arriba = document.querySelector(".side").offsetHeight + document.querySelector(".topbar").offsetHeight;
+    return caja.getBoundingClientRect().bottom < arriba + 60 &&
+      document.querySelector(".f2").getBoundingClientRect().bottom < window.innerHeight - 240;
+  }
+  /* Le dan play (o eligen plataforma, o agrandan) al que bajó solo: pasa a ser el video abierto */
+  function tomar() {
+    if (!asomado) { return; }
+    asomado = false;
+    caja.style.minHeight = caja.offsetHeight + "px";
+    caja.classList.add("viendo");
+    if (!loaded) { loadPlayer(); }
+  }
   function acomodar() {
+    if (vent.hidden || asomado) {
+      var mostrar = !grande && !descartado && puedeSeguir.matches && yaBajo();
+      asomado = mostrar;
+      vent.hidden = !mostrar;
+      vent.classList.toggle("flota", mostrar);
+      return;
+    }
     var flota = false;
-    if (!vent.hidden && !grande && puedeSeguir.matches) {
-      /* recién pasa a la esquina cuando su lugar ya no se ve y la portada no queda debajo de él */
-      var arriba = document.querySelector(".side").offsetHeight + document.querySelector(".topbar").offsetHeight;
-      flota = caja.getBoundingClientRect().bottom < arriba + 60 &&
-        document.querySelector(".f2").getBoundingClientRect().bottom < window.innerHeight - 240;
+    if (!grande && puedeSeguir.matches) {
+      flota = yaBajo();
     }
     var suelto = flota || grande;
     var estaba = vent.classList.contains("flota") || vent.classList.contains("grande");
@@ -2003,6 +2040,9 @@
   }
   function abrirVentana(p, desde) {
     volverA = desde || null;
+    asomado = false;
+    descartado = false;
+    vent.classList.remove("flota");
     vent.hidden = false;
     caja.classList.add("viendo");
     if (p && p !== platform) { selectPlatform(p, true); }
@@ -2011,6 +2051,10 @@
     acomodar();
   }
   function cerrarVentana() {
+    if (vent.classList.contains("flota")) { descartado = true; }
+    asomado = false;
+    caja.style.minHeight = "";
+    vent.classList.remove("flota");
     vent.hidden = true;
     caja.classList.remove("viendo");
     agrandar(false);
@@ -2018,9 +2062,12 @@
     selectPlatform(platform, false);   /* saca el reproductor: no queda sonando */
     if (volverA) { volverA.focus({ preventScroll: true }); }
   }
-  window.addEventListener("scroll", function () { if (!vent.hidden) { acomodar(); } }, { passive: true });
+  window.addEventListener("scroll", acomodar, { passive: true });
+  window.addEventListener("load", function () { dejarLugar(); acomodar(); });
+  dejarLugar();
   window.addEventListener("resize", function () {
-    if (vent.hidden) { return; }
+    if (asomado) { asomado = false; vent.hidden = true; }
+    if (vent.hidden) { dejarLugar(); acomodar(); return; }
     vent.classList.remove("flota", "grande");
     caja.style.minHeight = "";
     dejarLugar();
@@ -2039,9 +2086,10 @@
     });
   });
   document.querySelectorAll(".tab").forEach(function (b) {
-    b.addEventListener("click", function () { if (!vent.hidden && !loaded) { loadPlayer(); } });
+    b.addEventListener("click", function () { if (asomado) { tomar(); } else if (!vent.hidden && !loaded) { loadPlayer(); } });
   });
-  $("f2-chica").addEventListener("click", function (e) { agrandar(!grande); if (e.detail) { this.blur(); } });
+  $("play").addEventListener("click", tomar);
+  $("f2-chica").addEventListener("click", function (e) { tomar(); agrandar(!grande); if (e.detail) { this.blur(); } });
   $("f2-cerrar").addEventListener("click", cerrarVentana);
   /* Tocar afuera o Esc: de grande vuelve a chico; Esc otra vez lo cierra */
   vent.addEventListener("click", function (e) { if (grande && e.target === vent) { agrandar(false); } });
