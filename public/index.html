@@ -1054,6 +1054,9 @@
     #pickem output { display: block; background: #101215; border-radius: 8px; padding: 12px; overflow-wrap: anywhere; font-family: ui-monospace, Consolas, monospace; font-size: 14px; user-select: all; }
     #pickem .pk-copiar { display: flex; align-items: center; gap: 12px; }
     #pickem .pk-aviso { color: var(--muted); font-size: 14px; }
+    #pickem .pk-txt p.pk-pesos { margin-top: 12px; color: var(--fg); font-weight: 700; }
+    #pickem .pk-tabla ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; font-variant-numeric: tabular-nums; }
+    #pickem .pk-tabla h4 { margin: 12px 0 4px; font-size: 14px; color: var(--fg); }
     @media (max-width: 760px) {
       #pickem .pk-top { grid-template-columns: 56px minmax(0, 1fr); gap: 16px; padding: 20px; align-items: start; }
       #pickem .pk-ic { width: 56px; height: 56px; }
@@ -1064,6 +1067,9 @@
       #pickem .pk-lista { grid-template-columns: minmax(0, 1fr); }
       #pickem input, #pickem select { font-size: 16px; }
       #pickem .pk-fin > .btn { width: 100%; justify-content: center; }
+      #pickem .pk-tabs { gap: 4px; }
+      #pickem .pk-tabs button { flex: 1 1 0; min-width: 0; margin-right: 0; padding: 12px 2px; font-size: 13px; white-space: nowrap; }
+      #pickem .pk-tabs button b { display: block; margin: 5px 0 0; }
     }
   </style>
   <style id="nav-pickem">
@@ -1239,8 +1245,9 @@
               <span class="pk-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M9 20h6M10 17h4"/></svg></span>
               <div class="pk-txt">
                 <h3>Pick'em del SoloBoom</h3>
-                <p>Poné tus respuestas. Gana el que más puntos junta; si hay empate, sorteo en vivo.</p>
-                <span class="pk-tags"><span>750 RP, o en pesos si sos de Argentina</span><span>Primera semana: hasta el 30/11 18:00</span><span>Finales: hasta el 13/12</span></span>
+                <p>Gana tu mejor ronda, por porcentaje de aciertos. Premio para los 3 mejores; los empates van a sorteo en vivo.</p>
+                <span class="pk-tags"><span>1.º 975 RP · 2.º 750 RP · 3.º 520 RP</span><span>Cada semana cierra el lunes a las 18:00</span><span>El torneo: hasta el 14/12</span></span>
+                <p class="pk-pesos">Si sos de Argentina, todos los premios se pueden cobrar en pesos.</p>
               </div>
               <button class="btn" type="button" id="pk-abrir" aria-expanded="false" aria-controls="pk-form">Hacer mi pick'em</button>
             </div>
@@ -1250,11 +1257,15 @@
             <div class="pk-form" id="pk-form" hidden>
               <ol class="pk-pasos"><li>Contestá</li><li>Armá tu código</li><li>Pegalo en mi chat de Twitch</li></ol>
               <div class="pk-tabs" role="tablist" aria-label="Preguntas">
-                <button type="button" role="tab" id="pk-tab-semana" aria-controls="pk-semana" aria-selected="true">Primera semana <b>0/10</b></button>
-                <button type="button" role="tab" id="pk-tab-final" aria-controls="pk-final" aria-selected="false">Todo el torneo <b>0/15</b></button>
+                <button type="button" role="tab" id="pk-tab-r1" aria-controls="pk-r1" aria-selected="true">Semana 1 <b>0/10</b></button>
+                <button type="button" role="tab" id="pk-tab-r2" aria-controls="pk-r2" aria-selected="false">Semana 2 <b>0/10</b></button>
+                <button type="button" role="tab" id="pk-tab-r3" aria-controls="pk-r3" aria-selected="false">Semana 3 <b>0/10</b></button>
+                <button type="button" role="tab" id="pk-tab-final" aria-controls="pk-final" aria-selected="false">Torneo <b>0/15</b></button>
               </div>
               <p class="pk-nota" id="pk-nota"></p>
-              <ul class="pk-lista" id="pk-semana" role="tabpanel" aria-labelledby="pk-tab-semana"></ul>
+              <ul class="pk-lista" id="pk-r1" role="tabpanel" aria-labelledby="pk-tab-r1"></ul>
+              <ul class="pk-lista" id="pk-r2" role="tabpanel" aria-labelledby="pk-tab-r2" hidden></ul>
+              <ul class="pk-lista" id="pk-r3" role="tabpanel" aria-labelledby="pk-tab-r3" hidden></ul>
               <ul class="pk-lista" id="pk-final" role="tabpanel" aria-labelledby="pk-tab-final" hidden></ul>
               <div class="pk-fin">
                 <button class="btn" type="button" id="pk-armar">Armar mi código</button>
@@ -1888,19 +1899,30 @@
   var $ = function (id) { return document.getElementById(id); };
   var form = $("pk-form"), abrir = $("pk-abrir");
   if (!form) { return; }
-  var CIERRA_SEMANA = Date.parse("2026-11-30T21:00:00Z"), CIERRA_FINAL = Date.parse("2026-12-14T03:00:00Z");
+  // Rondas y cierres: los mismos que en pickem.js
+  var RONDAS = [
+    { id: "r1", bloque: "semana", nombre: "semana 1", cierra: Date.parse("2026-11-30T21:00:00Z"), sem: "la primera semana", dia: "6/12",
+      nota: "Cierra el lunes 30/11 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 6/12." },
+    { id: "r2", bloque: "semana", nombre: "semana 2", cierra: Date.parse("2026-12-07T21:00:00Z"), sem: "la segunda semana", dia: "13/12",
+      nota: "Cierra el lunes 7/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 13/12." },
+    { id: "r3", bloque: "semana", nombre: "semana 3", cierra: Date.parse("2026-12-14T21:00:00Z"), sem: "la tercera semana", dia: "20/12",
+      nota: "Cierra el lunes 14/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 20/12 a las 18:00." },
+    { id: "final", bloque: "final", nombre: "torneo", cierra: Date.parse("2026-12-14T21:00:00Z"),
+      nota: "Cierra el lunes 14/12 a las 18:00. Son sobre todo el torneo y se resuelven el 20/12." }
+  ];
+  var CIERRA_TODO = Date.parse("2026-12-14T21:00:00Z");
   // El orden es el mismo que en pickem.js
   var P = [
-    ["q02","semana","num","¿Cuántas partidas gano la primera semana?"],
-    ["q03","semana","num","¿Cuántas partidas juego la primera semana?"],
-    ["q04","semana","sn","¿Termino la primera semana con más victorias que derrotas?"],
-    ["q05","semana","camp","¿Qué campeón juego más la primera semana?"],
-    ["q06","semana","num","¿Cuántos campeones distintos juego la primera semana?"],
-    ["q07","semana","sn","¿Hago un pentakill la primera semana?"],
-    ["q08","semana","num","¿Cuál es mi mejor racha de victorias la primera semana?"],
-    ["q09","semana","rango","¿En qué rango estoy el domingo 6/12?"],
-    ["q11","semana","num","¿Cuántas kills tiene mi mejor partida de la primera semana?"],
-    ["q12","semana","num","¿Cuántas veces muero en mi peor partida de la primera semana?"],
+    ["q02","semana","num","¿Cuántas partidas gano {sem}?"],
+    ["q03","semana","num","¿Cuántas partidas juego {sem}?"],
+    ["q04","semana","sn","¿Termino {sem} con más victorias que derrotas?"],
+    ["q05","semana","camp","¿Qué campeón juego más {sem}?"],
+    ["q06","semana","num","¿Cuántos campeones distintos juego {sem}?"],
+    ["q07","semana","sn","¿Hago un pentakill {sem}?"],
+    ["q08","semana","num","¿Cuál es mi mejor racha de victorias {sem}?"],
+    ["q09","semana","rango","¿En qué rango estoy el domingo {dia}?"],
+    ["q11","semana","num","¿Cuántas kills tiene mi mejor partida de {sem}?"],
+    ["q12","semana","num","¿Cuántas veces muero en mi peor partida de {sem}?"],
     ["q13","final","rango","¿En qué rango termino el torneo?"],
     ["q14","final","num","¿Con cuántos LP termino?"],
     ["q15","final","rango","¿Cuál es el rango más alto que toco?"],
@@ -1917,66 +1939,76 @@
     ["q27","final","dec","¿Con qué KDA promedio termino?","Kills más asistencias, dividido muertes. Un decimal."],
     ["q28","final","num","¿Cuántos minutos dura mi partida más larga?"]
   ];
+  // En las de número, cuánto se puede errar y sumar igual: los mismos márgenes que en pickem-resolver.js
+  var MARGENES = { q02: 2, q03: 3, q06: 1, q08: 1, q11: 2, q12: 2, q14: 25, q16: 3, q17: 5, q18: 2, q20: 1, q21: 1, q24: 2, q25: 0, q27: 0.3, q28: 3 };
   var RANGOS = ["Platino o menos","Esmeralda IV","Esmeralda III","Esmeralda II","Esmeralda I","Diamante IV","Diamante III","Diamante II","Diamante I","Maestro","Gran Maestro","Retador"];
   var armado = false, previas = {};
-  try { previas = JSON.parse(localStorage.getItem("pickem-sb6") || "{}"); } catch (e) {}
+  try { previas = JSON.parse(localStorage.getItem("pickem-sb6-2") || "{}"); } catch (e) {}
 
   function el(tag, attrs, txt) { var n = document.createElement(tag); for (var k in attrs) { n.setAttribute(k, attrs[k]); } if (txt) { n.textContent = txt; } return n; }
-  function crudo(q) {
-    var c = $("pk-" + q[0]);
+  function de(r) { return P.filter(function (q) { return q[1] === r.bloque; }); }
+  function texto(q, r) { return q[3].replace("{sem}", r.sem).replace("{dia}", r.dia); }
+  function ayuda(q) {
+    var m = MARGENES[q[0]];
+    var margen = m === undefined ? "" : m === 0 ? "Hay que acertar el número justo." : "Suma si quedás a " + String(m).replace(".", ",") + " o menos.";
+    return [q[4], margen].filter(Boolean).join(" ");
+  }
+  function cerrada(r) { return Date.now() >= r.cierra; }
+  function crudo(r, q) {
+    var c = $("pk-" + r.id + "-" + q[0]);
     if (q[2] === "sn") { var b = c.querySelector('[aria-pressed="true"]'); return b ? b.getAttribute("data-v") : ""; }
     return c.value.trim();
   }
   function contar() {
-    ["semana", "final"].forEach(function (bloque) {
-      var total = 0, hechas = 0;
-      P.forEach(function (q) {
-        if (q[1] !== bloque) { return; }
-        total++;
-        var lleno = crudo(q) !== "";
+    RONDAS.forEach(function (r) {
+      var hechas = 0, lista = de(r);
+      lista.forEach(function (q) {
+        var lleno = crudo(r, q) !== "";
         if (lleno) { hechas++; }
-        $("pk-" + q[0]).closest("li").classList.toggle("hecha", lleno);
+        $("pk-" + r.id + "-" + q[0]).closest("li").classList.toggle("hecha", lleno);
       });
-      $("pk-tab-" + bloque).querySelector("b").textContent = hechas + "/" + total;
+      $("pk-tab-" + r.id).querySelector("b").textContent = hechas + "/" + lista.length;
     });
+  }
+  function pregunta(r, q) {
+    var id = "pk-" + r.id + "-" + q[0], tipo = q[2], li = el("li"), txt = el(tipo === "sn" ? "div" : "label", { class: "pk-p" }, texto(q, r)), campo;
+    var antes = previas[r.id + "-" + q[0]], extra = ayuda(q);
+    if (tipo !== "sn") { txt.setAttribute("for", id); }
+    if (extra) { txt.appendChild(el("small", {}, extra)); }
+    li.appendChild(txt);
+    if (tipo === "sn") {
+      campo = el("div", { class: "pk-sn", id: id, role: "group", "aria-label": texto(q, r) });
+      [["s", "Sí"], ["n", "No"]].forEach(function (o) {
+        var b = el("button", { type: "button", "data-v": o[0], "aria-pressed": antes === o[0] ? "true" : "false" }, o[1]);
+        b.addEventListener("click", function () {
+          [].forEach.call(campo.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+          contar();
+        });
+        campo.appendChild(b);
+      });
+    } else if (tipo === "rango") {
+      campo = el("select", { id: id });
+      campo.appendChild(el("option", { value: "" }, "Elegí un rango"));
+      RANGOS.forEach(function (n, i) { campo.appendChild(el("option", { value: String(i) }, n)); });
+      campo.value = antes || "";
+    } else {
+      var attrs = { id: id, autocomplete: "off" };
+      if (tipo === "camp") { attrs.list = "pk-campeones"; attrs.placeholder = "Nombre del campeón"; attrs.maxlength = "20"; }
+      else { attrs.inputmode = tipo === "dec" ? "decimal" : "numeric"; attrs.placeholder = tipo === "dec" ? "3,2" : "Un número"; attrs.maxlength = "4"; }
+      campo = el("input", attrs);
+      campo.value = antes || "";
+    }
+    li.appendChild(campo);
+    $("pk-" + r.id).appendChild(li);
+    if (cerrada(r)) {
+      li.className = "cerrada";
+      [].forEach.call(li.querySelectorAll("input,select,button"), function (x) { x.disabled = true; });
+    }
   }
   function armar() {
     if (armado) { return; }
     armado = true;
-    P.forEach(function (q) {
-      var id = "pk-" + q[0], tipo = q[2], li = el("li"), txt = el(tipo === "sn" ? "div" : "label", { class: "pk-p" }, q[3]), campo;
-      if (tipo !== "sn") { txt.setAttribute("for", id); }
-      if (q[4]) { txt.appendChild(el("small", {}, q[4])); }
-      li.appendChild(txt);
-      if (tipo === "sn") {
-        campo = el("div", { class: "pk-sn", id: id, role: "group", "aria-label": q[3] });
-        [["s", "Sí"], ["n", "No"]].forEach(function (o) {
-          var b = el("button", { type: "button", "data-v": o[0], "aria-pressed": previas[q[0]] === o[0] ? "true" : "false" }, o[1]);
-          b.addEventListener("click", function () {
-            [].forEach.call(campo.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-            contar();
-          });
-          campo.appendChild(b);
-        });
-      } else if (tipo === "rango") {
-        campo = el("select", { id: id });
-        campo.appendChild(el("option", { value: "" }, "Elegí un rango"));
-        RANGOS.forEach(function (r, i) { campo.appendChild(el("option", { value: String(i) }, r)); });
-        campo.value = previas[q[0]] || "";
-      } else {
-        var attrs = { id: id, autocomplete: "off" };
-        if (tipo === "camp") { attrs.list = "pk-campeones"; attrs.placeholder = "Nombre del campeón"; attrs.maxlength = "20"; }
-        else { attrs.inputmode = tipo === "dec" ? "decimal" : "numeric"; attrs.placeholder = tipo === "dec" ? "3,2" : "Un número"; attrs.maxlength = "4"; }
-        campo = el("input", attrs);
-        campo.value = previas[q[0]] || "";
-      }
-      li.appendChild(campo);
-      $("pk-" + q[1]).appendChild(li);
-      if (q[1] === "semana" && Date.now() >= CIERRA_SEMANA) {
-        li.className = "cerrada";
-        [].forEach.call(li.querySelectorAll("input,select,button"), function (x) { x.disabled = true; });
-      }
-    });
+    RONDAS.forEach(function (r) { de(r).forEach(function (q) { pregunta(r, q); }); });
     form.addEventListener("input", contar);
     form.addEventListener("change", contar);
     contar();
@@ -1988,14 +2020,13 @@
       .catch(function () {});
   }
 
-  function pestana(bloque) {
-    ["semana", "final"].forEach(function (b) {
-      $("pk-tab-" + b).setAttribute("aria-selected", b === bloque ? "true" : "false");
-      $("pk-" + b).hidden = b !== bloque;
+  function pestana(id) {
+    RONDAS.forEach(function (r) {
+      $("pk-tab-" + r.id).setAttribute("aria-selected", r.id === id ? "true" : "false");
+      $("pk-" + r.id).hidden = r.id !== id;
+      if (r.id === id) { $("pk-nota").textContent = cerrada(r) ? "Esta ya cerró. Completá las que siguen abiertas." : r.nota; }
     });
-    $("pk-nota").textContent = bloque === "final" ? "Cierran el 13/12 a las 23:59. Se resuelven el 20/12. En las de número gana el que queda más cerca."
-      : Date.now() >= CIERRA_SEMANA ? "Ya cerraron. Se resuelven el domingo 6/12."
-        : "Cierran el 30/11 a las 18:00. Se resuelven el domingo 6/12. En las de número gana el que queda más cerca.";
+    if (Date.now() >= CIERRA_TODO) { $("pk-nota").textContent = "El pick'em ya cerró."; }
   }
   function mostrar(si) {
     if (si) { armar(); }
@@ -2004,47 +2035,58 @@
     abrir.textContent = si ? "Cerrar" : "Hacer mi pick'em";
   }
   abrir.addEventListener("click", function () { mostrar(form.hidden); });
-  $("pk-tab-semana").addEventListener("click", function () { pestana("semana"); });
-  $("pk-tab-final").addEventListener("click", function () { pestana("final"); });
-  pestana(Date.now() >= CIERRA_SEMANA ? "final" : "semana");
+  RONDAS.forEach(function (r) { $("pk-tab-" + r.id).addEventListener("click", function () { pestana(r.id); }); });
+  // Se abre en la primera ronda que todavía se puede contestar
+  pestana((RONDAS.filter(function (r) { return !cerrada(r); })[0] || RONDAS[0]).id);
   function porEnlace() { if (location.hash === "#pickem") { mostrar(true); } }
   window.addEventListener("hashchange", porEnlace);
   [].forEach.call(document.querySelectorAll('a[href="#pickem"]'), function (a) { a.addEventListener("click", function () { mostrar(true); }); });
   porEnlace();
 
-  // La tabla se resuelve sola en el servidor: aparece cuando cierra la primera semana
-  var FIN_SEMANA = Date.parse("2026-12-07T03:00:00Z");
+  // La tabla se resuelve sola en el servidor: aparece cuando termina la primera semana
+  var PRIMERA_TABLA = Date.parse("2026-12-07T03:00:00Z");
+  function nombreDe(id) { var r = RONDAS.filter(function (x) { return x.id === id; })[0]; return r ? r.nombre : id; }
   function pintarTabla(t) {
     if (!t || !t.tabla || !t.tabla.length) { return; }
     var caja = $("pk-tabla");
     caja.textContent = "";
-    caja.appendChild(el("h3", {}, t.etapa === "final" ? "Resultado final" : "Tabla de la primera semana"));
-    var ol = el("ol");
-    t.tabla.slice(0, 10).forEach(function (f) { ol.appendChild(el("li", {}, f.usuario + " · " + f.puntos + (f.puntos === 1 ? " punto" : " puntos"))); });
-    caja.appendChild(ol);
-    var det = el("details"), lista = el("ul");
-    det.appendChild(el("summary", {}, "Respuestas correctas"));
-    P.forEach(function (q) {
-      var v = t.respuestas[q[0]];
-      if (v === undefined) { return; }
-      if (q[2] === "sn") { v = v === "s" ? "Sí" : "No"; }
-      if (q[2] === "rango") { v = RANGOS[v]; }
-      if (q[2] === "dec") { v = String(v).replace(".", ","); }
-      lista.appendChild(el("li", {}, q[3] + " " + v));
+    caja.appendChild(el("h3", {}, t.etapa === "final" ? "Resultado final" : "Cómo va la tabla"));
+    var ul = el("ul");
+    t.tabla.filter(function (f, i) { return i < 10 || f.puesto <= 3; }).forEach(function (f) {
+      ul.appendChild(el("li", {}, f.puesto + ".º " + f.usuario + " · " + f.pct + "% (" + nombreDe(f.ronda) + ", " + f.aciertos + " de " + f.total + ")"));
     });
-    det.appendChild(lista);
+    caja.appendChild(ul);
+    var empate = t.tabla.some(function (f, i) { return f.puesto <= 3 && t.tabla.some(function (g, j) { return i !== j && g.puesto === f.puesto; }); });
+    if (empate) { caja.appendChild(el("p", { class: "pk-aviso" }, t.etapa === "final" ? "Los empates en los puestos con premio se sortean en vivo." : "Si al final hay empate en un puesto con premio, se sortea en vivo.")); }
+    var det = el("details");
+    det.appendChild(el("summary", {}, "Respuestas correctas"));
+    RONDAS.forEach(function (r) {
+      var resp = t.respuestas[r.id];
+      if (!resp) { return; }
+      det.appendChild(el("h4", {}, r.nombre.charAt(0).toUpperCase() + r.nombre.slice(1)));
+      var lista = el("ul");
+      de(r).forEach(function (q) {
+        var v = resp[q[0]];
+        if (v === undefined) { return; }
+        if (q[2] === "sn") { v = v === "s" ? "Sí" : "No"; }
+        if (q[2] === "rango") { v = RANGOS[v]; }
+        if (q[2] === "dec") { v = String(v).replace(".", ","); }
+        lista.appendChild(el("li", {}, texto(q, r) + " " + v));
+      });
+      det.appendChild(lista);
+    });
     caja.appendChild(det);
     caja.hidden = false;
   }
-  if (Date.now() >= FIN_SEMANA) {
+  if (Date.now() >= PRIMERA_TABLA) {
     fetch("/api/pickem-tabla").then(function (r) { return r.json(); }).then(pintarTabla).catch(function () {});
   }
   window.pintarPickem = pintarTabla;
 
-  function valor(q) {
-    var c = $("pk-" + q[0]), tipo = q[2];
-    if (c.disabled || (c.querySelector && c.querySelector("button:disabled"))) { return ""; }
-    var v = crudo(q);
+  // Lo que va en el código: "" si está sin contestar o la ronda cerró, null si está mal escrita
+  function valor(r, q) {
+    if (cerrada(r)) { return ""; }
+    var v = crudo(r, q), tipo = q[2];
     if (!v) { return ""; }
     if (tipo === "camp") { v = v.normalize("NFD").toLowerCase().replace(/[^a-z]/g, "").slice(0, 16); return v.length > 1 ? v : null; }
     if (tipo === "dec") { var m = v.replace(",", ".").match(/^(\d{1,2})(?:\.(\d))?\d*$/); return m ? m[1] + (m[2] ? "_" + m[2] : "") : null; }
@@ -2052,22 +2094,30 @@
     return v;
   }
   $("pk-armar").addEventListener("click", function () {
-    if (Date.now() >= CIERRA_FINAL) { $("pk-falta").textContent = "El pick'em ya cerró."; return; }
-    var vals = [], mal = null, vacias = 0, guardar = {};
-    P.forEach(function (q) {
-      var v = valor(q), cerrada = $("pk-" + q[0]).closest("li").classList.contains("cerrada");
-      if (v === null) { mal = mal || q; v = ""; }
-      if (v === "" && !cerrada) { vacias++; }
-      vals.push(v);
-      guardar[q[0]] = crudo(q);
+    if (Date.now() >= CIERRA_TODO) { $("pk-falta").textContent = "El pick'em ya cerró."; return; }
+    var vals = [], mal = null, sinContestar = 0, guardar = {};
+    RONDAS.forEach(function (r) {
+      var puestas = 0, huecos = 0;
+      de(r).forEach(function (q) {
+        var v = valor(r, q);
+        if (v === null) { mal = mal || { r: r, q: q }; v = ""; }
+        if (v === "") { huecos++; } else { puestas++; }
+        vals.push(v);
+        guardar[r.id + "-" + q[0]] = crudo(r, q);
+      });
+      // Solo avisa de los huecos en las rondas que la persona empezó
+      if (puestas) { sinContestar += huecos; }
     });
-    try { localStorage.setItem("pickem-sb6", JSON.stringify(guardar)); } catch (e) {}
-    if (mal) { $("pk-salida").hidden = true; pestana(mal[1]); $("pk-falta").textContent = "Revisá esta: " + mal[3]; $("pk-" + mal[0]).focus(); return; }
+    try { localStorage.setItem("pickem-sb6-2", JSON.stringify(guardar)); } catch (e) {}
+    if (mal) {
+      $("pk-salida").hidden = true; pestana(mal.r.id);
+      $("pk-falta").textContent = "Revisá esta: " + texto(mal.q, mal.r); $("pk-" + mal.r.id + "-" + mal.q[0]).focus(); return;
+    }
     if (vals.every(function (v) { return v === ""; })) { $("pk-salida").hidden = true; $("pk-falta").textContent = "Contestá al menos una."; return; }
-    $("pk-codigo").textContent = "!pickem p1." + vals.join(".");
+    $("pk-codigo").textContent = "!pickem p2." + vals.join(".");
     $("pk-salida").hidden = false;
     $("pk-copiado").textContent = "";
-    $("pk-falta").textContent = vacias ? "Te quedaron " + vacias + " sin contestar. Podés mandarlo igual y completar después." : "";
+    $("pk-falta").textContent = sinContestar ? "Te quedaron " + sinContestar + " sin contestar. Podés mandarlo igual y completar después." : "";
   });
   $("pk-copiar").addEventListener("click", function () {
     var t = $("pk-codigo").textContent;
