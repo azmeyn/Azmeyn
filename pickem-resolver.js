@@ -253,6 +253,7 @@ export function puntuar(filas, resp) {
   const tabla = [];
   for (const f of filas) {
     let mejor = null;
+    const por = {};   // aciertos de cada ronda que contestó, para la tabla de la web
     for (const ronda of RONDAS) {
       const r = resp[ronda.id], dichas = f[ronda.id];
       if (!r || !dichas || !Object.keys(dichas).length) { continue; }
@@ -263,9 +264,10 @@ export function puntuar(filas, resp) {
         if (dichas[id] !== undefined && acierta(id, tipo, dichas[id], r[id], ronda.id)) { aciertos++; }
       }
       const esta = { ronda: ronda.id, aciertos: aciertos, total: total };
+      if (total) { por[ronda.id] = aciertos; }
       if (total && (!mejor || comparar(esta, mejor) < 0)) { mejor = esta; }
     }
-    if (mejor) { tabla.push(Object.assign({ usuario: f.usuario, pct: Math.round(mejor.aciertos * 100 / mejor.total) }, mejor)); }
+    if (mejor) { tabla.push(Object.assign({ usuario: f.usuario, pct: Math.round(mejor.aciertos * 100 / mejor.total), por: por }, mejor)); }
   }
   tabla.sort((a, b) => comparar(a, b) || (a.usuario < b.usuario ? -1 : 1));
   tabla.forEach((x, i) => { x.puesto = i && comparar(x, tabla[i - 1]) === 0 ? tabla[i - 1].puesto : i + 1; });
@@ -305,8 +307,8 @@ async function armarTabla(env, d, ahora, h) {
     respuestas: textos,
     anuladas: resp.final ? A_MANO.filter((q) => !(q in resp.final)) : [],
     participantes: filas.length,
-    // Los primeros 50 y, si hay muchos empatados en los puestos con premio, todos ellos
-    tabla: puntuar(filas, resp).filter((x, i) => i < 50 || x.puesto <= 3),
+    // Van todos, del primero al último (unos 130 bytes por persona)
+    tabla: puntuar(filas, resp),
     firma: firma
   };
   await h.kvPut(env, "pkd:tabla", JSON.stringify(tabla));
