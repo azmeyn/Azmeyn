@@ -1693,9 +1693,9 @@
   setInterval(function () { if (!document.hidden) { renderEvent(); } }, 1000);
 
   /* ---------- Cómo voy: nombre, elo, ganadas y perdidas ----------
-     CUENTA_API queda vacío hasta que exista la ruta que lee Riot. Espera:
+     CUENTA_API lo contesta el Worker; vacío ({}) hasta que arranca el torneo. Da:
      { name, tag, tier, rank, lp, wins, losses } */
-  var CUENTA_API = "";
+  var CUENTA_API = "/api/cuenta";
   var TIERS = { IRON: "Hierro", BRONZE: "Bronce", SILVER: "Plata", GOLD: "Oro", PLATINUM: "Platino", EMERALD: "Esmeralda", DIAMOND: "Diamante", MASTER: "Maestro", GRANDMASTER: "Gran Maestro", CHALLENGER: "Retador" };
   function pintarCuenta(c) {
     if (!c || typeof c.name !== "string" || typeof c.tag !== "string") { return; }
