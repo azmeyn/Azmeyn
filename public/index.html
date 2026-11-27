@@ -1066,7 +1066,26 @@
     #pickem .pk-txt p.pk-pesos { margin-top: 12px; color: var(--fg); font-weight: 700; }
     #pickem .pk-tabla ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; font-variant-numeric: tabular-nums; }
     #pickem .pk-tabla h4 { margin: 12px 0 4px; font-size: 14px; color: var(--fg); }
+    /* Contestar tocando: campeones y rangos con imagen, tramos y avance */
+    #pickem .pk-lista li.ancha { grid-column: 1 / -1; }
+    #pickem .pk-tit { display: flex; align-items: center; gap: 12px; }
+    #pickem .pk-tit > img { width: 56px; height: 56px; border-radius: 8px; flex: 0 0 auto; }
+    #pickem .pk-tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    #pickem .pk-camps { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 8px; }
+    #pickem .pk-rangos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+    #pickem .pk-tres button, #pickem .pk-camps button, #pickem .pk-rangos button { min-width: 0; font: 700 13px/1.25 var(--font-body); color: var(--fg); background: #101215; border: 2px solid var(--line); border-radius: 8px; padding: 12px 4px; cursor: pointer; }
+    #pickem .pk-camps button, #pickem .pk-rangos button { display: grid; justify-items: center; align-content: start; gap: 6px; padding: 6px 4px 8px; }
+    #pickem .pk-camps img { width: 100%; max-width: 76px; height: auto; aspect-ratio: 1; border-radius: 6px; }
+    #pickem .pk-camps i { width: 100%; max-width: 76px; aspect-ratio: 1; display: grid; place-items: center; font-style: normal; font-size: 26px; color: var(--muted); border: 2px dashed var(--line); border-radius: 6px; }
+    #pickem .pk-rangos img { width: 40px; height: 40px; object-fit: contain; }
+    #pickem .pk-tres button[aria-pressed="true"], #pickem .pk-camps button[aria-pressed="true"], #pickem .pk-rangos button[aria-pressed="true"] { border-color: var(--accent); background: rgba(255, 61, 129, 0.2); }
+    #pickem .pk-camps + input { max-width: 360px; }
+    #pickem input[hidden] { display: none; }
+    #pickem .pk-avance { margin: 0 0 14px; max-width: 520px; color: var(--muted); font-size: 13px; }
+    #pickem .pk-barra { height: 6px; margin-top: 6px; border-radius: 9px; background: var(--line); overflow: hidden; }
+    #pickem .pk-barra i { display: block; height: 100%; width: 0; background: var(--accent); }
     @media (max-width: 760px) {
+      #pickem .pk-camps, #pickem .pk-rangos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #pickem .pk-top { grid-template-columns: 56px minmax(0, 1fr); gap: 16px; padding: 20px; align-items: start; }
       #pickem .pk-ic { width: 56px; height: 56px; }
       #pickem .pk-ic svg { width: 30px; height: 30px; }
@@ -2212,82 +2231,108 @@
   // Rondas y cierres: los mismos que en pickem.js
   var RONDAS = [
     { id: "r1", bloque: "semana", nombre: "semana 1", cierra: Date.parse("2026-12-02T21:00:00Z"), sem: "la primera semana", dia: "6/12",
-      preguntas: ["q02", "q03", "q04", "q05", "q06", "q07", "q08", "q09", "q11", "q12"],
+      preguntas: ["q05", "q02", "q03", "q07", "q06", "q08", "q11", "q12", "q09"],
       nota: "Cierra el miércoles 2/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 6/12." },
     { id: "r2", bloque: "semana", nombre: "semana 2", cierra: Date.parse("2026-12-07T21:00:00Z"), sem: "la segunda semana", dia: "13/12",
-      preguntas: ["q02", "q03", "q04", "q33", "q34", "q35", "q36", "q37", "q38", "q09"],
+      preguntas: ["q35", "q02", "q03", "q33", "q34", "q37", "q38", "q36", "q09"],
       nota: "Cierra el lunes 7/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 13/12." },
     { id: "r3", bloque: "semana", nombre: "semana 3", cierra: Date.parse("2026-12-14T21:00:00Z"), sem: "la tercera semana", dia: "20/12",
-      preguntas: ["q02", "q03", "q04", "q39", "q40", "q41", "q42", "q43", "q44", "q09"],
+      preguntas: ["q42", "q02", "q03", "q39", "q41", "q40", "q44", "q43", "q09"],
       nota: "Cierra el lunes 14/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 20/12 a las 18:00." },
     { id: "final", bloque: "final", nombre: "torneo", cierra: Date.parse("2026-12-14T21:00:00Z"),
-      preguntas: ["q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24", "q25", "q27", "q28"],
+      preguntas: ["q22", "q13", "q15", "q14", "q19", "q18", "q16", "q17", "q20", "q21", "q24", "q25", "q27", "q28"],
       nota: "Cierra el lunes 14/12 a las 18:00. Son sobre todo el torneo y se resuelven el 20/12." }
   ];
   var CIERRA_TODO = Date.parse("2026-12-14T21:00:00Z");
-  // El orden es el mismo que en pickem.js
+  // Los mismos tipos que en pickem.js. Texto: {sem} y {dia} cambian con la semana
   var P = [
     ["q02","semana","num","¿Cuántas partidas gano {sem}?"],
-    ["q03","semana","num","¿Cuántas partidas juego {sem}?"],
-    ["q04","semana","sn","¿Termino {sem} con más victorias que derrotas?"],
-    ["q05","semana","camp","¿Qué campeón juego más {sem}?"],
-    ["q06","semana","num","¿Cuántos campeones distintos juego {sem}?"],
-    ["q07","semana","sn","¿Hago un pentakill {sem}?"],
-    ["q08","semana","num","¿Cuál es mi mejor racha de victorias {sem}?"],
+    ["q03","semana","rg","¿Cuántas partidas juego {sem}?"],
     ["q09","semana","rango","¿En qué rango estoy el domingo {dia}?"],
+    ["q05","semana","camp","¿Qué campeón juego más {sem}?"],
+    ["q06","semana","rg","¿Cuántos campeones distintos juego {sem}?"],
+    ["q07","semana","sn","¿Hago un pentakill {sem}?"],
+    ["q08","semana","rg","¿Cuál es mi mejor racha de victorias {sem}?"],
     ["q11","semana","num","¿Cuántas kills tiene mi mejor partida de {sem}?"],
-    ["q12","semana","num","¿Cuántas veces muero en mi peor partida de {sem}?"],
+    ["q12","semana","rg","¿Cuántas veces muero en mi peor partida de {sem}?"],
     ["q33","semana","sn","¿Gano 5 seguidas en la semana?"],
     ["q34","semana","sn","¿Meto 15 kills o más en alguna partida?"],
     ["q35","semana","camp","¿Con qué campeón gano más en la semana?"],
     ["q36","semana","num","¿Cuántos pings de «?» tiro?","Los del signo de pregunta, en toda la semana."],
-    ["q37","semana","num","¿Cuántos minutos me paso muerto en mi peor partida?"],
-    ["q38","semana","num","¿Cuántas horas juego en la semana?","Solo el tiempo dentro de las partidas."],
+    ["q37","semana","rg","¿Cuántos minutos me paso muerto en mi peor partida?"],
+    ["q38","semana","rg","¿Cuántas horas juego en la semana?","Solo el tiempo dentro de las partidas."],
     ["q39","semana","sn","¿Gano o pierdo la última partida de la semana?","",["Gano","Pierdo"]],
-    ["q40","semana","num","¿Cuál es mi peor racha de derrotas?"],
+    ["q40","semana","rg","¿Cuál es mi peor racha de derrotas?"],
     ["q41","semana","sn","¿Termino alguna partida sin morir?"],
     ["q42","semana","sn","¿Robo algún barón o dragón?","Cuenta lo que el juego marque como objetivo robado."],
     ["q43","semana","num","¿Cuántas veces muero en toda la semana?"],
-    ["q44","semana","num","¿Cuántos minutos dura mi partida más larga de la semana?"],
+    ["q44","semana","rg","¿Cuántos minutos dura mi partida más larga de la semana?"],
     ["q13","final","rango","¿En qué rango termino el torneo?"],
     ["q14","final","num","¿Con cuántos LP termino?"],
     ["q15","final","rango","¿Cuál es el rango más alto que toco?"],
-    ["q16","final","num","¿Con qué porcentaje de victorias termino?"],
-    ["q17","final","num","¿Cuántas partidas juego en total?"],
+    ["q16","final","rg","¿Con qué porcentaje de victorias termino?"],
+    ["q17","final","rg","¿Cuántas partidas juego en total?"],
     ["q18","final","num","¿En qué puesto de mi tabla termino?","Según la tabla oficial. Si no sale, se anula."],
     ["q19","final","sn","¿Termino en el top 10?","Según la tabla oficial. Si no sale, se anula."],
-    ["q20","final","num","¿Cuál es mi racha de victorias más larga?"],
-    ["q21","final","num","¿Cuál es mi peor racha de derrotas?"],
+    ["q20","final","rg","¿Cuál es mi racha de victorias más larga?"],
+    ["q21","final","rg","¿Cuál es mi peor racha de derrotas?"],
     ["q22","final","camp","¿Cuál es mi campeón más jugado?"],
-    ["q23","final","camp","¿Con qué campeón gano más seguido?","Cuentan los que jugué 5 veces o más."],
-    ["q24","final","num","¿Cuántos campeones distintos juego en todo el torneo?"],
-    ["q25","final","num","¿Cuántos pentakills hago en total?"],
-    ["q27","final","dec","¿Con qué KDA promedio termino?","Kills más asistencias, dividido muertes. Un decimal."],
-    ["q28","final","num","¿Cuántos minutos dura mi partida más larga?"]
+    ["q24","final","rg","¿Cuántos campeones distintos juego en todo el torneo?"],
+    ["q25","final","rg","¿Cuántos pentakills hago en total?"],
+    ["q27","final","rg","¿Con qué KDA promedio termino?","Kills más asistencias, dividido muertes."],
+    ["q28","final","rg","¿Cuántos minutos dura mi partida más larga?"]
   ];
-  // En las de número, cuánto se puede errar y sumar igual: los mismos márgenes que en pickem-resolver.js
-  var MARGENES = { q02: 2, q03: 3, q06: 1, q08: 1, q11: 2, q12: 2, q36: 10, q37: 2, q38: 2, q40: 1, q43: 10, q44: 3, q14: 25, q16: 3, q17: 5, q18: 2, q20: 1, q21: 1, q24: 2, q25: 0, q27: 0.3, q28: 3 };
+  // Tramos de las de tres opciones y márgenes de las de escribir: los mismos que en el servidor
+  var CORTES = {
+    q03: { r1: [20, 30], r2: [30, 45], r3: [30, 45] },
+    q06: [4, 7], q08: [4, 6], q12: [8, 11], q37: [5, 8], q38: [12, 20], q40: [3, 5], q44: [35, 42],
+    q16: [50, 59], q17: [90, 130], q20: [5, 8], q21: [4, 6], q24: [8, 14], q25: [1, 2], q27: [2.5, 3.4], q28: [40, 46]
+  };
+  var MARGENES = { q02: 2, q11: 2, q36: 10, q43: 10, q14: 25, q18: 2 };
+  var SUFIJO = { q16: "%", q28: " min", q37: " min", q38: " h", q44: " min" };
   var RANGOS = ["Platino o menos","Esmeralda IV","Esmeralda III","Esmeralda II","Esmeralda I","Diamante IV","Diamante III","Diamante II","Diamante I","Maestro","Gran Maestro","Retador"];
-  var armado = false, previas = {};
-  try { previas = JSON.parse(localStorage.getItem("pickem-sb6-2") || "{}"); } catch (e) {}
+  // Los campeones de la pool; cualquier otro se elige con «Otro»
+  var CAMPEONES = [["Cho'Gath","Chogath"],["Lee Sin","LeeSin"],["Elise","Elise"],["Twitch","Twitch"],["Jhin","Jhin"],["Fizz","Fizz"],["Garen","Garen"],["Lulu","Lulu"]];
+  var FOTO_CAMPEON = "https://ddragon.leagueoflegends.com/cdn/16.23.1/img/champion/";
+  var CDRAGON = "https://raw.communitydragon.org/latest/";
+  var ESCUDOS = CDRAGON + "plugins/rcp-fe-lol-static-assets/global/default/images/ranked-mini-crests/";
+  var IMAGENES = { q42: ["game/assets/characters/sru_dragon_elder/hud/dragon_square_elder.png", "game/assets/characters/sru_baron/hud/baron_square.png"] };
+  var armado = false, activa = null, previas = {};
+  try { previas = JSON.parse(localStorage.getItem("pickem-sb6-3") || "{}"); } catch (e) {}
 
   function el(tag, attrs, txt) { var n = document.createElement(tag); for (var k in attrs) { n.setAttribute(k, attrs[k]); } if (txt) { n.textContent = txt; } return n; }
+  /* Si una imagen del juego no carga, se esconde y queda el texto */
+  function foto(src) {
+    var i = el("img", { alt: "", loading: "lazy", decoding: "async", width: "56", height: "56" });
+    i.addEventListener("error", function () { i.hidden = true; });
+    i.src = src;
+    return i;
+  }
   var POR_ID = {};
   P.forEach(function (q) { POR_ID[q[0]] = q; });
   function de(r) { return r.preguntas.map(function (id) { return POR_ID[id]; }); }
   /* Botones de las de dos opciones: Sí / No, salvo que la pregunta diga otra cosa */
   function opciones(q) { return q[5] || ["Sí", "No"]; }
+  function cortes(q, r) { var c = CORTES[q[0]]; return Array.isArray(c) ? c : c[r.id]; }
+  function coma(n) { return String(n).replace(".", ","); }
+  function rotulos(q, r) {
+    var c = cortes(q, r), a = c[0], b = c[1], s = SUFIJO[q[0]] || "";
+    if (q[0] === "q25") { return ["Ninguno", "1 o 2", "3 o más"]; }
+    if (q[0] === "q27") { return ["Menos de " + coma(a), coma(a) + " a " + coma(b), "Más de " + coma(b)]; }
+    return ["Hasta " + (a - 1) + s, a + " a " + b + s, (b + 1) + s + " o más"];
+  }
   function texto(q, r) { return q[3].replace("{sem}", r.sem).replace("{dia}", r.dia); }
   function ayuda(q) {
     var m = MARGENES[q[0]];
-    var margen = m === undefined ? "" : m === 0 ? "Hay que acertar el número justo." : "Suma si quedás a " + String(m).replace(".", ",") + " o menos.";
-    return [q[4], margen].filter(Boolean).join(" ");
+    return [q[4], m === undefined ? "" : "Suma si quedás a " + m + " o menos."].filter(Boolean).join(" ");
   }
   function cerrada(r) { return Date.now() >= r.cierra; }
   function crudo(r, q) {
-    var c = $("pk-" + r.id + "-" + q[0]);
-    if (q[2] === "sn") { var b = c.querySelector('[aria-pressed="true"]'); return b ? b.getAttribute("data-v") : ""; }
-    return c.value.trim();
+    var id = "pk-" + r.id + "-" + q[0], c = $(id);
+    if (q[2] === "num") { return c.value.trim(); }
+    var b = c.querySelector('[aria-pressed="true"]');
+    if (!b) { return ""; }
+    return b.hasAttribute("data-otro") ? $(id + "-otro").value.trim() : b.getAttribute("data-v");
   }
   function contar() {
     RONDAS.forEach(function (r) {
@@ -2298,51 +2343,86 @@
         $("pk-" + r.id + "-" + q[0]).closest("li").classList.toggle("hecha", lleno);
       });
       $("pk-tab-" + r.id).querySelector("b").textContent = hechas + "/" + lista.length;
+      if (r.id === activa) {
+        $("pk-avance-t").textContent = hechas + " de " + lista.length + " contestadas";
+        $("pk-avance-b").style.width = Math.round(hechas * 100 / lista.length) + "%";
+      }
     });
   }
-  function pregunta(r, q) {
-    var id = "pk-" + r.id + "-" + q[0], tipo = q[2], li = el("li"), txt = el(tipo === "sn" ? "div" : "label", { class: "pk-p" }, texto(q, r)), campo;
-    var antes = previas[r.id + "-" + q[0]], extra = ayuda(q);
-    if (tipo !== "sn") { txt.setAttribute("for", id); }
-    if (extra) { txt.appendChild(el("small", {}, extra)); }
-    li.appendChild(txt);
-    if (tipo === "sn") {
-      campo = el("div", { class: "pk-sn", id: id, role: "group", "aria-label": texto(q, r) });
-      [["s", opciones(q)[0]], ["n", opciones(q)[1]]].forEach(function (o) {
-        var b = el("button", { type: "button", "data-v": o[0], "aria-pressed": antes === o[0] ? "true" : "false" }, o[1]);
-        b.addEventListener("click", function () {
-          [].forEach.call(campo.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-          contar();
-        });
-        campo.appendChild(b);
+  /* Si se cambia una respuesta, el código armado queda viejo: se esconde hasta armarlo de nuevo */
+  function cambio() { $("pk-salida").hidden = true; contar(); }
+  /* Grupo de botones donde queda marcado uno solo */
+  function grupo(id, clase, rotulo, items, antes, alElegir) {
+    var caja = el("div", { class: clase, id: id, role: "group", "aria-label": rotulo });
+    items.forEach(function (it) {
+      var b = el("button", { type: "button", "data-v": it.v, "aria-pressed": antes === it.v ? "true" : "false" });
+      if (it.otro) { b.setAttribute("data-otro", ""); }
+      if (it.img) { b.appendChild(foto(it.img)); }
+      if (it.signo) { b.appendChild(el("i", { "aria-hidden": "true" }, it.signo)); }
+      b.appendChild(el("span", {}, it.t));
+      b.addEventListener("click", function () {
+        [].forEach.call(caja.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        if (alElegir) { alElegir(b); }
+        cambio();
       });
+      caja.appendChild(b);
+    });
+    return caja;
+  }
+  function pregunta(r, q) {
+    var id = "pk-" + r.id + "-" + q[0], tipo = q[2], li = el("li"), antes = previas[r.id + "-" + q[0]] || "", extra = ayuda(q);
+    var tit = el("div", { class: "pk-tit" }), txt = el(tipo === "num" ? "label" : "div", { class: "pk-p" }, texto(q, r)), campo, otro;
+    if (tipo === "num") { txt.setAttribute("for", id); }
+    (IMAGENES[q[0]] || []).forEach(function (src) { tit.appendChild(foto(CDRAGON + src)); });
+    if (extra) { txt.appendChild(el("small", {}, extra)); }
+    tit.appendChild(txt);
+    li.appendChild(tit);
+    if (tipo === "sn") {
+      campo = grupo(id, "pk-sn", texto(q, r), [{ v: "s", t: opciones(q)[0] }, { v: "n", t: opciones(q)[1] }], antes);
+    } else if (tipo === "rg") {
+      campo = grupo(id, "pk-tres", texto(q, r), rotulos(q, r).map(function (t, i) { return { v: String(i + 1), t: t }; }), antes);
     } else if (tipo === "rango") {
-      campo = el("select", { id: id });
-      campo.appendChild(el("option", { value: "" }, "Elegí un rango"));
-      RANGOS.forEach(function (n, i) { campo.appendChild(el("option", { value: String(i) }, n)); });
-      campo.value = antes || "";
+      li.className = "ancha";
+      campo = grupo(id, "pk-rangos", texto(q, r), RANGOS.map(function (n, i) {
+        var escudo = i === 0 ? "platinum.png" : i < 5 ? "emerald.svg" : i < 9 ? "diamond.png" : ["master.png", "grandmaster.png", "challenger.png"][i - 9];
+        return { v: String(i), t: n, img: ESCUDOS + escudo };
+      }), antes);
+    } else if (tipo === "camp") {
+      li.className = "ancha";
+      var conocido = CAMPEONES.some(function (c) { return c[0] === antes; });
+      otro = el("input", { id: id + "-otro", list: "pk-campeones", autocomplete: "off", placeholder: "Nombre del campeón", maxlength: "20", "aria-label": "Otro campeón" });
+      otro.value = antes && !conocido ? antes : "";
+      otro.hidden = !otro.value;
+      campo = grupo(id, "pk-camps", texto(q, r), CAMPEONES.map(function (c) { return { v: c[0], t: c[0], img: FOTO_CAMPEON + c[1] + ".png" }; })
+        .concat([{ v: "otro", t: "Otro", signo: "?", otro: true }]), conocido ? antes : otro.value ? "otro" : "", function (b) {
+        otro.hidden = !b.hasAttribute("data-otro");
+        if (!otro.hidden) { otro.focus(); }
+      });
     } else {
-      var attrs = { id: id, autocomplete: "off" };
-      if (tipo === "camp") { attrs.list = "pk-campeones"; attrs.placeholder = "Nombre del campeón"; attrs.maxlength = "20"; }
-      else { attrs.inputmode = tipo === "dec" ? "decimal" : "numeric"; attrs.placeholder = tipo === "dec" ? "3,2" : "Un número"; attrs.maxlength = "4"; }
-      campo = el("input", attrs);
-      campo.value = antes || "";
+      campo = el("input", { id: id, autocomplete: "off", inputmode: "numeric", placeholder: "Escribí un número", maxlength: "4" });
+      campo.value = antes;
     }
     li.appendChild(campo);
+    if (otro) { li.appendChild(otro); }
     $("pk-" + r.id).appendChild(li);
     if (cerrada(r)) {
-      li.className = "cerrada";
-      [].forEach.call(li.querySelectorAll("input,select,button"), function (x) { x.disabled = true; });
+      li.classList.add("cerrada");
+      [].forEach.call(li.querySelectorAll("input,button"), function (x) { x.disabled = true; });
     }
   }
   function armar() {
     if (armado) { return; }
     armado = true;
+    var avance = el("div", { class: "pk-avance" }), barra = el("div", { class: "pk-barra", "aria-hidden": "true" });
+    avance.appendChild(el("p", { id: "pk-avance-t", role: "status" }));
+    barra.appendChild(el("i", { id: "pk-avance-b" }));
+    avance.appendChild(barra);
+    $("pk-nota").parentNode.insertBefore(avance, $("pk-nota").nextSibling);
     RONDAS.forEach(function (r) { de(r).forEach(function (q) { pregunta(r, q); }); });
-    form.addEventListener("input", contar);
-    form.addEventListener("change", contar);
+    form.addEventListener("input", cambio);
+    form.addEventListener("change", cambio);
     contar();
-    // Lista de campeones para autocompletar (si no carga, se escribe a mano)
+    // Lista de campeones para «Otro» (si no carga, se escribe a mano)
     fetch("https://ddragon.leagueoflegends.com/api/versions.json").then(function (r) { return r.json(); })
       .then(function (v) { return fetch("https://ddragon.leagueoflegends.com/cdn/" + v[0] + "/data/es_AR/champion.json"); })
       .then(function (r) { return r.json(); })
@@ -2351,12 +2431,14 @@
   }
 
   function pestana(id) {
+    activa = id;
     RONDAS.forEach(function (r) {
       $("pk-tab-" + r.id).setAttribute("aria-selected", r.id === id ? "true" : "false");
       $("pk-" + r.id).hidden = r.id !== id;
       if (r.id === id) { $("pk-nota").textContent = cerrada(r) ? "Esta ya cerró. Completá las que siguen abiertas." : r.nota; }
     });
     if (Date.now() >= CIERRA_TODO) { $("pk-nota").textContent = "El pick'em ya cerró."; }
+    if (armado) { contar(); }
   }
   function mostrar(si) {
     if (si) { armar(); }
@@ -2370,7 +2452,6 @@
   pestana((RONDAS.filter(function (r) { return !cerrada(r); })[0] || RONDAS[0]).id);
   function porEnlace() { if (location.hash === "#pickem") { mostrar(true); } }
   window.addEventListener("hashchange", porEnlace);
-  if (location.pathname === "/pickem") { mostrar(true); }
   [].forEach.call(document.querySelectorAll('a[href="#pickem"]'), function (a) { a.addEventListener("click", function () { mostrar(true); }); });
   porEnlace();
 
@@ -2401,7 +2482,7 @@
         if (v === undefined) { return; }
         if (q[2] === "sn") { v = opciones(q)[v === "s" ? 0 : 1]; }
         if (q[2] === "rango") { v = RANGOS[v]; }
-        if (q[2] === "dec") { v = String(v).replace(".", ","); }
+        if (q[2] === "rg") { var c = cortes(q, r); v = rotulos(q, r)[v < c[0] ? 0 : v <= c[1] ? 1 : 2] + " (fueron " + coma(v) + ")"; }
         lista.appendChild(el("li", {}, texto(q, r) + " " + v));
       });
       det.appendChild(lista);
@@ -2418,9 +2499,10 @@
   function valor(r, q) {
     if (cerrada(r)) { return ""; }
     var v = crudo(r, q), tipo = q[2];
+    /* Tocó «Otro» y no escribió cuál: se avisa en vez de mandarla vacía */
+    if (!v && tipo === "camp" && $("pk-" + r.id + "-" + q[0]).querySelector('[data-otro][aria-pressed="true"]')) { return null; }
     if (!v) { return ""; }
     if (tipo === "camp") { v = v.normalize("NFD").toLowerCase().replace(/[^a-z]/g, "").slice(0, 16); return v.length > 1 ? v : null; }
-    if (tipo === "dec") { var m = v.replace(",", ".").match(/^(\d{1,2})(?:\.(\d))?\d*$/); return m ? m[1] + (m[2] ? "_" + m[2] : "") : null; }
     if (tipo === "num") { return /^\d{1,4}$/.test(v) ? v : null; }
     return v;
   }
@@ -2439,13 +2521,14 @@
       // Solo avisa de los huecos en las rondas que la persona empezó
       if (puestas) { sinContestar += huecos; }
     });
-    try { localStorage.setItem("pickem-sb6-2", JSON.stringify(guardar)); } catch (e) {}
+    try { localStorage.setItem("pickem-sb6-3", JSON.stringify(guardar)); } catch (e) {}
     if (mal) {
       $("pk-salida").hidden = true; pestana(mal.r.id);
-      $("pk-falta").textContent = "Revisá esta: " + texto(mal.q, mal.r); $("pk-" + mal.r.id + "-" + mal.q[0]).focus(); return;
+      var malo = $("pk-" + mal.r.id + "-" + mal.q[0] + (mal.q[2] === "camp" ? "-otro" : ""));
+      $("pk-falta").textContent = "Revisá esta: " + texto(mal.q, mal.r); if (malo) { malo.focus(); } return;
     }
     if (vals.every(function (v) { return v === ""; })) { $("pk-salida").hidden = true; $("pk-falta").textContent = "Contestá al menos una."; return; }
-    $("pk-codigo").textContent = "!pickem p3." + vals.join(".");
+    $("pk-codigo").textContent = "!pickem p4." + vals.join(".");
     $("pk-salida").hidden = false;
     $("pk-copiado").textContent = "";
     $("pk-falta").textContent = sinContestar ? "Te quedaron " + sinContestar + " sin contestar. Podés mandarlo igual y completar después." : "";
