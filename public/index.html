@@ -1224,17 +1224,46 @@
     .f2-info { font: 700 13px/1.3 var(--font-body); color: var(--muted); text-underline-offset: 3px; padding: 4px 0; }
     .f2-info:hover { color: var(--fg); }
 
-    .f2-vent { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 12px; background: rgba(0, 0, 0, 0.82); }
+    /* El video se ve en el mismo recuadro de la portada, así no tapa nada. Debajo, solo íconos. */
+    .f2-directo.viendo > .f2-mini, .f2-directo.viendo > .f2-plat { display: none; }
     .f2-vent[hidden] { display: none; }
-    .f2-caja { width: min(1040px, 100%, calc((100vh - 190px) * 16 / 9)); min-width: min(400px, 100%); max-height: 100%; overflow: auto; background: #1C1F23; border: 1px solid rgba(255, 61, 129, 0.6); border-radius: 10px; }
-    .f2-vcab { display: flex; justify-content: flex-end; gap: 6px; padding: 8px; }
-    .f2-vcab button { font: 700 12.5px/1 var(--font-body); color: var(--fg); background: transparent; border: 1px solid var(--line-hi); border-radius: 6px; padding: 9px 12px; cursor: pointer; }
-    .f2-caja .player { border: 0 !important; border-radius: 0 !important; }
-    .f2-vent.esquina { inset: auto 12px 12px auto; padding: 0; background: none; }
-    .f2-vent.esquina .f2-caja { width: min(402px, calc(100vw - 24px)); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6); }
-    .f2-vent.esquina .pl-fallback { display: none; }
-    .f2-vent.esquina .screen { height: 300px; aspect-ratio: auto; }
-    @media (max-width: 480px) { .f2-vent.esquina { inset: auto 8px 8px 8px; } .f2-vent.esquina .f2-caja { width: 100%; } .f2-vent.esquina .screen { height: 200px; } }
+    .f2-caja { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "pantalla pantalla" "tabs botones"; align-items: center; }
+    .f2-caja .player { display: contents !important; }
+    .f2-caja .pl-head { grid-area: tabs; justify-content: flex-start; padding: 8px; border: 0; }
+    .f2-caja .screen { grid-area: pantalla; min-width: 0; border-radius: 0; }
+    .f2-caja .pl-fallback { grid-area: pie; display: none; }
+    .f2-vcab { grid-area: botones; display: flex; gap: 6px; padding: 8px; }
+    .f2-caja .tab, .f2-caja .f2-vcab button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 44px; height: 38px; min-height: 38px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--fg); cursor: pointer; }
+    .f2-caja .tab:hover, .f2-caja .f2-vcab button:hover { background: rgba(255, 255, 255, 0.1); }
+    .f2-caja .tab[data-pf="twitch"] { color: #a970ff; }
+    .f2-caja .tab[data-pf="kick"] { color: #8d93a0; }
+    .f2-caja .tab[aria-pressed="true"] { background: rgba(255, 255, 255, 0.16); }
+    .f2-caja .tab[data-pf="kick"][aria-pressed="true"] { color: #53FC18; }
+    .f2-caja .tab .t { display: none; }
+    .f2 .f2-caja .tab svg { width: 17px; height: 17px; fill: currentColor; stroke: none; }
+    .f2 .f2-caja svg.ln { width: 16px; height: 16px; stroke-width: 2.4; }
+    .f2 .f2-caja .play svg { fill: currentColor; stroke: none; }
+    @media (max-width: 759px) { .f2-caja #f2-chica { display: none; } }
+    /* Celulares muy angostos: el video usa todo el ancho (Twitch lo pausa si queda muy chico) */
+    @media (max-width: 400px) { .f2-directo.viendo { margin-inline: -20px; border-width: 1px 0; border-radius: 0; } }
+    /* «Agrandar»: ventana en el medio */
+    .f2-vent.grande { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 12px; background: rgba(0, 0, 0, 0.82); }
+    .f2-vent.grande .f2-caja { width: min(1040px, 100%, calc((100vh - 190px) * 16 / 9)); min-width: min(400px, 100%); max-height: 100%; overflow: auto; background: #1C1F23; border: 1px solid rgba(255, 61, 129, 0.6); border-radius: 10px; grid-template-areas: "tabs botones" "pantalla pantalla" "pie pie"; }
+    .f2-vent.grande .pl-fallback { display: block; }
+    .f2-vent.grande .tab { width: auto; padding: 0 14px; font-size: 13px; }
+    .f2-vent.grande .tab .t { display: inline; }
+    /* Solo compu: al bajar, el video sigue bien chico en la esquina y lo de abajo le deja el lugar */
+    @media (min-width: 1200px) {
+      .f2-vent.flota { position: fixed; right: 14px; bottom: 14px; z-index: 60; width: 320px; }
+      .f2-vent.flota .f2-caja { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: ". tabs botones" "pantalla pantalla pantalla"; }
+      .f2-vent.flota .pl-head, .f2-vent.flota .f2-vcab { gap: 2px; padding: 3px; margin-bottom: 6px; background: rgba(18, 20, 22, 0.72); border: 1px solid rgba(255, 255, 255, 0.14); }
+      .f2-vent.flota .pl-head { border-width: 1px 0 1px 1px; border-radius: 999px 0 0 999px; }
+      .f2-vent.flota .f2-vcab { border-width: 1px 1px 1px 0; border-radius: 0 999px 999px 0; }
+      .f2-vent.flota .tabs { gap: 2px; }
+      .f2-vent.flota .tab, .f2-vent.flota .f2-vcab button { width: 32px; height: 28px; min-height: 28px; border-radius: 999px; }
+      .f2-vent.flota .screen { width: 320px; height: 180px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55); }
+      body.f2-lugar .hero > .vods, body.f2-lugar main .sec, body.f2-lugar footer { margin-right: var(--f2-hueco, 0px); }
+    }
 
     .hero > .vods { margin-top: 18px; }
 
@@ -1243,7 +1272,7 @@
       .f2-lado { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
     }
     @media (min-width: 1100px) {
-      .f2 { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 0.86fr); }
+      .f2 { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(324px, 0.86fr); }
     }
     /* Notebook baja: todo un poco más junto para que entre sin bajar */
     @media (min-width: 1100px) and (max-height: 820px) {
@@ -1397,13 +1426,45 @@
             </article>
 
             <div class="f2-lado">
-              <section class="f2-card f2-directo" aria-label="Directo de Azmeyn">
-                <button type="button" class="f2-mini" id="f2-mini" aria-haspopup="dialog">
+              <section class="f2-card f2-directo" id="f2-dir" aria-label="Directo de Azmeyn">
+                <button type="button" class="f2-mini" id="f2-mini">
                   <span class="f2-mini-badge" id="f2-mini-badge" hidden>En vivo</span>
                   <strong id="f2-mini-t">Ver directo</strong>
                   <span class="f2-play" aria-hidden="true"></span>
                   <small id="f2-mini-s">Tocá y miralo acá</small>
                 </button>
+                <!-- El video aparece acá mismo; el reproductor solo carga cuando se toca -->
+                <div class="f2-vent" id="f2-vent" aria-label="Directo de Azmeyn" hidden>
+                  <div class="f2-caja">
+                    <section id="directo" class="player" aria-label="Reproductor">
+                      <div class="pl-head">
+                        <div class="tabs" role="group" aria-label="Elegir plataforma">
+                          <button class="tab" type="button" data-pf="twitch" aria-pressed="true" aria-label="Twitch" title="Twitch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg><span class="t">Twitch</span></button>
+                          <button class="tab" type="button" data-pf="kick" aria-pressed="false" aria-label="Kick" title="Kick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"/></svg><span class="t">Kick</span></button>
+                        </div>
+                      </div>
+                      <div class="screen" id="screen" data-loading="1">
+                        <!-- Vista previa del directo (miniatura en vivo o último directo) -->
+                        <div class="pv" id="pv" hidden>
+                          <div class="pv-img" id="pv-img"></div>
+                          <p class="pv-badge" id="pv-badge"><span class="pv-dot" aria-hidden="true"></span><span id="pv-badge-t"></span></p>
+                        </div>
+                        <div class="poster" id="poster">
+                          <button class="play" type="button" id="play" aria-label="Abrir el reproductor">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                          </button>
+                          <p class="poster-t" id="poster-t">Ver directo</p>
+                          <p class="poster-s" id="poster-s">Tocá y miralo acá.</p>
+                        </div>
+                      </div>
+                      <p class="pl-fallback">¿No carga? <a id="pl-open" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">Abrir en Twitch ↗</a></p>
+                    </section>
+                    <div class="f2-vcab">
+                      <button type="button" id="f2-chica" aria-label="Agrandar" title="Agrandar"><svg class="ln" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg></button>
+                      <button type="button" id="f2-cerrar" aria-label="Cerrar el video" title="Cerrar"><svg class="ln" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+                    </div>
+                  </div>
+                </div>
                 <div class="f2-plat">
                   <a class="btn tw" data-ventana="twitch" data-link="twitch" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>Twitch</a>
                   <a class="btn kk" data-ventana="kick" data-link="kick" href="https://kick.com/azmeyn" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"/></svg>Kick</a>
@@ -1422,36 +1483,6 @@
                 <p class="f2-gris" id="f2-nota">Se llena desde el lunes 30/11</p>
                 <a class="f2-info" href="https://soloboom.net/#que-es" target="_blank" rel="noopener noreferrer">Info oficial del torneo ↗</a>
               </aside>
-            </div>
-          </div>
-
-          <!-- Ventana del directo: el reproductor vive acá y solo carga cuando se abre -->
-          <div class="f2-vent" id="f2-vent" role="dialog" aria-label="Directo de Azmeyn" hidden>
-            <div class="f2-caja">
-              <div class="f2-vcab"><button type="button" id="f2-chica">Achicar</button><button type="button" id="f2-cerrar">Cerrar ✕</button></div>
-              <section id="directo" class="player" aria-label="Reproductor">
-                <div class="pl-head">
-                  <div class="tabs" role="group" aria-label="Elegir plataforma">
-                    <button class="tab" type="button" data-pf="twitch" aria-pressed="true">Twitch</button>
-                    <button class="tab" type="button" data-pf="kick" aria-pressed="false">Kick</button>
-                  </div>
-                </div>
-                <div class="screen" id="screen" data-loading="1">
-                  <!-- Vista previa del directo (miniatura en vivo o último directo) -->
-                  <div class="pv" id="pv" hidden>
-                    <div class="pv-img" id="pv-img"></div>
-                    <p class="pv-badge" id="pv-badge"><span class="pv-dot" aria-hidden="true"></span><span id="pv-badge-t"></span></p>
-                  </div>
-                  <div class="poster" id="poster">
-                    <button class="play" type="button" id="play" aria-label="Abrir el reproductor">
-                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-                    </button>
-                    <p class="poster-t" id="poster-t">Ver directo</p>
-                    <p class="poster-s" id="poster-s">Tocá y miralo acá.</p>
-                  </div>
-                </div>
-                <p class="pl-fallback">¿No carga? <a id="pl-open" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">Abrir en Twitch ↗</a></p>
-              </section>
             </div>
           </div>
 
@@ -1896,7 +1927,7 @@
     var src;
     if (platform === "twitch") {
       var ultimo = state.twitch === false && vods[0] && String(vods[0].url || "").match(/\/videos\/(\d+)/);
-      src = "https://player.twitch.tv/?" + (ultimo ? "video=" + ultimo[1] + "&autoplay=false" : "channel=" + encodeURIComponent(CONFIG.twitch)) +
+      src = "https://player.twitch.tv/?" + (ultimo ? "video=" + ultimo[1] : "channel=" + encodeURIComponent(CONFIG.twitch)) +
         "&parent=" + encodeURIComponent(location.hostname) + "&muted=true";
     } else {
       src = "https://player.kick.com/" + encodeURIComponent(CONFIG.kick);
@@ -1916,7 +1947,7 @@
   });
   $("play").addEventListener("click", loadPlayer);
 
-  /* ---------- Portada F2: recuadro chico del directo y ventana emergente ---------- */
+  /* ---------- Portada F2: recuadro del directo; el video se ve ahí mismo ---------- */
   var miniUrl = "";
   function f2Mini() {
     var mini = $("f2-mini");
@@ -1931,28 +1962,71 @@
     $("f2-mini-t").textContent = vivo ? "Estoy en vivo" : state.twitch === false ? (antes ? "Arranco el lunes a las 18" : "Ahora no estoy en vivo") : "Ver directo";
     $("f2-mini-s").textContent = vivo ? "Miralo acá" : state.twitch === false && vods.length ? "Ver el último directo" : "Tocá y miralo acá";
   }
-  var vent = $("f2-vent"), volverA = null;
-  function achicar(si) {
-    vent.classList.toggle("esquina", si);
-    $("f2-chica").textContent = si ? "Agrandar" : "Achicar";
-    document.documentElement.style.overflow = si || vent.hidden ? "" : "hidden";
+  var vent = $("f2-vent"), caja = $("f2-dir"), volverA = null, grande = false;
+  /* En compu, al bajar, el video sigue chico en la esquina; en celu y pantallas chicas se queda en su lugar */
+  var puedeSeguir = window.matchMedia("(min-width: 1200px) and (min-height: 560px)");
+  /* Las secciones de abajo se corren lo justo para que el video chico (320 px) no las tape */
+  function dejarLugar() {
+    var si = !vent.hidden && puedeSeguir.matches;
+    if (si) {
+      var w = document.querySelector("main .wrap");
+      var libre = document.documentElement.clientWidth - w.getBoundingClientRect().right + parseFloat(getComputedStyle(w).paddingRight);
+      document.documentElement.style.setProperty("--f2-hueco", Math.max(0, Math.ceil(350 - libre)) + "px");
+    }
+    document.body.classList.toggle("f2-lugar", si);
+  }
+  function acomodar() {
+    var flota = false;
+    if (!vent.hidden && !grande && puedeSeguir.matches) {
+      /* recién pasa a la esquina cuando su lugar ya no se ve y la portada no queda debajo de él */
+      var arriba = document.querySelector(".side").offsetHeight + document.querySelector(".topbar").offsetHeight;
+      flota = caja.getBoundingClientRect().bottom < arriba + 60 &&
+        document.querySelector(".f2").getBoundingClientRect().bottom < window.innerHeight - 240;
+    }
+    var suelto = flota || grande;
+    var estaba = vent.classList.contains("flota") || vent.classList.contains("grande");
+    if (suelto && !estaba) { caja.style.minHeight = caja.offsetHeight + "px"; }   /* guarda el lugar: nada salta */
+    vent.classList.toggle("flota", flota);
+    vent.classList.toggle("grande", grande);
+    if (!suelto) { caja.style.minHeight = ""; }
+  }
+  function agrandar(si) {
+    grande = si;
+    var b = $("f2-chica");
+    b.setAttribute("aria-label", si ? "Achicar" : "Agrandar");
+    b.setAttribute("title", si ? "Achicar" : "Agrandar");
+    if (si) { vent.setAttribute("role", "dialog"); } else { vent.removeAttribute("role"); }
+    document.documentElement.style.overflow = si ? "hidden" : "";
+    acomodar();
   }
   function abrirVentana(p, desde) {
     volverA = desde || null;
     vent.hidden = false;
-    achicar(false);
+    caja.classList.add("viendo");
     if (p && p !== platform) { selectPlatform(p, true); }
     if (!loaded) { loadPlayer(); }
-    $("f2-cerrar").focus();
+    dejarLugar();
+    acomodar();
   }
   function cerrarVentana() {
     vent.hidden = true;
-    achicar(false);
+    caja.classList.remove("viendo");
+    agrandar(false);
+    dejarLugar();
     selectPlatform(platform, false);   /* saca el reproductor: no queda sonando */
-    if (volverA) { volverA.focus(); }
+    if (volverA) { volverA.focus({ preventScroll: true }); }
   }
-  $("f2-mini").addEventListener("click", function () {
+  window.addEventListener("scroll", function () { if (!vent.hidden) { acomodar(); } }, { passive: true });
+  window.addEventListener("resize", function () {
+    if (vent.hidden) { return; }
+    vent.classList.remove("flota", "grande");
+    caja.style.minHeight = "";
+    dejarLugar();
+    acomodar();
+  });
+  $("f2-mini").addEventListener("click", function (e) {
     abrirVentana(state.twitch !== true && state.kick === true ? "kick" : "twitch", $("f2-mini"));
+    if (!e.detail) { $("f2-cerrar").focus({ preventScroll: true }); }   /* con teclado, el foco sigue en el video */
   });
   document.querySelectorAll("[data-ventana]").forEach(function (a) {
     a.addEventListener("click", function (e) {
@@ -1965,13 +2039,13 @@
   document.querySelectorAll(".tab").forEach(function (b) {
     b.addEventListener("click", function () { if (!vent.hidden && !loaded) { loadPlayer(); } });
   });
-  $("f2-chica").addEventListener("click", function () { achicar(!vent.classList.contains("esquina")); });
+  $("f2-chica").addEventListener("click", function (e) { agrandar(!grande); if (e.detail) { this.blur(); } });
   $("f2-cerrar").addEventListener("click", cerrarVentana);
-  vent.addEventListener("click", function (e) { if (e.target === vent) { cerrarVentana(); } });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !vent.hidden) { cerrarVentana(); } });
-  /* Si se toca un enlace de la página con la ventana grande abierta, se achica */
-  document.addEventListener("click", function (e) {
-    if (!vent.hidden && !vent.contains(e.target) && e.target.closest && e.target.closest('a[href^="#"]')) { achicar(true); }
+  /* Tocar afuera o Esc: de grande vuelve a chico; Esc otra vez lo cierra */
+  vent.addEventListener("click", function (e) { if (grande && e.target === vent) { agrandar(false); } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || vent.hidden) { return; }
+    if (grande) { agrandar(false); } else { cerrarVentana(); }
   });
 
   /* ---------- Últimos directos ---------- */
