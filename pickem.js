@@ -6,12 +6,20 @@
      /api/pickem?key=PRESENTE_KEY&user=...&c=...   lo llama el comando !pickem de StreamElements
      /api/pickem-lista?key=ADMIN_KEY               todas las respuestas (la abre Maxi)
 
-   El código es "p1." + las 25 respuestas separadas por puntos, en el orden de PREGUNTAS.
-   Una respuesta vacía es una pregunta sin contestar. */
+   Hay cuatro rondas: una por semana (las mismas 10 preguntas) y la del torneo (15). Gana la mejor
+   ronda de cada persona. El código es "p2." + 10 de la semana 1 + 10 de la semana 2 + 10 de la
+   semana 3 + 15 del torneo, separadas por puntos. Una respuesta vacía es una pregunta sin contestar. */
 
 export const ABRE = Date.parse("2026-11-29T03:00:00Z");        // 29/11 00:00 ARG
-export const CIERRA_SEMANA = Date.parse("2026-11-30T21:00:00Z"); // 30/11 18:00 ARG
-export const CIERRA_FINAL = Date.parse("2026-12-14T03:00:00Z");  // fin del 13/12 ARG
+
+// Hasta cuándo se puede mandar cada ronda (lunes 18:00 ARG; la del torneo cierra con la semana 3)
+export const RONDAS = [
+  { id: "r1", bloque: "semana", nombre: "semana 1", cierra: Date.parse("2026-11-30T21:00:00Z") },
+  { id: "r2", bloque: "semana", nombre: "semana 2", cierra: Date.parse("2026-12-07T21:00:00Z") },
+  { id: "r3", bloque: "semana", nombre: "semana 3", cierra: Date.parse("2026-12-14T21:00:00Z") },
+  { id: "final", bloque: "final", nombre: "torneo", cierra: Date.parse("2026-12-14T21:00:00Z") }
+];
+export const CIERRA_TODO = Math.max(...RONDAS.map((r) => r.cierra));
 
 // [id, bloque, tipo]. Tipos: num (entero), dec (un decimal), sn (s / n), camp (campeón), rango (0 a 11)
 export const PREGUNTAS = [
@@ -23,6 +31,8 @@ export const PREGUNTAS = [
   ["q21", "final", "num"], ["q22", "final", "camp"], ["q23", "final", "camp"], ["q24", "final", "num"],
   ["q25", "final", "num"], ["q27", "final", "dec"], ["q28", "final", "num"]
 ];
+export const preguntasDe = (ronda) => PREGUNTAS.filter((q) => q[1] === ronda.bloque);
+const CAMPOS = RONDAS.reduce((n, r) => n + preguntasDe(r).length, 0);
 
 function valido(tipo, v) {
   if (tipo === "num") { return /^\d{1,4}$/.test(v); }
@@ -33,20 +43,26 @@ function valido(tipo, v) {
   return false;
 }
 
-// Devuelve { semana: {...}, final: {...} } o null si el código no sirve
+const vacias = () => Object.fromEntries(RONDAS.map((r) => [r.id, {}]));
+
+// Devuelve { r1: {...}, r2: {...}, r3: {...}, final: {...} } o null si el código no sirve
 export function leerCodigo(codigo) {
   const partes = String(codigo || "").trim().toLowerCase().split(".");
-  if (partes[0] !== "p1" || partes.length !== PREGUNTAS.length + 1) { return null; }
-  const out = { semana: {}, final: {} };
-  for (let i = 0; i < PREGUNTAS.length; i++) {
-    const [id, bloque, tipo] = PREGUNTAS[i];
-    const v = partes[i + 1];
-    if (v === "") { continue; }
-    if (!valido(tipo, v)) { return null; }
-    out[bloque][id] = v;
+  if (partes[0] !== "p2" || partes.length !== CAMPOS + 1) { return null; }
+  const out = vacias();
+  let i = 1;
+  for (const ronda of RONDAS) {
+    for (const [id, , tipo] of preguntasDe(ronda)) {
+      const v = partes[i++];
+      if (v === "") { continue; }
+      if (!valido(tipo, v)) { return null; }
+      out[ronda.id][id] = v;
+    }
   }
   return out;
 }
+
+const cuantas = (o) => Object.keys(o || {}).length;
 
 export async function pickem(url, env, h) {
   if (!env.CHECKINS || !env.PRESENTE_KEY) { return h.plain("El pick'em todavía no está configurado"); }
@@ -60,30 +76,33 @@ export async function pickem(url, env, h) {
 
   const ahora = Date.now();
   if (ahora < ABRE) { return h.plain("@" + user + " el pick'em abre el 29/11"); }
-  if (ahora >= CIERRA_FINAL) { return h.plain("@" + user + " el pick'em ya cerró"); }
+  if (ahora >= CIERRA_TODO) { return h.plain("@" + user + " el pick'em ya cerró"); }
   const nuevo = leerCodigo(codigo);
   if (!nuevo) { return h.plain("@" + user + " ese código no sirve. Copialo entero desde azmeyn.com/pickem"); }
 
   const clave = "pk:" + user;
-  const guardado = (await env.CHECKINS.get(clave, "json")) || { semana: {}, final: {} };
-  const semanaAbierta = ahora < CIERRA_SEMANA;
-  const nSemana = Object.keys(nuevo.semana).length, nFinal = Object.keys(nuevo.final).length;
-  if (!nFinal && (!semanaAbierta || !nSemana)) {
-    return h.plain("@" + user + (semanaAbierta ? " no contestaste ninguna pregunta" : " las de la primera semana ya cerraron y no mandaste finales"));
+  const guardado = Object.assign(vacias(), (await env.CHECKINS.get(clave, "json")) || {});
+  const abiertas = RONDAS.filter((r) => ahora < r.cierra);
+  // ¿Manda algo distinto de una ronda que ya cerró?
+  const tarde = RONDAS.some((r) => ahora >= r.cierra &&
+    Object.entries(nuevo[r.id]).some(([k, v]) => guardado[r.id][k] !== v));
+  if (!abiertas.some((r) => cuantas(nuevo[r.id]))) {
+    return h.plain("@" + user + (tarde ? " esa ronda ya cerró. Completá las que siguen en azmeyn.com/pickem" : " no contestaste ninguna pregunta"));
   }
   // Una respuesta nueva reemplaza a la anterior; lo que venga vacío no borra lo guardado
-  const antes = JSON.stringify([guardado.semana, guardado.final]);
-  if (semanaAbierta) { guardado.semana = Object.assign({}, guardado.semana, nuevo.semana); }
-  guardado.final = Object.assign({}, guardado.final, nuevo.final);
+  const foto = () => JSON.stringify(RONDAS.map((r) => guardado[r.id]));
+  const antes = foto();
+  for (const r of abiertas) { guardado[r.id] = Object.assign({}, guardado[r.id], nuevo[r.id]); }
   // Si no cambió nada no se escribe: repetir el mismo código no gasta la cuota del KV
-  if (JSON.stringify([guardado.semana, guardado.final]) !== antes) {
+  if (foto() !== antes) {
     guardado.cuando = new Date(ahora).toISOString();
-    await h.kvPut(env, clave, JSON.stringify(guardado), { metadata: { semana: guardado.semana, final: guardado.final } });
+    // Las respuestas viajan también en la metadata (tope de Cloudflare: 1024) para armar la tabla barato
+    const meta = Object.fromEntries(RONDAS.map((r) => [r.id, guardado[r.id]]));
+    await h.kvPut(env, clave, JSON.stringify(guardado), JSON.stringify(meta).length <= 1000 ? { metadata: meta } : {});
   }
 
-  const s = Object.keys(guardado.semana).length, f = Object.keys(guardado.final).length;
-  return h.plain("@" + user + " pick'em guardado: " + s + " de 10 de la primera semana y " + f + " de 15 finales" +
-    (!semanaAbierta && nSemana ? " (las de la semana ya habían cerrado)" : ""));
+  const resumen = RONDAS.map((r) => r.nombre + " " + cuantas(guardado[r.id]) + "/" + preguntasDe(r).length).join(", ");
+  return h.plain("@" + user + " pick'em guardado: " + resumen + (tarde ? " (lo que ya había cerrado no cambió)" : ""));
 }
 
 export async function pickemLista(url, env, h) {

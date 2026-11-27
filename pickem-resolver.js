@@ -1,8 +1,9 @@
 /* ------------------------- Pick'em: se resuelve solo -------------------------
    Corre con el cron (cada 5 minutos, solo durante el torneo):
      1) lee las partidas SoloQ de la cuenta del torneo y el rango (API de Riot),
-     2) anota el rango más alto y la foto del rango al cerrar la primera semana y el torneo,
-     3) calcula las respuestas y la tabla, y la guarda para la web.
+     2) anota el rango más alto y la foto del rango al terminar cada semana y el torneo,
+     3) calcula las respuestas de cada ronda y la tabla, y la guarda para la web. Cada persona
+        vale por su mejor ronda (porcentaje de aciertos); los empates se sortean en vivo.
    Necesita el secreto RIOT_API_KEY. Sin él no hace nada y lo deja anotado.
 
      /api/pickem-tabla                    pública: tabla y respuestas ya resueltas
@@ -12,11 +13,23 @@
 
    Antes del torneo el mismo cron prueba la clave con la cuenta del torneo y anota el resultado
    (se escribe solo si cambia, y una vez por día). */
-import { PREGUNTAS } from "./pickem.js";
+import { RONDAS, preguntasDe } from "./pickem.js";
 
 export const INICIO = Date.parse("2026-11-30T21:00:00Z");       // 30/11 18:00 ARG
-export const FIN_SEMANA = Date.parse("2026-12-07T03:00:00Z");   // termina el domingo 6/12 ARG
 export const FIN = Date.parse("2026-12-20T21:00:00Z");          // 20/12 18:00 ARG
+// Partidas que cuentan en cada ronda: desde que cierra para responder hasta el domingo
+export const TRAMOS = {
+  r1: { desde: INICIO, hasta: Date.parse("2026-12-07T03:00:00Z") },                             // al terminar el domingo 6/12
+  r2: { desde: Date.parse("2026-12-07T21:00:00Z"), hasta: Date.parse("2026-12-14T03:00:00Z") }, // 7/12 18:00 a fin del 13/12
+  r3: { desde: Date.parse("2026-12-14T21:00:00Z"), hasta: FIN },                                // 14/12 18:00 a 20/12 18:00
+  final: { desde: INICIO, hasta: FIN }
+};
+const FIJA = 6 * 3600000;              // pasado este rato, las respuestas de una ronda quedan fijas
+// En las de número se suma quedando dentro de este margen (la página muestra el mismo)
+export const MARGENES = {
+  q02: 2, q03: 3, q06: 1, q08: 1, q11: 2, q12: 2,
+  q14: 25, q16: 3, q17: 5, q18: 2, q20: 1, q21: 1, q24: 2, q25: 0, q27: 0.3, q28: 3
+};
 const CUENTA = "TE LA SACO#SB6";
 const CONOCIDA = "OTK Azmeyn#OTK";    // cuenta que ya existe, solo para probar la clave
 const PLATAFORMA = "la2";
@@ -74,10 +87,13 @@ async function campeones(env) {
   } catch (e) { return {}; }
 }
 
-const vacio = () => ({ puuid: null, partidas: {}, rango: null, maximo: null, semana: null, final: null, manual: {}, error: null });
+const vacio = () => ({ puuid: null, partidas: {}, rango: null, maximo: null, antes: {}, fotos: {}, cubierto: {}, resueltas: {}, manual: {}, error: null });
 
 export async function leerDatos(env) {
-  return Object.assign(vacio(), (await env.CHECKINS.get("pkd:datos", "json")) || {});
+  const d = Object.assign(vacio(), (await env.CHECKINS.get("pkd:datos", "json")) || {});
+  // Las cargadas a mano van en su propia clave: la vuelta del cron nunca las pisa
+  d.manual = Object.assign({}, d.manual, (await env.CHECKINS.get("pkd:mano", "json")) || {});
+  return d;
 }
 
 async function actualizarDatos(env, d, ahora) {
@@ -91,16 +107,16 @@ async function actualizarDatos(env, d, ahora) {
   const l = (ligas || []).find((x) => x.queueType === "RANKED_SOLO_5x5");
   d.rango = l ? { tier: l.tier, div: l.rank, lp: l.leaguePoints } : null;
   if (d.rango && ahora >= INICIO && ahora <= FIN + MARGEN && altura(d.rango) > altura(d.maximo)) { d.maximo = d.rango; }
-  // Fotos del rango al cerrar la primera semana y el torneo. Se sacan apenas pasa el corte; si la
-  // vuelta llega tarde (y ya pudo haber jugado de nuevo), vale lo último visto antes del corte.
-  for (const [campo, corte] of [["semana", FIN_SEMANA], ["final", FIN]]) {
-    if (ahora < corte) { d["antes_" + campo] = d.rango; }
-    else if (!d[campo]) {
-      const aTiempo = ahora - corte <= MARGEN * 2 || d["antes_" + campo] === undefined;
-      d[campo] = { rango: aTiempo ? d.rango : d["antes_" + campo], cuando: new Date(ahora).toISOString() };
+  // Fotos del rango al terminar cada ronda. Se sacan apenas pasa el corte; si la vuelta llega
+  // tarde (y ya pudo haber jugado de nuevo), vale lo último visto antes del corte.
+  for (const [id, t] of Object.entries(TRAMOS)) {
+    if (ahora < t.hasta) { d.antes[id] = d.rango; }
+    else if (!d.fotos[id]) {
+      // Si llega tarde y no hay nada visto antes del corte, el rango queda sin dato (no se inventa)
+      const aTiempo = ahora - t.hasta <= MARGEN * 2;
+      d.fotos[id] = { rango: aTiempo ? d.rango : d.antes[id] || null, cuando: new Date(ahora).toISOString() };
     }
   }
-
   // Riot devuelve de a 100: se piden más páginas mientras todo lo que viene sea desconocido
   const faltan = [];
   for (let desde = 0; desde < 300; desde += 100) {
@@ -126,11 +142,14 @@ async function actualizarDatos(env, d, ahora) {
     };
   }
   d.pendientes = Math.max(0, faltan.length - NUEVAS_POR_VUELTA);
+  // Una ronda se puede resolver recién cuando se leyeron todas las partidas después de su corte.
+  // Si Riot falla antes de llegar acá, no queda marcada.
+  for (const [id, t] of Object.entries(TRAMOS)) { if (ahora >= t.hasta && !d.pendientes) { d.cubierto[id] = true; } }
 }
 
 // Partidas que cuentan en un tramo, en orden (sin remakes)
-export function jugadas(d, hasta) {
-  return Object.values(d.partidas).filter((p) => !p.remake && p.ini >= INICIO && p.fin <= hasta).sort((a, b) => a.ini - b.ini);
+export function jugadas(d, desde, hasta) {
+  return Object.values(d.partidas).filter((p) => !p.remake && p.ini >= desde && p.fin <= hasta).sort((a, b) => a.ini - b.ini);
 }
 function racha(lista, gano) {
   let mejor = 0, n = 0;
@@ -158,55 +177,81 @@ function mejores(m, valor, filtro) {
   return { texto: g.map(([, c]) => c.nombre).join(" / "), claves: g.flatMap(([, c]) => c.claves) };
 }
 
-// Devuelve { q02: respuesta, ... } solo con lo que ya se puede resolver
-export function respuestas(d, ahora) {
-  const r = {};
-  const siNo = (b) => (b ? "s" : "n");
-  if (ahora >= FIN_SEMANA && d.semana && !d.pendientes) {
-    const p = jugadas(d, FIN_SEMANA), g = p.filter((x) => x.gano).length, c = porCampeon(p);
-    r.q02 = g; r.q03 = p.length; r.q04 = siNo(g > p.length - g);
-    r.q05 = mejores(c, (x) => x.j); r.q06 = c.size; r.q07 = siNo(p.some((x) => x.penta > 0)); r.q08 = racha(p, true);
-    r.q09 = indiceRango(d.semana.rango);
-    r.q11 = p.length ? Math.max(...p.map((x) => x.k)) : null; r.q12 = p.length ? Math.max(...p.map((x) => x.m)) : null;
-  }
-  if (ahora >= FIN && d.final && !d.pendientes) {
-    const p = jugadas(d, FIN), g = p.filter((x) => x.gano).length, c = porCampeon(p);
-    const suma = (k) => p.reduce((a, x) => a + x[k], 0);
-    r.q13 = indiceRango(d.final.rango); r.q14 = d.final.rango ? d.final.rango.lp : null; r.q15 = indiceRango(d.maximo);
-    r.q16 = p.length ? Math.round(g * 100 / p.length) : null; r.q17 = p.length;
-    r.q20 = racha(p, true); r.q21 = racha(p, false);
-    r.q22 = mejores(c, (x) => x.j); r.q23 = mejores(c, (x) => x.g / x.j, (x) => x.j >= 5);
-    r.q24 = c.size; r.q25 = suma("penta");
-    r.q27 = p.length ? Math.round((suma("k") + suma("a")) * 10 / Math.max(1, suma("m"))) / 10 : null;
-    r.q28 = p.length ? Math.floor(Math.max(...p.map((x) => x.dur)) / 60) : null;
-    for (const q of A_MANO) { if (d.manual[q] !== undefined) { r[q] = q === "q18" ? Number(d.manual[q]) : d.manual[q]; } }
-  }
+const siNo = (b) => (b ? "s" : "n");
+function deSemana(d, id) {
+  const p = jugadas(d, TRAMOS[id].desde, TRAMOS[id].hasta), g = p.filter((x) => x.gano).length, c = porCampeon(p);
+  return {
+    q02: g, q03: p.length, q04: siNo(g > p.length - g), q05: mejores(c, (x) => x.j), q06: c.size,
+    q07: siNo(p.some((x) => x.penta > 0)), q08: racha(p, true), q09: indiceRango(d.fotos[id].rango),
+    q11: p.length ? Math.max(...p.map((x) => x.k)) : null, q12: p.length ? Math.max(...p.map((x) => x.m)) : null
+  };
+}
+function deTorneo(d) {
+  const p = jugadas(d, INICIO, FIN), g = p.filter((x) => x.gano).length, c = porCampeon(p), foto = d.fotos.final;
+  const suma = (k) => p.reduce((a, x) => a + x[k], 0);
+  return {
+    q13: indiceRango(foto.rango), q14: foto.rango ? foto.rango.lp : null, q15: indiceRango(d.maximo),
+    q16: p.length ? Math.round(g * 100 / p.length) : null, q17: p.length, q20: racha(p, true), q21: racha(p, false),
+    q22: mejores(c, (x) => x.j), q23: mejores(c, (x) => x.g / x.j, (x) => x.j >= 5), q24: c.size, q25: suma("penta"),
+    q27: p.length ? Math.round((suma("k") + suma("a")) * 10 / Math.max(1, suma("m"))) / 10 : null,
+    q28: p.length ? Math.floor(Math.max(...p.map((x) => x.dur)) / 60) : null
+  };
+}
+function calcular(d, id) {
+  const r = id === "final" ? deTorneo(d) : deSemana(d, id);
   for (const k of Object.keys(r)) { if (r[k] === null || r[k] === undefined) { delete r[k]; } }
   return r;
 }
+const lista = (d, id, ahora) => ahora >= TRAMOS[id].hasta && !!d.fotos[id] && !!d.cubierto[id];
 
-// En las de número suma el punto quien queda más cerca (si empatan, todos). En el resto, hay que acertar.
-export function puntuar(filas, resp) {
-  const tabla = filas.map((f) => ({ usuario: f.usuario, puntos: 0 }));
-  for (const [id, bloque, tipo] of PREGUNTAS) {
-    if (!(id in resp)) { continue; }
-    const correcta = resp[id];
-    const dichas = filas.map((f) => (f[bloque] || {})[id]);
-    if (tipo === "num" || tipo === "dec") {
-      const dist = dichas.map((v) => v === undefined ? Infinity : Math.abs(Math.round((Number(String(v).replace("_", ".")) - correcta) * 10)));
-      const menor = Math.min(...dist);
-      if (menor !== Infinity) { dist.forEach((x, i) => { if (x === menor) { tabla[i].puntos++; } }); }
-    } else {
-      dichas.forEach((v, i) => {
-        if (v === undefined) { return; }
-        const ok = tipo === "camp" ? correcta.claves.includes(v) : String(v) === String(correcta);
-        if (ok) { tabla[i].puntos++; }
-      });
+// Devuelve { r1: { q02: respuesta, ... }, ... } solo con las rondas que ya se pueden resolver
+export function respuestas(d, ahora) {
+  const out = {};
+  for (const { id } of RONDAS) {
+    if (!d.resueltas[id] && !lista(d, id, ahora)) { continue; }
+    const r = Object.assign({}, d.resueltas[id] || calcular(d, id));
+    if (id === "final") {
+      for (const q of A_MANO) { if (d.manual[q] !== undefined) { r[q] = q === "q18" ? Number(d.manual[q]) : d.manual[q]; } }
     }
+    out[id] = r;
   }
-  return tabla.sort((a, b) => b.puntos - a.puntos || (a.usuario < b.usuario ? -1 : 1));
+  return out;
 }
 
+export function acierta(id, tipo, dicha, correcta) {
+  if (tipo === "num" || tipo === "dec") {
+    const lejos = Math.abs(Math.round((Number(String(dicha).replace("_", ".")) - correcta) * 10));
+    return lejos <= Math.round((MARGENES[id] || 0) * 10);
+  }
+  if (tipo === "camp") { return correcta.claves.includes(dicha); }
+  return String(dicha) === String(correcta);
+}
+// a mejor que b si su porcentaje es mayor (se compara en enteros para que los empates sean exactos)
+const comparar = (a, b) => b.aciertos * a.total - a.aciertos * b.total;
+
+// Cada persona vale por su mejor ronda: aciertos sobre las preguntas resueltas de esa ronda
+export function puntuar(filas, resp) {
+  const tabla = [];
+  for (const f of filas) {
+    let mejor = null;
+    for (const ronda of RONDAS) {
+      const r = resp[ronda.id], dichas = f[ronda.id];
+      if (!r || !dichas || !Object.keys(dichas).length) { continue; }
+      let aciertos = 0, total = 0;
+      for (const [id, , tipo] of preguntasDe(ronda)) {
+        if (!(id in r)) { continue; }
+        total++;
+        if (dichas[id] !== undefined && acierta(id, tipo, dichas[id], r[id])) { aciertos++; }
+      }
+      const esta = { ronda: ronda.id, aciertos: aciertos, total: total };
+      if (total && (!mejor || comparar(esta, mejor) < 0)) { mejor = esta; }
+    }
+    if (mejor) { tabla.push(Object.assign({ usuario: f.usuario, pct: Math.round(mejor.aciertos * 100 / mejor.total) }, mejor)); }
+  }
+  tabla.sort((a, b) => comparar(a, b) || (a.usuario < b.usuario ? -1 : 1));
+  tabla.forEach((x, i) => { x.puesto = i && comparar(x, tabla[i - 1]) === 0 ? tabla[i - 1].puesto : i + 1; });
+  return tabla;
+}
 async function participantes(env) {
   const filas = [];
   let cursor;
@@ -214,7 +259,7 @@ async function participantes(env) {
     const pagina = await env.CHECKINS.list({ prefix: "pk:", cursor: cursor });
     for (const k of pagina.keys) {
       // Las respuestas viajan en la metadata de la clave: así no hace falta leer una por una
-      const r = k.metadata && k.metadata.semana ? k.metadata : await env.CHECKINS.get(k.name, "json");
+      const r = k.metadata && k.metadata.r1 ? k.metadata : await env.CHECKINS.get(k.name, "json");
       if (r) { filas.push(Object.assign({ usuario: k.name.slice(3) }, r)); }
     }
     cursor = pagina.list_complete ? undefined : pagina.cursor;
@@ -232,13 +277,17 @@ async function armarTabla(env, d, ahora, h) {
   if (previa && previa.firma === firma) { return previa; }
   const filas = await participantes(env);
   const textos = {};
-  for (const [k, v] of Object.entries(resp)) { textos[k] = v && typeof v === "object" ? v.texto : v; }
+  for (const [ronda, r] of Object.entries(resp)) {
+    textos[ronda] = {};
+    for (const [k, v] of Object.entries(r)) { textos[ronda][k] = v && typeof v === "object" ? v.texto : v; }
+  }
   const tabla = {
-    etapa: ahora >= FIN && d.final ? "final" : "semana",
+    etapa: resp.final ? "final" : "parcial",
     respuestas: textos,
-    anuladas: ahora >= FIN && d.final ? A_MANO.filter((q) => !(q in resp)) : [],
+    anuladas: resp.final ? A_MANO.filter((q) => !(q in resp.final)) : [],
     participantes: filas.length,
-    tabla: puntuar(filas, resp).slice(0, 50),
+    // Los primeros 50 y, si hay muchos empatados en los puestos con premio, todos ellos
+    tabla: puntuar(filas, resp).filter((x, i) => i < 50 || x.puesto <= 3),
     firma: firma
   };
   await h.kvPut(env, "pkd:tabla", JSON.stringify(tabla));
@@ -252,10 +301,13 @@ export async function pickemVuelta(env, h) {
   const d = await leerDatos(env);
   const antes = JSON.stringify(d);
   if (!env.RIOT_API_KEY) { d.error = "falta el secreto RIOT_API_KEY"; }
-  else if (!d.final || d.pendientes) {       // con todo leído y la foto final no se pregunta más a Riot
+  else if (!d.cubierto.final || d.pendientes || ahora <= FIN + 2 * 3600000) {   // con todo leído no se pregunta más a Riot
     d.error = null;
     try { await actualizarDatos(env, d, ahora); }
     catch (e) { d.error = String(e && e.message || "error"); }
+  }
+  for (const { id } of RONDAS) {
+    if (!d.resueltas[id] && !d.error && ahora >= TRAMOS[id].hasta + FIJA && lista(d, id, ahora)) { d.resueltas[id] = calcular(d, id); }
   }
   if (JSON.stringify(d) !== antes) { await h.kvPut(env, "pkd:datos", JSON.stringify(d)); }
   await armarTabla(env, d, ahora, h);
@@ -305,7 +357,7 @@ export async function pickemDatos(url, env, h) {
   const q18 = url.searchParams.get("q18"), q19 = url.searchParams.get("q19");
   if (q18 && /^\d{1,4}$/.test(q18)) { d.manual.q18 = q18; cambio = true; }
   if (q19 === "s" || q19 === "n") { d.manual.q19 = q19; cambio = true; }
-  if (cambio) { await h.kvPut(env, "pkd:datos", JSON.stringify(d)); await armarTabla(env, d, Date.now(), h); }
+  if (cambio) { await h.kvPut(env, "pkd:mano", JSON.stringify(d.manual)); await armarTabla(env, d, Date.now(), h); }
   // &probar=1: comprueba ahora mismo la clave de Riot y que la cuenta exista (sirve antes del torneo)
   let prueba;
   if (url.searchParams.get("probar") === "1") {
@@ -318,10 +370,10 @@ export async function pickemDatos(url, env, h) {
       } catch (e) { prueba = "falla con " + cuenta + ": " + (e && e.message); }
     }
   }
-  const p = jugadas(d, FIN);
+  const p = jugadas(d, INICIO, FIN);
   return new Response(JSON.stringify({
     prueba: prueba, cuenta: d.cuenta || null, error: d.error, partidas: p.length, victorias: p.filter((x) => x.gano).length,
-    pendientes: d.pendientes || 0, rango: d.rango, rangoMasAlto: d.maximo, semana: d.semana, final: d.final,
+    pendientes: d.pendientes || 0, rango: d.rango, rangoMasAlto: d.maximo, fotos: d.fotos,
     aMano: d.manual, respuestas: respuestas(d, Date.now())
   }, null, 2), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
 }
