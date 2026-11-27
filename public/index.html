@@ -36,7 +36,16 @@
       "name": "Azmeyn",
       "alternateName": [
         "AZMEYN",
-        "azmeyn.com"
+        "azmeyn.com",
+        "AZ",
+        "Azmein",
+        "Azmen",
+        "Azmain",
+        "Asmeyn",
+        "Asmein",
+        "Asmen",
+        "Meyn",
+        "Meinaz"
       ],
       "inLanguage": "es-AR",
       "publisher": {
@@ -58,7 +67,7 @@
       "@type": "Person",
       "@id": "https://azmeyn.com/#azmeyn",
       "name": "Azmeyn",
-      "alternateName": "AZMEYN",
+      "alternateName": ["AZMEYN", "AZ", "Azmein", "Azmen", "Azmain", "Asmeyn", "Asmein", "Asmen", "Meyn", "Meinaz"],
       "url": "https://azmeyn.com/",
       "image": "https://azmeyn.com/favicon-192.png",
       "description": "Jugador de League of Legends y creador de contenido.",
@@ -1773,9 +1782,9 @@
   var lastId = null;
   /* Al tocar una sección queda marcada esa (aunque la página no dé para subirla del todo) hasta que se mueva a mano */
   var fijada = null, yFijada = null, quieto = null, llego = false;
-  /* La barra del navegador nunca muestra "#": solo el Pick'em tiene dirección propia (azmeyn.com/pickem) */
+  /* La barra del navegador nunca muestra "#": cada sección tiene su dirección (azmeyn.com/discord). Las rutas están en _redirects */
   function ponerDireccion(id) {
-    var ruta = id === "pickem" ? "/pickem" : "/";
+    var ruta = SECCIONES.hasOwnProperty(id) ? "/" + id : "/";
     if (location.pathname !== ruta || location.hash) {
       try { history.replaceState(history.state, "", ruta + location.search); } catch (e) {}
     }
@@ -1839,9 +1848,10 @@
     e.preventDefault();
     irA(id, false);
   });
-  /* Si se entra con un enlace viejo (/#discord, /#pickem), se va a la sección y se limpia la dirección */
+  /* Si se entra por la dirección de una sección (/discord) o por un enlace viejo (/#discord), se va ahí */
   function llegada() {
-    var id = location.hash.slice(1);
+    var ruta = location.pathname.slice(1);
+    var id = location.hash.slice(1) || (SECCIONES.hasOwnProperty(ruta) ? ruta : "");
     llego = true;
     if (id === "contenido-principal") { return; }
     if (id && $(id)) { irA(id, true); }
@@ -2040,6 +2050,7 @@
   pestana((RONDAS.filter(function (r) { return !cerrada(r); })[0] || RONDAS[0]).id);
   function porEnlace() { if (location.hash === "#pickem") { mostrar(true); } }
   window.addEventListener("hashchange", porEnlace);
+  if (location.pathname === "/pickem") { mostrar(true); }
   [].forEach.call(document.querySelectorAll('a[href="#pickem"]'), function (a) { a.addEventListener("click", function () { mostrar(true); }); });
   porEnlace();
 

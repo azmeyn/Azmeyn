@@ -2253,7 +2253,7 @@
     }
     if (fijada) { act = subLinks.filter(function (a) { return a.getAttribute("href") === "#" + fijada; })[0] || act; }
     var vista = act ? act.getAttribute("href").slice(1) : null;
-    if (vista !== seccionVista) { seccionVista = vista; ponerTitulo(); }
+    if (vista !== seccionVista) { seccionVista = vista; ponerTitulo(); ponerDireccion(); }
     /* Solo se toca el menú cuando cambia la sección marcada */
     if (act !== lastAct) {
       lastAct = act;
@@ -2287,10 +2287,13 @@
     quieto = setTimeout(function () { yFijada = window.pageYOffset; }, 180);
   }
   function soltar() { if (fijada) { fijada = null; onScroll(); } }
-  /* La barra del navegador nunca muestra "#": se baja hasta la sección y la dirección queda limpia */
-  function limpiarDireccion() {
-    if (location.hash) {
-      try { history.replaceState(history.state, "", location.pathname + location.search); } catch (e) {}
+  /* La barra del navegador nunca muestra "#": cada sección tiene su dirección (azmeyn.com/sorteos). Las rutas están en _redirects */
+  var RUTAS = { como: "/como-funciona", tienda: "/canjes", sorteos: "/sorteos", faq: "/preguntas" };
+  var llego = false;
+  function ponerDireccion() {
+    var ruta = RUTAS[seccionVista] || "/canjes";
+    if (llego && (location.pathname !== ruta || location.hash)) {
+      try { history.replaceState(history.state, "", ruta + location.search); } catch (e) {}
     }
   }
   function irA(id, alLlegar) {
@@ -2302,8 +2305,8 @@
       destino.setAttribute("tabindex", "-1");
       destino.focus({ preventScroll: true });
     }
-    limpiarDireccion();
     updateSub();
+    ponerDireccion();
   }
   document.addEventListener("click", function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
@@ -2314,10 +2317,16 @@
     e.preventDefault();
     irA(id, false);
   });
-  /* Si se entra con un enlace a una sección (soloboom#sorteos), se va ahí y se limpia la dirección */
+  /* Si se entra por la dirección de una sección (/sorteos) o por un enlace viejo (soloboom#sorteos), se va ahí */
   function llegada() {
     var id = location.hash.slice(1);
-    if (id && id !== "contenido-principal" && $(id)) { irA(id, true); }
+    /* /canjes es la dirección de la página: entra arriba de todo */
+    Object.keys(RUTAS).forEach(function (k) {
+      if (!id && k !== "tienda" && RUTAS[k] === location.pathname) { id = k; }
+    });
+    llego = true;
+    if (id === "contenido-principal") { return; }
+    if (id && $(id)) { irA(id, true); } else { ponerDireccion(); }
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("wheel", soltar, { passive: true });
