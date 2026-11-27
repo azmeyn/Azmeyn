@@ -1482,10 +1482,10 @@
             <div class="pk-form" id="pk-form" hidden>
               <ol class="pk-pasos"><li>Contestá</li><li>Armá tu código</li><li>Pegalo en mi chat de Twitch</li></ol>
               <div class="pk-tabs" role="tablist" aria-label="Preguntas">
-                <button type="button" role="tab" id="pk-tab-r1" aria-controls="pk-r1" aria-selected="true">Semana 1 <b>0/10</b></button>
-                <button type="button" role="tab" id="pk-tab-r2" aria-controls="pk-r2" aria-selected="false">Semana 2 <b>0/10</b></button>
-                <button type="button" role="tab" id="pk-tab-r3" aria-controls="pk-r3" aria-selected="false">Semana 3 <b>0/10</b></button>
-                <button type="button" role="tab" id="pk-tab-final" aria-controls="pk-final" aria-selected="false">Torneo <b>0/15</b></button>
+                <button type="button" role="tab" id="pk-tab-r1" aria-controls="pk-r1" aria-selected="true">Semana 1 <b>0/9</b></button>
+                <button type="button" role="tab" id="pk-tab-r2" aria-controls="pk-r2" aria-selected="false">Semana 2 <b>0/9</b></button>
+                <button type="button" role="tab" id="pk-tab-r3" aria-controls="pk-r3" aria-selected="false">Semana 3 <b>0/9</b></button>
+                <button type="button" role="tab" id="pk-tab-final" aria-controls="pk-final" aria-selected="false">Torneo <b>0/14</b></button>
               </div>
               <p class="pk-nota" id="pk-nota"></p>
               <ul class="pk-lista" id="pk-r1" role="tabpanel" aria-labelledby="pk-tab-r1"></ul>
@@ -2450,7 +2450,8 @@
   RONDAS.forEach(function (r) { $("pk-tab-" + r.id).addEventListener("click", function () { pestana(r.id); }); });
   // Se abre en la primera ronda que todavía se puede contestar
   pestana((RONDAS.filter(function (r) { return !cerrada(r); })[0] || RONDAS[0]).id);
-  function porEnlace() { if (location.hash === "#pickem") { mostrar(true); } }
+  /* El enlace del bot es azmeyn.com/pickem: entra con el Pick'em abierto */
+  function porEnlace() { if (location.hash === "#pickem" || location.pathname === "/pickem") { mostrar(true); } }
   window.addEventListener("hashchange", porEnlace);
   [].forEach.call(document.querySelectorAll('a[href="#pickem"]'), function (a) { a.addEventListener("click", function () { mostrar(true); }); });
   porEnlace();
