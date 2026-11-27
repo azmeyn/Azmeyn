@@ -1112,6 +1112,141 @@
     }
     @media (max-width: 374px) { .contact .ic-caja { display: none !important; } }
 </style>
+  <style id="portada-f2">
+    /* ===== Portada F2 (elegida por Maxi, 27/11): tienda > Pick'em > directo y cuenta ===== */
+    .hero { padding-block: 20px 0; }
+    .f2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .f2 > *, .f2-lado > * { min-width: 0; }
+    .f2 h2 { margin: 0; }
+    .f2 ol, .f2 ul, .f2 dl, .f2 dd { margin: 0; padding: 0; list-style: none; }
+    .f2 p { margin: 0; }
+    .f2 svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .f2 .btn svg { fill: currentColor; stroke: none; width: 18px; height: 18px; }
+    .f2-card { background: #1C1F23; border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .f2-eti { color: var(--accent); font: 700 11.5px/1.35 var(--font-body) !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; }
+    .f2-gris { color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .f2-abajo { margin-top: auto; justify-content: center; text-align: center; }
+
+    .f2-tienda { background: linear-gradient(135deg, #4a2231, #1c1f23 62%); border-color: rgba(255, 61, 129, 0.6); }
+    .f2-num { font: 800 clamp(40px, 11vw, 50px)/1 var(--font-display); color: var(--accent); white-space: nowrap; }
+    .f2-sub { display: flex; align-items: center; gap: 8px; font: 800 13px/1 var(--font-display); text-transform: uppercase !important; letter-spacing: 0.04em !important; }
+    .f2-sub::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    .f2-fechas li { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 11px; align-items: center; padding: 4px 0; }
+    .f2-fechas li:not(:last-child)::after { content: ""; position: absolute; left: 9px; top: calc(50% + 12px); bottom: calc(-50% + 12px); width: 2px; background: #3a3e45; }
+    .f2-fechas i { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #4b5059; display: grid; place-items: center; font: 700 11px/1 var(--font-body); font-style: normal; }
+    .f2-fechas li.ahora i { border-color: var(--accent); }
+    .f2-fechas li.paso { opacity: 0.45; }
+    .f2-fechas small { display: block; font: 700 10.5px/1.3 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .f2-fechas b { display: block; font: 800 13.5px/1.25 var(--font-display); text-transform: uppercase; }
+    .f2-fechas em { font: 800 15px/1.2 var(--font-display); font-style: normal; color: var(--accent); text-align: right; white-space: nowrap; }
+    /* El sorteo final es el premio grande: renglón propio, rosa lleno */
+    .f2-fechas li.fin { margin: 5px -8px 0; padding: 8px 10px 8px 8px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); }
+    .f2-fechas li.fin i { background: var(--accent-ink); border-color: var(--accent-ink); color: var(--accent); }
+    .f2-fechas li.fin small, .f2-fechas li.fin em { color: var(--accent-ink); }
+    .f2-fechas li.fin b { font-size: 15px; }
+    .f2-fechas li.fin em { font-size: 24px; }
+    .f2-canjes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .f2-canje { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 9px; align-items: center; padding: 7px 9px; background: rgba(0, 0, 0, 0.28); border: 1px solid var(--line); border-radius: 9px; color: var(--fg); text-decoration: none; }
+    .f2-canje:hover { border-color: var(--accent); }
+    .f2-canje i { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 7px; background: rgba(255, 61, 129, 0.18); color: var(--accent); }
+    .f2-canje.mayor { border-color: var(--accent); }
+    .f2-canje.mayor i { background: var(--accent); color: var(--accent-ink); }
+    .f2-canje i svg { width: 19px; height: 19px; }
+    .f2-canje b { display: block; font: 800 13px/1.2 var(--font-display); }
+    .f2-canje em { display: block; font: 700 12.5px/1.35 var(--font-body); font-style: normal; color: var(--accent); }
+    .f2-canje small { display: block; font-size: 11.5px; line-height: 1.25; color: var(--muted); }
+
+    .f2-pick { background: linear-gradient(170deg, #3a1c29, #1c1f23 55%); border: 2px solid var(--accent); }
+    .f2-pick h2 { display: flex; align-items: center; gap: 10px; font-size: 21px; line-height: 1.15; text-transform: uppercase !important; }
+    .f2-pick h2 svg { width: 30px; height: 30px; flex: none; color: var(--accent); }
+    .f2-podio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .f2-podio li { text-align: center; background: rgba(0, 0, 0, 0.28); border: 1px solid var(--line); border-radius: 9px; padding: 9px 4px 8px; }
+    .f2-podio li.oro { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .f2-podio small { display: block; font: 700 12px/1 var(--font-body); }
+    .f2-podio b { display: block; margin-top: 5px; font: 800 clamp(28px, 8vw, 36px)/1 var(--font-display); color: var(--accent); }
+    .f2-podio li.oro b { color: var(--accent-ink); }
+    .f2-podio span { display: block; margin-top: 2px; font: 700 11px/1 var(--font-body); letter-spacing: 0.1em; }
+    .f2-pick > p { font-size: 14px; line-height: 1.45; }
+    .f2-pick > p.f2-pesos { font-weight: 700; font-size: 13px; }
+    .f2-cuenta-atras { display: grid; gap: 7px; }
+    .f2-pick .reloj b { font-size: 26px; }
+    .f2-rondas li { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); padding: 5px 0; font-size: 13px; }
+    .f2-rondas b { color: var(--accent); white-space: nowrap; }
+    .f2-rondas li.paso { opacity: 0.45; }
+
+    .f2-lado { display: flex; flex-direction: column; gap: 14px; }
+    .f2-directo { padding: 0; gap: 0; overflow: hidden; }
+    .f2-mini { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; width: 100%; aspect-ratio: 16 / 9; padding: 12px; border: 0; border-bottom: 3px solid var(--accent); background: #101215 center / cover no-repeat; color: var(--fg); text-align: center; cursor: pointer; overflow: hidden; }
+    .f2-mini::before { content: ""; position: absolute; inset: 0; background: rgba(12, 13, 15, 0.68); }
+    .f2-mini.vivo::before { background: rgba(12, 13, 15, 0.38); }
+    .f2-mini > * { position: relative; }
+    .f2-mini strong { font: 800 17px/1.2 var(--font-display); }
+    .f2-mini small { font: 700 12.5px/1.2 var(--font-body); text-shadow: 0 1px 4px #000; }
+    .f2-mini .f2-mini-badge { position: absolute; left: 9px; top: 9px; background: var(--accent); color: var(--accent-ink); font: 700 11px/1 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; border-radius: 4px; padding: 6px 9px; }
+    .f2-mini .f2-mini-badge[hidden] { display: none; }
+    .f2-play { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: rgba(18, 20, 22, 0.75); border: 2px solid var(--accent); }
+    .f2-play::after { content: ""; border-left: 13px solid var(--accent); border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 4px; }
+    .f2-plat { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; }
+    .f2 .f2-plat .btn { justify-content: center; gap: 8px; min-height: 42px; }
+    .f2 .f2-plat .btn.tw { background: #9146FF; border-color: #9146FF; color: #fff; }
+    .f2 .f2-plat .btn.kk { background: #53FC18; border-color: #53FC18; color: #0b0e0f; }
+    .f2-voy { flex: 1; justify-content: space-between; }
+    .f2-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+    .f2-fila.f2-ini { justify-content: flex-start; }
+    .f2-dia { font: 800 13px/1.2 var(--font-display); }
+    .f2-riot { font: 800 15px/1 var(--font-display); color: var(--fg); text-decoration: none; background: rgba(255, 61, 129, 0.12); border: 1px solid rgba(255, 61, 129, 0.45); border-radius: 6px; padding: 8px 10px; }
+    .f2-riot[hidden] { display: none; }
+    .f2-cat { font: 700 11px/1 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent); border-radius: 99px; padding: 6px 10px; }
+    .f2 .f2-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .f2-stats div { display: flex; flex-direction: column-reverse; gap: 5px; text-align: center; background: rgba(0, 0, 0, 0.28); border: 1px solid var(--line); border-radius: 8px; padding: 11px 4px; }
+    .f2-stats div.ancha { grid-column: 1 / -1; }
+    .f2-stats dt { font: 700 9.5px/1 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .f2-stats dd { font: 800 21px/1.1 var(--font-display); }
+    .f2-info { font: 700 13px/1.3 var(--font-body); color: var(--muted); text-underline-offset: 3px; padding: 4px 0; }
+    .f2-info:hover { color: var(--fg); }
+
+    .f2-vent { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 12px; background: rgba(0, 0, 0, 0.82); }
+    .f2-vent[hidden] { display: none; }
+    .f2-caja { width: min(1040px, 100%, calc((100vh - 190px) * 16 / 9)); min-width: min(400px, 100%); max-height: 100%; overflow: auto; background: #1C1F23; border: 1px solid rgba(255, 61, 129, 0.6); border-radius: 10px; }
+    .f2-vcab { display: flex; justify-content: flex-end; gap: 6px; padding: 8px; }
+    .f2-vcab button { font: 700 12.5px/1 var(--font-body); color: var(--fg); background: transparent; border: 1px solid var(--line-hi); border-radius: 6px; padding: 9px 12px; cursor: pointer; }
+    .f2-caja .player { border: 0 !important; border-radius: 0 !important; }
+    .f2-vent.esquina { inset: auto 12px 12px auto; padding: 0; background: none; }
+    .f2-vent.esquina .f2-caja { width: min(402px, calc(100vw - 24px)); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6); }
+    .f2-vent.esquina .pl-fallback { display: none; }
+    .f2-vent.esquina .screen { height: 300px; aspect-ratio: auto; }
+    @media (max-width: 480px) { .f2-vent.esquina { inset: auto 8px 8px 8px; } .f2-vent.esquina .f2-caja { width: 100%; } .f2-vent.esquina .screen { height: 200px; } }
+
+    .hero > .vods { margin-top: 18px; }
+
+    @media (min-width: 760px) and (max-width: 1099px) {
+      .f2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .f2-lado { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 1100px) {
+      .f2 { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 0.86fr); }
+    }
+    /* Notebook baja: todo un poco más junto para que entre sin bajar */
+    @media (min-width: 1100px) and (max-height: 820px) {
+      .hero { padding-block: 12px 0; }
+      .f2, .f2-lado { gap: 12px; }
+      .f2-card { padding: 12px 14px; gap: 7px; }
+      .f2-directo { padding: 0; gap: 0; }
+      .f2-num { font-size: 40px; }
+      .f2-fechas li { padding: 1px 0; }
+      .f2-fechas li.fin { padding: 5px 10px 5px 8px; margin-top: 3px; }
+      .f2-fechas li.fin em { font-size: 21px; }
+      .f2-canje { padding: 4px 8px; }
+      .f2-canjes { gap: 6px; }
+      .f2-pick > p { font-size: 13px; }
+      .f2-podio li { padding: 6px 4px; }
+      .f2-podio b { font-size: 28px; }
+      .f2-pick .reloj span { padding: 6px 0 5px; }
+      .f2-rondas li { padding: 3px 0; font-size: 12.5px; }
+      .f2-stats div { padding: 7px 4px; }
+      .f2 .btn { min-height: 40px; }
+    }
+  </style>
 </head>
 <body>
 <a class="skip" href="#contenido-principal">Saltar al contenido</a>
@@ -1192,12 +1327,90 @@
     <main id="contenido-principal">
       <div class="wrap">
 
-        <!-- ===== INICIO + REPRODUCTOR ===== -->
+        <!-- ===== PORTADA F2: 1º tienda, 2º Pick'em, 3º directo y cuenta ===== -->
         <section class="hero" id="inicio" aria-labelledby="titulo">
           <h1 class="sr-only" id="titulo">Azmeyn</h1>
-          <div class="hero-in">
-            <div class="hero-grid">
-              <section id="directo" class="player" aria-label="Directo de Azmeyn">
+          <div class="f2">
+            <article class="f2-card f2-tienda" aria-labelledby="f2-tienda-h">
+              <p class="f2-eti" id="f2-tienda-h">Tienda · Sorteos y canjes</p>
+              <p class="f2-num">+15.800 RP</p>
+              <p class="f2-gris">en premios, sorteos y Pick'em durante el torneo</p>
+              <h2 class="f2-sub">Sorteos</h2>
+              <ol class="f2-fechas">
+                <li data-hasta="2026-11-30T18:00:00-03:00"><i aria-hidden="true"></i><span><small>lun 30/11</small><b>Arranca el torneo</b></span><em></em></li>
+                <li data-hasta="2026-12-06T23:59:00-03:00"><i aria-hidden="true"></i><span><small>dom 6/12</small><b>Sorteo semanal 1</b></span><em>1.350 RP</em></li>
+                <li data-hasta="2026-12-13T23:59:00-03:00"><i aria-hidden="true"></i><span><small>dom 13/12</small><b>Sorteo semanal 2</b></span><em>1.350 RP</em></li>
+                <li data-hasta="2026-12-20T23:59:00-03:00"><i aria-hidden="true"></i><span><small>dom 20/12</small><b>Sorteo semanal 3</b></span><em>1.350 RP</em></li>
+                <li class="fin" data-hasta="2026-12-20T23:59:00-03:00"><i aria-hidden="true">★</i><span><small>dom 20/12</small><b>Sorteo final</b></span><em>3.250 RP</em></li>
+              </ol>
+              <h2 class="f2-sub">Canjes</h2>
+              <div class="f2-canjes">
+                <a class="f2-canje mayor" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7C9 2 5 5 12 7c7-2 3-5 0 0"/></svg></i><span><b>Skin de 1.820 RP</b><em>10.000 puntos</em><small>skin o RP</small></span></a>
+                <a class="f2-canje" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7C9 2 5 5 12 7c7-2 3-5 0 0"/></svg></i><span><b>Skin de 1.350 RP</b><em>5.000 puntos</em><small>skin o RP</small></span></a>
+                <a class="f2-canje" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 4v5c0 5-3 7.5-7 9-4-1.5-7-4-7-9V7zM9 12l2 2 4-4"/></svg></i><span><b>Elegí mi campeón</b><em>1.500 puntos</em><small>1 por día</small></span></a>
+                <a class="f2-canje" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h15v10l-4 4h-4l-3 3v-3H5zM11 8v5M16 8v5"/></svg></i><span><b>VIP en Twitch</b><em>1.200 puntos</em><small>1 por persona</small></span></a>
+                <a class="f2-canje" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4zM14 7v10"/></svg></i><span><b>Ticket de sorteo</b><em>800 puntos</em><small>hasta 3 por semana</small></span></a>
+                <a class="f2-canje" href="soloboom.html#tienda"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 7.5c3.5-1 5.5-1 9 0M7 16.5c3.5 1 6.5 1 10 0M15.5 17c0 1 1.5 3 2 3 1.5 0 2.8-1.7 3.5-3 .7-1.7.5-5.8-1.5-11.5-1.5-1-3-1.3-4.500-1.5l-1 1.9a12 12 0 0 0-4 0L9 4c-1.5.2-3 .5-4.500 1.5-2 5.7-2.200 9.8-1.5 11.5.7 1.3 2 3 3.5 3 .5 0 2-2 2-3M9 12h.01M15 12h.01"/></svg></i><span><b>VIP en Discord</b><em>500 puntos</em><small>1 por persona</small></span></a>
+              </div>
+              <a class="btn f2-abajo" href="soloboom.html">Ver la tienda</a>
+            </article>
+
+            <article class="f2-card f2-pick" aria-labelledby="f2-pick-h">
+              <h2 id="f2-pick-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M9 20h6M10 17h4"/></svg>Pick'em del SoloBoom</h2>
+              <ol class="f2-podio">
+                <li class="oro"><small>1.º</small><b>975</b><span>RP</span></li>
+                <li><small>2.º</small><b>750</b><span>RP</span></li>
+                <li><small>3.º</small><b>520</b><span>RP</span></li>
+              </ol>
+              <p>Gana tu mejor ronda, por porcentaje de aciertos. Premio para los 3 mejores; los empates van a sorteo en vivo.</p>
+              <p class="f2-pesos">Si sos de Argentina, todos los premios se pueden cobrar en pesos.</p>
+              <div class="f2-cuenta-atras">
+                <p class="f2-eti" id="f2-pk-que">La semana 1 cierra en</p>
+                <div id="f2-pk-reloj" role="timer"></div>
+              </div>
+              <ul class="f2-rondas">
+                <li data-hasta="2026-12-02T18:00:00-03:00"><span>Semana 1</span><b>cierra 2/12 18:00</b></li>
+                <li data-hasta="2026-12-07T18:00:00-03:00"><span>Semana 2</span><b>cierra 7/12 18:00</b></li>
+                <li data-hasta="2026-12-14T18:00:00-03:00"><span>Semana 3</span><b>cierra 14/12 18:00</b></li>
+                <li data-hasta="2026-12-14T18:00:00-03:00"><span>Torneo</span><b>cierra 14/12 18:00</b></li>
+              </ul>
+              <a class="btn f2-abajo" href="#pickem">Hacer mi pick'em</a>
+            </article>
+
+            <div class="f2-lado">
+              <section class="f2-card f2-directo" aria-label="Directo de Azmeyn">
+                <button type="button" class="f2-mini" id="f2-mini" aria-haspopup="dialog">
+                  <span class="f2-mini-badge" id="f2-mini-badge" hidden>En vivo</span>
+                  <strong id="f2-mini-t">Ver directo</strong>
+                  <span class="f2-play" aria-hidden="true"></span>
+                  <small id="f2-mini-s">Tocá y miralo acá</small>
+                </button>
+                <div class="f2-plat">
+                  <a class="btn tw" data-ventana="twitch" data-link="twitch" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>Twitch</a>
+                  <a class="btn kk" data-ventana="kick" data-link="kick" href="https://kick.com/azmeyn" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"/></svg>Kick</a>
+                </div>
+              </section>
+
+              <!-- Torneo: de acá salen las fechas (data-start, data-kickoff, data-end, data-days) -->
+              <aside class="f2-card f2-voy" id="soloboom" aria-labelledby="f2-voy-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T18:00:00-03:00" data-end="2026-12-20T18:00:00-03:00" data-days="21">
+                <div class="f2-fila"><h2 class="f2-eti" id="f2-voy-h">Cómo voy en el SoloBoom</h2><span class="f2-dia" id="f2-dia"></span></div>
+                <div class="f2-fila f2-ini"><a class="f2-riot" id="f2-riot" target="_blank" rel="noopener noreferrer" hidden></a><span class="f2-cat">Mid Elo</span></div>
+                <dl class="f2-stats">
+                  <div class="ancha"><dt>Elo</dt><dd id="f2-elo">—</dd></div>
+                  <div><dt>Ganadas</dt><dd id="f2-ganadas">—</dd></div>
+                  <div><dt>Perdidas</dt><dd id="f2-perdidas">—</dd></div>
+                </dl>
+                <p class="f2-gris" id="f2-nota">Se llena desde el lunes 30/11</p>
+                <a class="f2-info" href="https://soloboom.net/#que-es" target="_blank" rel="noopener noreferrer">Info oficial del torneo ↗</a>
+              </aside>
+            </div>
+          </div>
+
+          <!-- Ventana del directo: el reproductor vive acá y solo carga cuando se abre -->
+          <div class="f2-vent" id="f2-vent" role="dialog" aria-label="Directo de Azmeyn" hidden>
+            <div class="f2-caja">
+              <div class="f2-vcab"><button type="button" id="f2-chica">Achicar</button><button type="button" id="f2-cerrar">Cerrar ✕</button></div>
+              <section id="directo" class="player" aria-label="Reproductor">
                 <div class="pl-head">
                   <div class="tabs" role="group" aria-label="Elegir plataforma">
                     <button class="tab" type="button" data-pf="twitch" aria-pressed="true">Twitch</button>
@@ -1220,29 +1433,13 @@
                 </div>
                 <p class="pl-fallback">¿No carga? <a id="pl-open" href="https://www.twitch.tv/azmeyn" target="_blank" rel="noopener noreferrer">Abrir en Twitch ↗</a></p>
               </section>
-
-              <!-- Torneo: tarjeta al costado del reproductor -->
-              <aside class="event" id="soloboom" aria-labelledby="ev-h" data-start="2026-11-30T00:00:00-03:00" data-kickoff="2026-11-30T18:00:00-03:00" data-end="2026-12-20T18:00:00-03:00" data-days="21">
-                <div class="ev-main">
-                  <p class="ev-k" id="ev-k">Cuenta regresiva</p>
-                  <span class="count" id="event-count" role="timer"></span>
-                  <h3 id="ev-h">SoloBoom Challenge <span>6</span></h3>
-                  <p class="ev-date">30 de noviembre al 20 de diciembre</p>
-                  <p class="ev-p">Mirá el directo, juntá puntos y canjealos por premios y tickets para los sorteos.</p>
-                </div>
-                <div class="event-cta">
-                  <a class="btn" href="soloboom.html">Ver los canjes</a>
-                  <a class="btn ghost" href="#pickem">Hacer mi pick'em</a>
-                  <a class="btn ghost" href="https://soloboom.net/#que-es" target="_blank" rel="noopener noreferrer">Info oficial del torneo ↗</a>
-                </div>
-              </aside>
-
-              <!-- Últimos directos: a todo el ancho, debajo del reproductor y la tarjeta -->
-              <div class="vods" id="vods" aria-busy="true">
-                <h3>Últimos directos</h3>
-                <div class="vod-row" id="vod-row"><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span></div>
-              </div>
             </div>
+          </div>
+
+          <!-- Últimos directos: debajo de la portada -->
+          <div class="vods" id="vods" aria-busy="true">
+            <h3>Últimos directos</h3>
+            <div class="vod-row" id="vod-row"><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span><span class="vod sk" aria-hidden="true"><span class="vod-th sk-box"></span><span class="vod-b"><span class="sk-line sk-box"></span><span class="sk-line short sk-box"></span></span></span></div>
           </div>
         </section>
 
@@ -1255,7 +1452,7 @@
               <div class="pk-txt">
                 <h3>Pick'em del SoloBoom</h3>
                 <p>Gana tu mejor ronda, por porcentaje de aciertos. Premio para los 3 mejores; los empates van a sorteo en vivo.</p>
-                <span class="pk-tags"><span>1.º 975 RP · 2.º 750 RP · 3.º 520 RP</span><span>Cada semana cierra el lunes a las 18:00</span><span>El torneo: hasta el 14/12</span></span>
+                <span class="pk-tags"><span>1.º 975 RP · 2.º 750 RP · 3.º 520 RP</span><span>Semana 1: hasta el miércoles 2/12 a las 18:00</span><span>Semanas 2 y 3: hasta el lunes a las 18:00</span><span>El torneo: hasta el 14/12</span></span>
                 <p class="pk-pesos">Si sos de Argentina, todos los premios se pueden cobrar en pesos.</p>
               </div>
               <button class="btn" type="button" id="pk-abrir" aria-expanded="false" aria-controls="pk-form">Hacer mi pick'em</button>
@@ -1418,7 +1615,7 @@
   /* ---------- Evento (cuenta regresiva) ----------
      data-start = día 1 a las 00:00 (para contar los días), data-kickoff = arranque real del torneo.
      Para cambiar de evento, editá data-start, data-kickoff, data-end y data-days en .event */
-  var evEl = document.querySelector(".event");
+  var evEl = $("soloboom");
   function pad(n) { return n < 10 ? "0" + n : String(n); }
   /* Día calendario en Argentina (UTC-3), para decir "hoy / mañana / en N días" */
   function argDay(t) { return Math.floor((t - 3 * 3600000) / DAY); }
@@ -1448,31 +1645,74 @@
     return { over: false, label: "Torneo en curso", text: "En curso · Día " + (idx + 1) + " de " + days };
   }
   var ei = eventInfo();
+  /* Portada F2: día del torneo, cuenta regresiva del Pick'em y fechas que ya pasaron */
+  function marcarPasadas(sel) {
+    var ahora = Date.now(), marcada = false;
+    document.querySelectorAll(sel + " li").forEach(function (li) {
+      var paso = ahora >= Date.parse(li.getAttribute("data-hasta"));
+      li.classList.toggle("paso", paso);
+      li.classList.toggle("ahora", !paso && !marcada);
+      if (!paso) { marcada = true; }
+    });
+  }
+  function relojPickem() {
+    var caja = $("f2-pk-reloj"), que = $("f2-pk-que");
+    var cierres = [
+      ["La semana 1 cierra en", Date.parse("2026-12-02T18:00:00-03:00")],
+      ["La semana 2 cierra en", Date.parse("2026-12-07T18:00:00-03:00")],
+      ["La semana 3 y el torneo cierran en", Date.parse("2026-12-14T18:00:00-03:00")]
+    ];
+    var ahora = Date.now();
+    var prox = cierres.filter(function (c) { return ahora < c[1]; })[0];
+    if (!prox) { que.textContent = "Ya cerraron todas las rondas"; caja.textContent = ""; return; }
+    if (que.textContent !== prox[0]) { que.textContent = prox[0]; }
+    var s = Math.floor((prox[1] - ahora) / 1000);
+    var partes = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
+    var lab = ["DÍAS", "HORAS", "MIN", "SEG"];
+    var box = caja.firstChild;
+    if (box && box.children && box.children.length === 4) {
+      /* Ya está armado: solo se cambian los números que cambiaron */
+      partes.forEach(function (n, i) {
+        var b = box.children[i].firstChild, t = pad(n);
+        if (b.textContent !== t) { b.textContent = t; }
+      });
+    } else {
+      caja.innerHTML = '<span class="reloj">' + partes.map(function (n, i) { return '<span><b' + (i === 3 ? ' class="seg"' : "") + '>' + pad(n) + '</b><small>' + lab[i] + '</small></span>'; }).join("") + '</span>';
+    }
+  }
   function renderEvent() {
     ei = eventInfo();
-    var c = $("event-count");
-    if (ei && ei.parts) {
-      /* Estética 25/11: reloj de cajitas (solo números que calcula esta página) */
-      var lab = ["DÍAS", "HORAS", "MIN", "SEG"];
-      var box = c.firstChild && c.firstChild.className === "reloj" ? c.firstChild : null;
-      if (box && box.children.length === 4) {
-        /* Ya está armado: solo se cambian los números que cambiaron (no se rehace todo cada segundo) */
-        ei.parts.forEach(function (n, i) {
-          var b = box.children[i].firstChild, t = pad(n);
-          if (b.textContent !== t) { b.textContent = t; }
-        });
-      } else {
-        c.innerHTML = '<span class="reloj">' + ei.parts.map(function (n, i) { return '<span><b' + (i === 3 ? ' class="seg"' : "") + '>' + pad(n) + '</b><small>' + lab[i] + '</small></span>'; }).join("") + '</span>';
-      }
-    } else {
-      c.textContent = ei ? (ei.clock || ei.text) : "";
-    }
-    c.classList.toggle("urgent", !!(ei && ei.clock && ei.soon));
-    if (ei && ei.label) { $("ev-k").textContent = ei.label; }
-    if (ei && ei.clock) { c.setAttribute("aria-label", ei.text); } else { c.removeAttribute("aria-label"); }
+    var dia = $("f2-dia");
+    var texto = !ei ? "" : ei.over ? "Terminado" : ei.parts ? ei.text : ei.text.replace("En curso · ", "");
+    if (dia.textContent !== texto) { dia.textContent = texto; }
+    marcarPasadas(".f2-fechas");
+    marcarPasadas(".f2-rondas");
+    relojPickem();
   }
   renderEvent();
-  setInterval(function () { if (!document.hidden && ei && ei.clock) { renderEvent(); } }, 1000);
+  setInterval(function () { if (!document.hidden) { renderEvent(); } }, 1000);
+
+  /* ---------- Cómo voy: nombre, elo, ganadas y perdidas ----------
+     CUENTA_API queda vacío hasta que exista la ruta que lee Riot. Espera:
+     { name, tag, tier, rank, lp, wins, losses } */
+  var CUENTA_API = "";
+  var TIERS = { IRON: "Hierro", BRONZE: "Bronce", SILVER: "Plata", GOLD: "Oro", PLATINUM: "Platino", EMERALD: "Esmeralda", DIAMOND: "Diamante", MASTER: "Maestro", GRANDMASTER: "Gran Maestro", CHALLENGER: "Retador" };
+  function pintarCuenta(c) {
+    if (!c || typeof c.name !== "string" || typeof c.tag !== "string") { return; }
+    var a = $("f2-riot");
+    a.textContent = c.name + "#" + c.tag;
+    a.href = "https://www.leagueofgraphs.com/es/summoner/las/" + encodeURIComponent(c.name).replace(/%20/g, "+") + "-" + encodeURIComponent(c.tag);
+    a.hidden = false;
+    var t = TIERS[c.tier];
+    var alto = /^(MASTER|GRANDMASTER|CHALLENGER)$/.test(c.tier);
+    $("f2-elo").textContent = t ? t + (alto || !c.rank ? "" : " " + c.rank) + (typeof c.lp === "number" ? " · " + c.lp + " LP" : "") : "Sin rango";
+    if (typeof c.wins === "number") { $("f2-ganadas").textContent = c.wins; }
+    if (typeof c.losses === "number") { $("f2-perdidas").textContent = c.losses; }
+    $("f2-nota").textContent = "Se actualiza con cada partida";
+  }
+  if (CUENTA_API) {
+    fetch(CUENTA_API).then(function (r) { if (!r.ok) { throw new Error("http " + r.status); } return r.json(); }).then(pintarCuenta).catch(function () {});
+  }
 
   /* ---------- Copiar el mail ---------- */
   $("copy-mail").addEventListener("click", function () {
@@ -1636,7 +1876,8 @@
     }
     var src;
     if (platform === "twitch") {
-      src = "https://player.twitch.tv/?channel=" + encodeURIComponent(CONFIG.twitch) +
+      var ultimo = state.twitch === false && vods[0] && String(vods[0].url || "").match(/\/videos\/(\d+)/);
+      src = "https://player.twitch.tv/?" + (ultimo ? "video=" + ultimo[1] + "&autoplay=false" : "channel=" + encodeURIComponent(CONFIG.twitch)) +
         "&parent=" + encodeURIComponent(location.hostname) + "&muted=true";
     } else {
       src = "https://player.kick.com/" + encodeURIComponent(CONFIG.kick);
@@ -1655,6 +1896,64 @@
     b.addEventListener("click", function () { selectPlatform(b.getAttribute("data-pf"), true); });
   });
   $("play").addEventListener("click", loadPlayer);
+
+  /* ---------- Portada F2: recuadro chico del directo y ventana emergente ---------- */
+  var miniUrl = "";
+  function f2Mini() {
+    var mini = $("f2-mini");
+    var vivo = state.twitch === true ? "twitch" : state.kick === true ? "kick" : "";
+    var d = (vivo && info[vivo]) || {};
+    var url = vivo ? safeImg(d.thumbnail) : vods.length ? safeImg(vods[0].preview || vods[0].thumbnail) : "";
+    if (url && vivo) { url += (url.indexOf("?") < 0 ? "?" : "&") + "t=" + Math.floor(Date.now() / 300000); }
+    if (url !== miniUrl) { miniUrl = url; mini.style.backgroundImage = url ? "url(\"" + url + "\")" : ""; }
+    mini.classList.toggle("vivo", !!vivo);
+    $("f2-mini-badge").hidden = !vivo;
+    var antes = ei && ei.parts;
+    $("f2-mini-t").textContent = vivo ? "Estoy en vivo" : state.twitch === false ? (antes ? "Arranco el lunes a las 18" : "Ahora no estoy en vivo") : "Ver directo";
+    $("f2-mini-s").textContent = vivo ? "Miralo acá" : state.twitch === false && vods.length ? "Ver el último directo" : "Tocá y miralo acá";
+  }
+  var vent = $("f2-vent"), volverA = null;
+  function achicar(si) {
+    vent.classList.toggle("esquina", si);
+    $("f2-chica").textContent = si ? "Agrandar" : "Achicar";
+    document.documentElement.style.overflow = si || vent.hidden ? "" : "hidden";
+  }
+  function abrirVentana(p, desde) {
+    volverA = desde || null;
+    vent.hidden = false;
+    achicar(false);
+    if (p && p !== platform) { selectPlatform(p, true); }
+    if (!loaded) { loadPlayer(); }
+    $("f2-cerrar").focus();
+  }
+  function cerrarVentana() {
+    vent.hidden = true;
+    achicar(false);
+    selectPlatform(platform, false);   /* saca el reproductor: no queda sonando */
+    if (volverA) { volverA.focus(); }
+  }
+  $("f2-mini").addEventListener("click", function () {
+    abrirVentana(state.twitch !== true && state.kick === true ? "kick" : "twitch", $("f2-mini"));
+  });
+  document.querySelectorAll("[data-ventana]").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      /* En el celu (pantalla angosta) se abre la app o la página de la plataforma */
+      if (window.innerWidth < 600 || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) { return; }
+      e.preventDefault();
+      abrirVentana(a.getAttribute("data-ventana"), a);
+    });
+  });
+  document.querySelectorAll(".tab").forEach(function (b) {
+    b.addEventListener("click", function () { if (!vent.hidden && !loaded) { loadPlayer(); } });
+  });
+  $("f2-chica").addEventListener("click", function () { achicar(!vent.classList.contains("esquina")); });
+  $("f2-cerrar").addEventListener("click", cerrarVentana);
+  vent.addEventListener("click", function (e) { if (e.target === vent) { cerrarVentana(); } });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !vent.hidden) { cerrarVentana(); } });
+  /* Si se toca un enlace de la página con la ventana grande abierta, se achica */
+  document.addEventListener("click", function (e) {
+    if (!vent.hidden && !vent.contains(e.target) && e.target.closest && e.target.closest('a[href^="#"]')) { achicar(true); }
+  });
 
   /* ---------- Últimos directos ---------- */
   function renderVods() {
@@ -1709,6 +2008,7 @@
     useAvatar(data);
     setIndicators();
     renderVods();
+    f2Mini();
     if (!userPicked && !loaded) {
       selectPlatform(state.twitch === true ? "twitch" : state.kick === true ? "kick" : platform, false);
     } else {
@@ -1911,13 +2211,17 @@
   if (!form) { return; }
   // Rondas y cierres: los mismos que en pickem.js
   var RONDAS = [
-    { id: "r1", bloque: "semana", nombre: "semana 1", cierra: Date.parse("2026-11-30T21:00:00Z"), sem: "la primera semana", dia: "6/12",
-      nota: "Cierra el lunes 30/11 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 6/12." },
+    { id: "r1", bloque: "semana", nombre: "semana 1", cierra: Date.parse("2026-12-02T21:00:00Z"), sem: "la primera semana", dia: "6/12",
+      preguntas: ["q02", "q03", "q04", "q05", "q06", "q07", "q08", "q09", "q11", "q12"],
+      nota: "Cierra el miércoles 2/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 6/12." },
     { id: "r2", bloque: "semana", nombre: "semana 2", cierra: Date.parse("2026-12-07T21:00:00Z"), sem: "la segunda semana", dia: "13/12",
+      preguntas: ["q02", "q03", "q04", "q33", "q34", "q35", "q36", "q37", "q38", "q09"],
       nota: "Cierra el lunes 7/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 13/12." },
     { id: "r3", bloque: "semana", nombre: "semana 3", cierra: Date.parse("2026-12-14T21:00:00Z"), sem: "la tercera semana", dia: "20/12",
+      preguntas: ["q02", "q03", "q04", "q39", "q40", "q41", "q42", "q43", "q44", "q09"],
       nota: "Cierra el lunes 14/12 a las 18:00. Cuentan las partidas desde ese momento hasta el domingo 20/12 a las 18:00." },
     { id: "final", bloque: "final", nombre: "torneo", cierra: Date.parse("2026-12-14T21:00:00Z"),
+      preguntas: ["q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24", "q25", "q27", "q28"],
       nota: "Cierra el lunes 14/12 a las 18:00. Son sobre todo el torneo y se resuelven el 20/12." }
   ];
   var CIERRA_TODO = Date.parse("2026-12-14T21:00:00Z");
@@ -1933,6 +2237,18 @@
     ["q09","semana","rango","¿En qué rango estoy el domingo {dia}?"],
     ["q11","semana","num","¿Cuántas kills tiene mi mejor partida de {sem}?"],
     ["q12","semana","num","¿Cuántas veces muero en mi peor partida de {sem}?"],
+    ["q33","semana","sn","¿Gano 5 seguidas en la semana?"],
+    ["q34","semana","sn","¿Meto 15 kills o más en alguna partida?"],
+    ["q35","semana","camp","¿Con qué campeón gano más en la semana?"],
+    ["q36","semana","num","¿Cuántos pings de «?» tiro?","Los del signo de pregunta, en toda la semana."],
+    ["q37","semana","num","¿Cuántos minutos me paso muerto en mi peor partida?"],
+    ["q38","semana","num","¿Cuántas horas juego en la semana?","Solo el tiempo dentro de las partidas."],
+    ["q39","semana","sn","¿Gano o pierdo la última partida de la semana?","",["Gano","Pierdo"]],
+    ["q40","semana","num","¿Cuál es mi peor racha de derrotas?"],
+    ["q41","semana","sn","¿Termino alguna partida sin morir?"],
+    ["q42","semana","sn","¿Robo algún barón o dragón?","Cuenta lo que el juego marque como objetivo robado."],
+    ["q43","semana","num","¿Cuántas veces muero en toda la semana?"],
+    ["q44","semana","num","¿Cuántos minutos dura mi partida más larga de la semana?"],
     ["q13","final","rango","¿En qué rango termino el torneo?"],
     ["q14","final","num","¿Con cuántos LP termino?"],
     ["q15","final","rango","¿Cuál es el rango más alto que toco?"],
@@ -1950,13 +2266,17 @@
     ["q28","final","num","¿Cuántos minutos dura mi partida más larga?"]
   ];
   // En las de número, cuánto se puede errar y sumar igual: los mismos márgenes que en pickem-resolver.js
-  var MARGENES = { q02: 2, q03: 3, q06: 1, q08: 1, q11: 2, q12: 2, q14: 25, q16: 3, q17: 5, q18: 2, q20: 1, q21: 1, q24: 2, q25: 0, q27: 0.3, q28: 3 };
+  var MARGENES = { q02: 2, q03: 3, q06: 1, q08: 1, q11: 2, q12: 2, q36: 10, q37: 2, q38: 2, q40: 1, q43: 10, q44: 3, q14: 25, q16: 3, q17: 5, q18: 2, q20: 1, q21: 1, q24: 2, q25: 0, q27: 0.3, q28: 3 };
   var RANGOS = ["Platino o menos","Esmeralda IV","Esmeralda III","Esmeralda II","Esmeralda I","Diamante IV","Diamante III","Diamante II","Diamante I","Maestro","Gran Maestro","Retador"];
   var armado = false, previas = {};
   try { previas = JSON.parse(localStorage.getItem("pickem-sb6-2") || "{}"); } catch (e) {}
 
   function el(tag, attrs, txt) { var n = document.createElement(tag); for (var k in attrs) { n.setAttribute(k, attrs[k]); } if (txt) { n.textContent = txt; } return n; }
-  function de(r) { return P.filter(function (q) { return q[1] === r.bloque; }); }
+  var POR_ID = {};
+  P.forEach(function (q) { POR_ID[q[0]] = q; });
+  function de(r) { return r.preguntas.map(function (id) { return POR_ID[id]; }); }
+  /* Botones de las de dos opciones: Sí / No, salvo que la pregunta diga otra cosa */
+  function opciones(q) { return q[5] || ["Sí", "No"]; }
   function texto(q, r) { return q[3].replace("{sem}", r.sem).replace("{dia}", r.dia); }
   function ayuda(q) {
     var m = MARGENES[q[0]];
@@ -1988,7 +2308,7 @@
     li.appendChild(txt);
     if (tipo === "sn") {
       campo = el("div", { class: "pk-sn", id: id, role: "group", "aria-label": texto(q, r) });
-      [["s", "Sí"], ["n", "No"]].forEach(function (o) {
+      [["s", opciones(q)[0]], ["n", opciones(q)[1]]].forEach(function (o) {
         var b = el("button", { type: "button", "data-v": o[0], "aria-pressed": antes === o[0] ? "true" : "false" }, o[1]);
         b.addEventListener("click", function () {
           [].forEach.call(campo.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
@@ -2079,7 +2399,7 @@
       de(r).forEach(function (q) {
         var v = resp[q[0]];
         if (v === undefined) { return; }
-        if (q[2] === "sn") { v = v === "s" ? "Sí" : "No"; }
+        if (q[2] === "sn") { v = opciones(q)[v === "s" ? 0 : 1]; }
         if (q[2] === "rango") { v = RANGOS[v]; }
         if (q[2] === "dec") { v = String(v).replace(".", ","); }
         lista.appendChild(el("li", {}, texto(q, r) + " " + v));
@@ -2125,7 +2445,7 @@
       $("pk-falta").textContent = "Revisá esta: " + texto(mal.q, mal.r); $("pk-" + mal.r.id + "-" + mal.q[0]).focus(); return;
     }
     if (vals.every(function (v) { return v === ""; })) { $("pk-salida").hidden = true; $("pk-falta").textContent = "Contestá al menos una."; return; }
-    $("pk-codigo").textContent = "!pickem p2." + vals.join(".");
+    $("pk-codigo").textContent = "!pickem p3." + vals.join(".");
     $("pk-salida").hidden = false;
     $("pk-copiado").textContent = "";
     $("pk-falta").textContent = sinContestar ? "Te quedaron " + sinContestar + " sin contestar. Podés mandarlo igual y completar después." : "";
