@@ -14,7 +14,7 @@
 
    Antes del torneo el mismo cron prueba la clave con la cuenta del torneo y anota el resultado
    (se escribe solo si cambia, y una vez por día). */
-import { RONDAS, preguntasDe } from "./pickem.js";
+import { RONDAS, preguntasDe, tramoDe } from "./pickem.js";
 
 export const INICIO = Date.parse("2026-11-30T21:00:00Z");       // 30/11 18:00 ARG
 export const FIN = Date.parse("2026-12-20T21:00:00Z");          // 20/12 18:00 ARG
@@ -27,11 +27,7 @@ export const TRAMOS = {
 };
 const FIJA = 6 * 3600000;              // pasado este rato, las respuestas de una ronda quedan fijas
 // En las de número se suma quedando dentro de este margen (la página muestra el mismo)
-export const MARGENES = {
-  q02: 2, q03: 3, q06: 1, q08: 1, q11: 2, q12: 2,
-  q36: 10, q37: 2, q38: 2, q40: 1, q43: 10, q44: 3,
-  q14: 25, q16: 3, q17: 5, q18: 2, q20: 1, q21: 1, q24: 2, q25: 0, q27: 0.3, q28: 3
-};
+export const MARGENES = { q02: 2, q11: 2, q36: 10, q43: 10, q14: 25, q18: 2 };   // solo las de escribir
 const CUENTA = "TE LA SACO#SB6";
 const CONOCIDA = "OTK Azmeyn#OTK";    // cuenta que ya existe, solo para probar la clave
 const PLATAFORMA = "la2";
@@ -233,11 +229,9 @@ export function respuestas(d, ahora) {
   return out;
 }
 
-export function acierta(id, tipo, dicha, correcta) {
-  if (tipo === "num" || tipo === "dec") {
-    const lejos = Math.abs(Math.round((Number(String(dicha).replace("_", ".")) - correcta) * 10));
-    return lejos <= Math.round((MARGENES[id] || 0) * 10);
-  }
+export function acierta(id, tipo, dicha, correcta, ronda) {
+  if (tipo === "num") { return Math.abs(Number(dicha) - correcta) <= (MARGENES[id] || 0); }
+  if (tipo === "rg") { return tramoDe(id, ronda, correcta) === String(dicha); }
   if (tipo === "camp") { return correcta.claves.includes(dicha); }
   return String(dicha) === String(correcta);
 }
@@ -256,7 +250,7 @@ export function puntuar(filas, resp) {
       for (const [id, , tipo] of preguntasDe(ronda)) {
         if (!(id in r)) { continue; }
         total++;
-        if (dichas[id] !== undefined && acierta(id, tipo, dichas[id], r[id])) { aciertos++; }
+        if (dichas[id] !== undefined && acierta(id, tipo, dichas[id], r[id], ronda.id)) { aciertos++; }
       }
       const esta = { ronda: ronda.id, aciertos: aciertos, total: total };
       if (total && (!mejor || comparar(esta, mejor) < 0)) { mejor = esta; }
