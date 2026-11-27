@@ -19,7 +19,7 @@ export const INICIO = Date.parse("2026-11-30T21:00:00Z");       // 30/11 18:00 A
 export const FIN = Date.parse("2026-12-20T21:00:00Z");          // 20/12 18:00 ARG
 // Partidas que cuentan en cada ronda: desde que cierra para responder hasta el domingo
 export const TRAMOS = {
-  r1: { desde: INICIO, hasta: Date.parse("2026-12-07T03:00:00Z") },                             // al terminar el domingo 6/12
+  r1: { desde: Date.parse("2026-12-02T21:00:00Z"), hasta: Date.parse("2026-12-07T03:00:00Z") }, // 2/12 18:00 a fin del 6/12
   r2: { desde: Date.parse("2026-12-07T21:00:00Z"), hasta: Date.parse("2026-12-14T03:00:00Z") }, // 7/12 18:00 a fin del 13/12
   r3: { desde: Date.parse("2026-12-14T21:00:00Z"), hasta: FIN },                                // 14/12 18:00 a 20/12 18:00
   final: { desde: INICIO, hasta: FIN }
@@ -28,6 +28,7 @@ const FIJA = 6 * 3600000;              // pasado este rato, las respuestas de un
 // En las de número se suma quedando dentro de este margen (la página muestra el mismo)
 export const MARGENES = {
   q02: 2, q03: 3, q06: 1, q08: 1, q11: 2, q12: 2,
+  q36: 10, q37: 2, q38: 2, q40: 1, q43: 10, q44: 3,
   q14: 25, q16: 3, q17: 5, q18: 2, q20: 1, q21: 1, q24: 2, q25: 0, q27: 0.3, q28: 3
 };
 const CUENTA = "TE LA SACO#SB6";
@@ -138,7 +139,8 @@ async function actualizarDatos(env, d, ahora) {
       fin: info.gameEndTimestamp || (info.gameStartTimestamp || 0) + dur * 1000,
       dur: dur, remake: dur < 300 || !!yo.gameEndedInEarlySurrender, gano: !!yo.win,
       cid: yo.championId, champ: nombres[yo.championId] || yo.championName, alias: normal(yo.championName),
-      k: yo.kills || 0, m: yo.deaths || 0, a: yo.assists || 0, penta: yo.pentaKills || 0
+      k: yo.kills || 0, m: yo.deaths || 0, a: yo.assists || 0, penta: yo.pentaKills || 0,
+      pings: yo.enemyMissingPings || 0, robos: yo.objectivesStolen || 0, gris: yo.totalTimeSpentDead || 0
     };
   }
   d.pendientes = Math.max(0, faltan.length - NUEVAS_POR_VUELTA);
@@ -180,10 +182,19 @@ function mejores(m, valor, filtro) {
 const siNo = (b) => (b ? "s" : "n");
 function deSemana(d, id) {
   const p = jugadas(d, TRAMOS[id].desde, TRAMOS[id].hasta), g = p.filter((x) => x.gano).length, c = porCampeon(p);
+  const suma = (k) => p.reduce((a, x) => a + (x[k] || 0), 0);
+  const maximo = (valor) => (p.length ? Math.max(...p.map(valor)) : null);
+  const alguna = (cumple) => siNo(p.some(cumple));
   return {
-    q02: g, q03: p.length, q04: siNo(g > p.length - g), q05: mejores(c, (x) => x.j), q06: c.size,
-    q07: siNo(p.some((x) => x.penta > 0)), q08: racha(p, true), q09: indiceRango(d.fotos[id].rango),
-    q11: p.length ? Math.max(...p.map((x) => x.k)) : null, q12: p.length ? Math.max(...p.map((x) => x.m)) : null
+    q02: g, q03: p.length, q04: siNo(g > p.length - g), q09: indiceRango(d.fotos[id].rango),
+    q05: mejores(c, (x) => x.j), q06: c.size, q07: alguna((x) => x.penta > 0), q08: racha(p, true),
+    q11: maximo((x) => x.k), q12: maximo((x) => x.m),
+    // semana 2: las de "gano" con campeón se anulan si no ganó ninguna
+    q33: siNo(racha(p, true) >= 5), q34: alguna((x) => x.k >= 15), q35: mejores(c, (x) => x.g, (x) => x.g > 0),
+    q36: suma("pings"), q37: maximo((x) => Math.round((x.gris || 0) / 60)), q38: Math.round(suma("dur") / 3600),
+    // semana 3
+    q39: p.length ? siNo(p[p.length - 1].gano) : null, q40: racha(p, false), q41: alguna((x) => x.m === 0),
+    q42: alguna((x) => x.robos > 0), q43: suma("m"), q44: maximo((x) => Math.floor(x.dur / 60))
   };
 }
 function deTorneo(d) {
@@ -198,8 +209,11 @@ function deTorneo(d) {
   };
 }
 function calcular(d, id) {
-  const r = id === "final" ? deTorneo(d) : deSemana(d, id);
-  for (const k of Object.keys(r)) { if (r[k] === null || r[k] === undefined) { delete r[k]; } }
+  const todo = id === "final" ? deTorneo(d) : deSemana(d, id), r = {};
+  // Solo las preguntas de esa ronda y las que se pudieron resolver
+  for (const q of RONDAS.find((x) => x.id === id).preguntas) {
+    if (todo[q] !== null && todo[q] !== undefined) { r[q] = todo[q]; }
+  }
   return r;
 }
 const lista = (d, id, ahora) => ahora >= TRAMOS[id].hasta && !!d.fotos[id] && !!d.cubierto[id];
