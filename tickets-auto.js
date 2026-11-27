@@ -34,6 +34,9 @@ const TOPE_CANJE_SEMANA = 3;
 const PTS_ACIERTO = 200;
 const ACIERTOS_PARA_TICKET = 3;
 const VENTANA_HORAS = 48;          // cuánto para atrás mira el Activity feed en cada vuelta
+const CANJES_POR_PEDIDO = 500;     // el máximo que acepta StreamElements en un pedido
+const TANDA_GRANDE = 100;          // desde acá se pide la tanda siguiente, por si el tope real fuera menor
+const MAX_TANDAS = 4;              // hasta unos 2000 canjes por vuelta sin pasar las llamadas del plan gratis
 const DIAS_RECUERDO = 70;          // cuánto tiempo se recuerda un canje o predicción ya procesado
 const HORA_INICIO_ARG = 18;        // el torneo arranca a las 18:00 ARG del primer día (y cierra igual el último)
 const SUBS_TICKETS = 2;            // tickets por semana para cada sub (decisión D3, 25/11)
@@ -88,11 +91,11 @@ function anotarItemIgnorado(informe, item) {
 }
 
 /* ---------------------------------- Canjes ---------------------------------- */
-async function leerCanjes(env, desdeMs, hastaMs) {
+async function pedirCanjes(env, desdeMs, hastaMs) {
   const q = new URLSearchParams({
     after: new Date(desdeMs).toISOString(),
     before: new Date(hastaMs).toISOString(),
-    limit: "500",
+    limit: String(CANJES_POR_PEDIDO),
     types: "redemption",
     origin: "feed"
   });
@@ -101,8 +104,45 @@ async function leerCanjes(env, desdeMs, hastaMs) {
   });
   if (!r.ok) { throw new Error("StreamElements (activity feed) respondió " + r.status); }
   const j = await r.json();
-  const lista = Array.isArray(j) ? j : (j && Array.isArray(j.docs) ? j.docs : []);
-  return lista.filter(function (a) { return a && a.type === "redemption" && a.data; });
+  return Array.isArray(j) ? j : (j && Array.isArray(j.docs) ? j.docs : []);
+}
+
+// StreamElements entrega como mucho 500 canjes por pedido y todos los artículos comparten ese
+// cupo (el !tts, que es gratis, también). Si una tanda viene grande, se pide lo que sigue hasta
+// que no aparezca nada nuevo. Sirve venga ordenada de la más nueva a la más vieja o al revés.
+async function leerCanjes(env, desdeMs, hastaMs, informe) {
+  const todos = [];
+  const vistos = new Set();
+  let desde = desdeMs;
+  let hasta = hastaMs;
+  let falta = false;
+  for (let n = 1; n <= MAX_TANDAS; n++) {
+    let tanda;
+    try { tanda = await pedirCanjes(env, desde, hasta); }
+    catch (e) {
+      if (n === 1) { throw e; }
+      // Lo que ya llegó se procesa igual; el resto se reintenta en la vuelta siguiente
+      if (informe) { informe.errores.push("canjes: no pude leer la tanda " + n + " (" + e.message + ")"); }
+      return todos;
+    }
+    let nuevos = 0;
+    for (const a of tanda) {
+      const id = a && a._id ? String(a._id) : null;
+      if (id && vistos.has(id)) { continue; }
+      if (id) { vistos.add(id); nuevos++; }
+      if (a && a.type === "redemption" && a.data) { todos.push(a); }
+    }
+    falta = tanda.length >= TANDA_GRANDE;
+    // Una tanda grande sin nada nuevo significa que no se puede avanzar: queda avisado abajo
+    if (!falta || !nuevos) { break; }
+    const primera = Date.parse(tanda[0] && tanda[0].createdAt);
+    const ultima = Date.parse(tanda[tanda.length - 1] && tanda[tanda.length - 1].createdAt);
+    if (isNaN(primera) || isNaN(ultima)) { break; }
+    // El milisegundo de margen hace que no se pierda un canje con la misma hora que el del borde
+    if (primera >= ultima) { hasta = ultima + 1; } else { desde = ultima - 1; }
+  }
+  if (falta && informe) { informe.errores.push("canjes: hay más de los que se pueden leer en una vuelta (" + todos.length + " leídos)"); }
+  return todos;
 }
 
 async function procesarCanjes(env, h, prueba, informe) {
@@ -111,7 +151,7 @@ async function procesarCanjes(env, h, prueba, informe) {
   if (ahora < v.inicio) { informe.canjes.nota = "el torneo todavía no empezó"; return; }
   const desde = Math.max(v.inicio, ahora - VENTANA_HORAS * 3600000);
 
-  const acts = await leerCanjes(env, desde, ahora);
+  const acts = await leerCanjes(env, desde, ahora, informe);
   informe.canjes.vistos = acts.length;
   for (const a of acts) {
     const item = String(a.data.redemption || "").trim().toLowerCase();
