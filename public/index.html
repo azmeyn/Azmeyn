@@ -1114,6 +1114,26 @@
     #pickem .pk-tabla ol { margin: 12px 0 0; padding-left: 22px; display: grid; gap: 4px; font-variant-numeric: tabular-nums; }
     #pickem .pk-tabla details { margin-top: 14px; color: var(--muted); font-size: 14px; }
     @media (max-width: 760px) { #pickem .pk-tabla { padding: 16px; } }
+    #pickem .pk-tabla table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 15px; font-variant-numeric: tabular-nums; }
+    #pickem .pk-tabla th { font: 700 11px/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-align: center; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+    #pickem .pk-tabla td { text-align: center; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+    #pickem .pk-tabla .pk-izq { text-align: left; overflow-wrap: anywhere; }
+    #pickem .pk-tabla tr.pk-podio td { background: rgba(255, 61, 129, 0.13); }
+    #pickem .pk-tabla tr.pk-ultimo td { background: rgba(255, 255, 255, 0.05); }
+    #pickem .pk-tabla .pk-puesto { font-weight: 700; white-space: nowrap; }
+    #pickem .pk-tabla .pk-mejor { font-weight: 700; color: var(--accent); }
+    #pickem .pk-tabla .pk-nada { color: #6b7078; }
+    #pickem .pk-tabla .pk-tag { display: inline-block; margin-left: 6px; font: 700 10px/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; color: var(--muted); border: 1px solid var(--muted); border-radius: 4px; padding: 3px 5px; vertical-align: 2px; }
+    #pickem .pk-tabla .pk-tag.pk-rp { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+    #pickem .pk-tabla .pk-corto { display: none; }
+    @media (max-width: 500px) {
+      #pickem .pk-tabla table { font-size: 13.5px; }
+      #pickem .pk-tabla th { font-size: 9.5px; letter-spacing: 0.02em; padding: 7px 2px; }
+      #pickem .pk-tabla td { padding: 8px 2px; }
+      #pickem .pk-tabla .pk-tag { margin-left: 3px; font-size: 8.5px; padding: 2px 3px; }
+      #pickem .pk-tabla .pk-largo { display: none; }
+      #pickem .pk-tabla .pk-corto { display: inline; }
+    }
   </style>
 <style id="iguales-2026">
     /* Portada y Canjes iguales (26/11): misma raya rosa, mismo icono en cuadrito y misma cuenta regresiva. Sin animaciones nuevas. */
@@ -2591,17 +2611,53 @@
 
   // La tabla se resuelve sola en el servidor: aparece cuando termina la primera semana
   var PRIMERA_TABLA = Date.parse("2026-12-07T03:00:00Z");
-  function nombreDe(id) { var r = RONDAS.filter(function (x) { return x.id === id; })[0]; return r ? r.nombre : id; }
+  var PREMIOS = { 1: "975 RP", 2: "750 RP", 3: "520 RP" };
+  var COLUMNAS = [["r1", "S1"], ["r2", "S2"], ["r3", "S3"], ["final", "Torneo", "T"]];
+  /* Todos, del primero al último: aciertos de cada ronda y el porcentaje de la mejor */
+  function filasTabla(t) {
+    var tabla = el("table"), cab = el("tr"), cuerpo = el("tbody"), ultimo = t.tabla[t.tabla.length - 1].puesto;
+    cab.appendChild(el("th", {}, "#"));
+    cab.appendChild(el("th", { class: "pk-izq" }, "Usuario"));
+    COLUMNAS.forEach(function (c) {
+      var th = el("th");
+      th.appendChild(el("span", { class: c[2] ? "pk-largo" : "" }, c[1]));
+      if (c[2]) { th.appendChild(el("span", { class: "pk-corto", "aria-hidden": "true" }, c[2])); }
+      cab.appendChild(th);
+    });
+    cab.appendChild(el("th", {}, "Mejor"));
+    t.tabla.forEach(function (f) {
+      var premio = PREMIOS[f.puesto], atras = !premio && f.puesto === ultimo;
+      var tr = el("tr", { class: premio ? "pk-podio" : atras ? "pk-ultimo" : "" });
+      var quien = el("td", { class: "pk-izq" }, f.usuario);
+      if (premio) {
+        var comparte = t.tabla.filter(function (g) { return g.puesto === f.puesto; }).length > 1;
+        quien.appendChild(el("span", { class: "pk-tag pk-rp" }, comparte ? "Empate" : premio));
+      } else if (atras) {
+        quien.appendChild(el("span", { class: "pk-tag" }, "Último"));
+      }
+      tr.appendChild(el("td", { class: "pk-puesto" }, f.puesto + ".º"));
+      tr.appendChild(quien);
+      COLUMNAS.forEach(function (c) {
+        /* punto: todavía no se resolvió; raya: no la contestó */
+        var hay = !!t.respuestas[c[0]], v = f.por ? f.por[c[0]] : undefined;
+        tr.appendChild(el("td", { class: hay && v !== undefined ? "" : "pk-nada" }, !hay ? "·" : v === undefined ? "—" : String(v)));
+      });
+      tr.appendChild(el("td", { class: "pk-mejor" }, f.pct + "%"));
+      cuerpo.appendChild(tr);
+    });
+    var cabeza = el("thead");
+    cabeza.appendChild(cab);
+    tabla.appendChild(cabeza);
+    tabla.appendChild(cuerpo);
+    return tabla;
+  }
   function pintarTabla(t) {
     if (!t || !t.tabla || !t.tabla.length) { return; }
-    var caja = $("pk-tabla");
+    var caja = $("pk-tabla"), n = t.tabla.length;
     caja.textContent = "";
     caja.appendChild(el("h3", {}, t.etapa === "final" ? "Resultado final" : "Cómo va la tabla"));
-    var ul = el("ul");
-    t.tabla.filter(function (f, i) { return i < 10 || f.puesto <= 3; }).forEach(function (f) {
-      ul.appendChild(el("li", {}, f.puesto + ".º " + f.usuario + " · " + f.pct + "% (" + nombreDe(f.ronda) + ", " + f.aciertos + " de " + f.total + ")"));
-    });
-    caja.appendChild(ul);
+    caja.appendChild(el("p", { class: "pk-aviso" }, n + (n === 1 ? " participante" : " participantes") + " · aciertos de cada ronda · ordena tu mejor ronda"));
+    caja.appendChild(filasTabla(t));
     var empate = t.tabla.some(function (f, i) { return f.puesto <= 3 && t.tabla.some(function (g, j) { return i !== j && g.puesto === f.puesto; }); });
     if (empate) { caja.appendChild(el("p", { class: "pk-aviso" }, t.etapa === "final" ? "Los empates en los puestos con premio se sortean en vivo." : "Si al final hay empate en un puesto con premio, se sortea en vivo.")); }
     var det = el("details");
