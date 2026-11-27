@@ -1073,7 +1073,7 @@
     #pickem .pk-tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     #pickem .pk-camps { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 8px; }
     #pickem .pk-rangos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-    #pickem .pk-rangos.pk-diez { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    #pickem .pk-rangos.pk-diez, #pickem .pk-rangos.pk-cinco { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     #pickem .pk-tres button, #pickem .pk-camps button, #pickem .pk-rangos button { min-width: 0; font: 700 13px/1.25 var(--font-body); color: var(--fg); background: #101215; border: 2px solid var(--line); border-radius: 8px; padding: 12px 4px; cursor: pointer; }
     #pickem .pk-camps button, #pickem .pk-rangos button { display: grid; justify-items: center; align-content: start; gap: 6px; padding: 6px 4px 8px; }
     #pickem .pk-camps img { width: 100%; max-width: 76px; height: auto; aspect-ratio: 1; border-radius: 6px; }
@@ -1088,6 +1088,10 @@
     @media (max-width: 760px) {
       #pickem .pk-camps, #pickem .pk-rangos, #pickem .pk-rangos.pk-diez { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #pickem .pk-rangos.pk-diez > button:last-child { grid-column: 1 / -1; }
+      /* cinco opciones: tres arriba y dos abajo, sin hueco */
+      #pickem .pk-rangos.pk-cinco { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+      #pickem .pk-rangos.pk-cinco > button { grid-column: span 2; }
+      #pickem .pk-rangos.pk-cinco > button:nth-child(n+4) { grid-column: span 3; }
       #pickem .pk-top { grid-template-columns: 56px minmax(0, 1fr); gap: 16px; padding: 20px; align-items: start; }
       #pickem .pk-ic { width: 56px; height: 56px; }
       #pickem .pk-ic svg { width: 30px; height: 30px; }
@@ -1879,7 +1883,7 @@
     } else if (s === false) {
       kind = "off";
       badge = "Offline";
-      if (platform === "twitch" && vods.length) {
+      if ((platform === "twitch" || state.twitch === false) && vods.length) {
         url = safeImg(vods[0].preview || vods[0].thumbnail);
         kind = "vod";
         var when = vods[0].date ? ago(vods[0].date) : "";
@@ -1943,7 +1947,7 @@
       return;
     }
     var src;
-    if (platform === "twitch") {
+    if (platform === "twitch" || state.kick === false) {
       var ultimo = state.twitch === false && vods[0] && String(vods[0].url || "").match(/\/videos\/(\d+)/);
       src = "https://player.twitch.tv/?" + (ultimo ? "video=" + ultimo[1] : "channel=" + encodeURIComponent(CONFIG.twitch)) +
         "&parent=" + encodeURIComponent(location.hostname) + "&muted=true";
@@ -1952,7 +1956,7 @@
     }
     var f = document.createElement("iframe");
     f.src = src;
-    f.title = "Directo de " + NAMES[platform];
+    f.title = src.indexOf("video=") > 0 ? "Último directo" : "Directo de " + NAMES[platform];
     f.allowFullscreen = true;
     f.setAttribute("allow", "autoplay; fullscreen");
     $("screen").appendChild(f);
@@ -1961,7 +1965,7 @@
     loaded = true;
   }
   document.querySelectorAll(".tab").forEach(function (b) {
-    b.addEventListener("click", function () { selectPlatform(b.getAttribute("data-pf"), true); });
+    b.addEventListener("click", function (e) { selectPlatform(b.getAttribute("data-pf"), true); if (e.detail) { b.blur(); } });
   });
   $("play").addEventListener("click", loadPlayer);
 
@@ -2415,6 +2419,9 @@
   var MARGENES = { q02: 2, q11: 2, q36: 10, q43: 10, q14: 25, q18: 2 };
   var SUFIJO = { q16: "%", q28: " min", q37: " min", q38: " h", q44: " min" };
   var RANGOS = ["Platino o menos","Esmeralda IV","Esmeralda III","Esmeralda II","Esmeralda I","Diamante IV","Diamante III","Diamante II","Diamante I","Maestro","Gran Maestro","Retador"];
+  /* Rangos que ofrece cada ronda, de cuál a cuál: lo que quede más abajo entra en «o menos» (igual que pickem-resolver.js) */
+  var RANGOS_RONDA = { r1: [0, 9], r2: [6, 11], r3: [6, 11], final: [7, 11] };
+  function nombreRango(r, i) { var desde = RANGOS_RONDA[r.id][0]; return RANGOS[i] + (desde && i === desde ? " o menos" : ""); }
   // Los campeones de la pool; cualquier otro se elige con «Otro»
   var CAMPEONES = [["Cho'Gath","Chogath"],["Lee Sin","LeeSin"],["Elise","Elise"],["Twitch","Twitch"],["Jhin","Jhin"],["Fizz","Fizz"],["Garen","Garen"],["Lulu","Lulu"]];
   var FOTO_CAMPEON = "https://ddragon.leagueoflegends.com/cdn/16.23.1/img/champion/";
@@ -2507,11 +2514,11 @@
       campo = grupo(id, "pk-tres", texto(q, r), rotulos(q, r).map(function (t, i) { return { v: String(i + 1), t: t }; }), antes);
     } else if (tipo === "rango") {
       li.className = "ancha";
-      /* En la semana 1 no se llega más arriba de Maestro: se ofrecen solo hasta ahí */
-      var corta = r.id === "r1";
-      campo = grupo(id, corta ? "pk-rangos pk-diez" : "pk-rangos", texto(q, r), RANGOS.slice(0, corta ? 10 : RANGOS.length).map(function (n, i) {
+      var desde = RANGOS_RONDA[r.id][0], cuantos = RANGOS_RONDA[r.id][1] - desde + 1;
+      campo = grupo(id, "pk-rangos" + (cuantos === 10 ? " pk-diez" : cuantos === 5 ? " pk-cinco" : ""), texto(q, r), RANGOS.slice(desde, desde + cuantos).map(function (n, k) {
+        var i = desde + k;
         var escudo = i === 0 ? "platinum.png" : i < 5 ? "emerald.svg" : i < 9 ? "diamond.png" : ["master.png", "grandmaster.png", "challenger.png"][i - 9];
-        return { v: String(i), t: n, img: ESCUDOS + escudo };
+        return { v: String(i), t: nombreRango(r, i), img: ESCUDOS + escudo };
       }), antes);
     } else if (tipo === "camp") {
       li.className = "ancha";
@@ -2608,7 +2615,7 @@
         var v = resp[q[0]];
         if (v === undefined) { return; }
         if (q[2] === "sn") { v = opciones(q)[v === "s" ? 0 : 1]; }
-        if (q[2] === "rango") { v = RANGOS[v]; }
+        if (q[2] === "rango") { v = nombreRango(r, v); }
         if (q[2] === "rg") { var c = cortes(q, r); v = rotulos(q, r)[v < c[0] ? 0 : v <= c[1] ? 1 : 2] + " (fueron " + coma(v) + ")"; }
         lista.appendChild(el("li", {}, texto(q, r) + " " + v));
       });
