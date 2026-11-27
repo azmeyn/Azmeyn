@@ -1073,6 +1073,7 @@
     #pickem .pk-tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     #pickem .pk-camps { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 8px; }
     #pickem .pk-rangos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+    #pickem .pk-rangos.pk-diez { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     #pickem .pk-tres button, #pickem .pk-camps button, #pickem .pk-rangos button { min-width: 0; font: 700 13px/1.25 var(--font-body); color: var(--fg); background: #101215; border: 2px solid var(--line); border-radius: 8px; padding: 12px 4px; cursor: pointer; }
     #pickem .pk-camps button, #pickem .pk-rangos button { display: grid; justify-items: center; align-content: start; gap: 6px; padding: 6px 4px 8px; }
     #pickem .pk-camps img { width: 100%; max-width: 76px; height: auto; aspect-ratio: 1; border-radius: 6px; }
@@ -1085,7 +1086,8 @@
     #pickem .pk-barra { height: 6px; margin-top: 6px; border-radius: 9px; background: var(--line); overflow: hidden; }
     #pickem .pk-barra i { display: block; height: 100%; width: 0; background: var(--accent); }
     @media (max-width: 760px) {
-      #pickem .pk-camps, #pickem .pk-rangos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      #pickem .pk-camps, #pickem .pk-rangos, #pickem .pk-rangos.pk-diez { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      #pickem .pk-rangos.pk-diez > button:last-child { grid-column: 1 / -1; }
       #pickem .pk-top { grid-template-columns: 56px minmax(0, 1fr); gap: 16px; padding: 20px; align-items: start; }
       #pickem .pk-ic { width: 56px; height: 56px; }
       #pickem .pk-ic svg { width: 30px; height: 30px; }
@@ -2457,7 +2459,9 @@
       campo = grupo(id, "pk-tres", texto(q, r), rotulos(q, r).map(function (t, i) { return { v: String(i + 1), t: t }; }), antes);
     } else if (tipo === "rango") {
       li.className = "ancha";
-      campo = grupo(id, "pk-rangos", texto(q, r), RANGOS.map(function (n, i) {
+      /* En la semana 1 no se llega más arriba de Maestro: se ofrecen solo hasta ahí */
+      var corta = r.id === "r1";
+      campo = grupo(id, corta ? "pk-rangos pk-diez" : "pk-rangos", texto(q, r), RANGOS.slice(0, corta ? 10 : RANGOS.length).map(function (n, i) {
         var escudo = i === 0 ? "platinum.png" : i < 5 ? "emerald.svg" : i < 9 ? "diamond.png" : ["master.png", "grandmaster.png", "challenger.png"][i - 9];
         return { v: String(i), t: n, img: ESCUDOS + escudo };
       }), antes);
