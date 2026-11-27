@@ -13,7 +13,7 @@
 import { handleAvisos } from "./avisos.js";
 import { ticketsAuto, ticketsAutoRuta } from "./tickets-auto.js";
 import { pickem, pickemLista } from "./pickem.js";
-import { pickemVuelta, pickemTabla, pickemDatos, pickemPrueba, pickemEstado } from "./pickem-resolver.js";
+import { pickemVuelta, pickemTabla, pickemDatos, pickemPrueba, pickemEstado, pickemCuenta } from "./pickem-resolver.js";
 
 let twitchTokenCache = null; // { value, exp }
 let kickTokenCache = null;   // { value, exp }
@@ -360,6 +360,7 @@ export default {
         if (url.pathname === "/api/pickem-tabla") { return await pickemTabla(env); }
         if (url.pathname === "/api/pickem-datos") { return await pickemDatos(url, env, HELPERS); }
         if (url.pathname === "/api/pickem-estado") { return await pickemEstado(env); }
+        if (url.pathname === "/api/cuenta") { return await pickemCuenta(env); }
       } catch (e) {
         return plain("Error interno, probá de nuevo en un rato", 500);
       }

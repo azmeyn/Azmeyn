@@ -7,6 +7,7 @@
    Necesita el secreto RIOT_API_KEY. Sin él no hace nada y lo deja anotado.
 
      /api/pickem-tabla                    pública: tabla y respuestas ya resueltas
+     /api/cuenta                          pública: nombre, rango, ganadas y perdidas de la cuenta del torneo
      /api/pickem-estado                   pública: si hay clave de Riot y qué dio la última prueba
      /api/pickem-datos?key=ADMIN_KEY      lo que leyó de Riot. Con &q18=12&q19=s se cargan a mano
                                           las dos que dependen de la tabla oficial del torneo.
@@ -356,6 +357,23 @@ export async function pickemEstado(env) {
     prueba: prueba,
     torneo: d ? { error: d.error || null, partidas: Object.keys(d.partidas || {}).length } : null
   }), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
+}
+
+// «Cómo voy» de la portada: sale de lo que ya leyó la vuelta del cron (no consulta a Riot por visita).
+// Hasta que el torneo arranque y se encuentre la cuenta, responde vacío y la página muestra rayitas.
+export async function pickemCuenta(env) {
+  const d = env.CHECKINS ? await env.CHECKINS.get("pkd:datos", "json") : null;
+  let out = {};
+  if (d && d.cuenta) {
+    const i = d.cuenta.lastIndexOf("#"), p = jugadas(Object.assign({ partidas: {} }, d), INICIO, FIN);
+    const ganadas = p.filter((x) => x.gano).length;
+    out = {
+      name: d.cuenta.slice(0, i), tag: d.cuenta.slice(i + 1),
+      tier: d.rango ? d.rango.tier : null, rank: d.rango ? d.rango.div : null, lp: d.rango ? d.rango.lp : null,
+      wins: ganadas, losses: p.length - ganadas
+    };
+  }
+  return new Response(JSON.stringify(out), { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=60" } });
 }
 
 export async function pickemTabla(env) {
