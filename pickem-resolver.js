@@ -177,10 +177,15 @@ function mejores(m, valor, filtro) {
 }
 
 const siNo = (b) => (b ? "s" : "n");
-// La semana 1 ofrece hasta Maestro (posición 9): algo más alto cuenta como Maestro
-function rangoSemana(id, r) {
+// Rangos que ofrece la página en cada ronda, de cuál a cuál (igual que index.html). La semana 1 llega
+// hasta Maestro; después arranca en «Diamante III o menos» y el torneo en «Diamante II o menos».
+export const RANGOS_RONDA = { r1: [0, 9], r2: [6, 11], r3: [6, 11], final: [7, 11] };
+// Lo que quede fuera de lo ofrecido cuenta como la opción de la punta
+export function rangoOfrecido(id, r) {
   const i = indiceRango(r);
-  return id === "r1" && i !== null ? Math.min(i, 9) : i;
+  if (i === null) { return null; }
+  const [desde, hasta] = RANGOS_RONDA[id];
+  return Math.min(Math.max(i, desde), hasta);
 }
 function deSemana(d, id) {
   const p = jugadas(d, TRAMOS[id].desde, TRAMOS[id].hasta), g = p.filter((x) => x.gano).length, c = porCampeon(p);
@@ -188,7 +193,7 @@ function deSemana(d, id) {
   const maximo = (valor) => (p.length ? Math.max(...p.map(valor)) : null);
   const alguna = (cumple) => siNo(p.some(cumple));
   return {
-    q02: g, q03: p.length, q04: siNo(g > p.length - g), q09: rangoSemana(id, d.fotos[id].rango),
+    q02: g, q03: p.length, q04: siNo(g > p.length - g), q09: rangoOfrecido(id, d.fotos[id].rango),
     q05: mejores(c, (x) => x.j), q06: c.size, q07: alguna((x) => x.penta > 0), q08: racha(p, true),
     q11: maximo((x) => x.k), q12: maximo((x) => x.m),
     // semana 2: las de "gano" con campeón se anulan si no ganó ninguna
@@ -203,7 +208,7 @@ function deTorneo(d) {
   const p = jugadas(d, INICIO, FIN), g = p.filter((x) => x.gano).length, c = porCampeon(p), foto = d.fotos.final;
   const suma = (k) => p.reduce((a, x) => a + x[k], 0);
   return {
-    q13: indiceRango(foto.rango), q14: foto.rango ? foto.rango.lp : null, q15: indiceRango(d.maximo),
+    q13: rangoOfrecido("final", foto.rango), q14: foto.rango ? foto.rango.lp : null, q15: rangoOfrecido("final", d.maximo),
     q16: p.length ? Math.round(g * 100 / p.length) : null, q17: p.length, q20: racha(p, true), q21: racha(p, false),
     q22: mejores(c, (x) => x.j), q23: mejores(c, (x) => x.g / x.j, (x) => x.j >= 5), q24: c.size, q25: suma("penta"),
     q27: p.length ? Math.round((suma("k") + suma("a")) * 10 / Math.max(1, suma("m"))) / 10 : null,
