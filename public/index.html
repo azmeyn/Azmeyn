@@ -1341,6 +1341,22 @@
     .f2 .f2-canje i.ico .rp-logo { width: 34px; height: 34px; }
     .rp-logo { display: block; background: currentColor; -webkit-mask: url(https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/icon-rp-72.png) center / contain no-repeat; mask: url(https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/icon-rp-72.png) center / contain no-repeat; }
     .riot-aviso { display: block; margin-top: 8px; font-size: 12px; line-height: 1.5; opacity: 0.75; }
+    /* Una sola grilla de arriba abajo: dos columnas de contenido y una para el directo, que acompaña */
+    @media (min-width: 1100px) {
+      #contenido-principal > .wrap { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(324px, 0.86fr); column-gap: 14px; align-items: start; }
+      #contenido-principal > .wrap > .hero, #contenido-principal .hero > .f2 { display: contents; }
+      #contenido-principal .f2-tienda { grid-column: 1; grid-row: 1; align-self: stretch; margin-top: 20px; }
+      #contenido-principal .f2-pick { grid-column: 2; grid-row: 1; align-self: stretch; margin-top: 20px; }
+      #contenido-principal .f2-lado { grid-column: 3; grid-row: 1 / span 6; align-self: start; position: sticky; top: calc(var(--side-h, 69px) + var(--top-h, 0px) + 12px); margin-top: 20px; }
+      #contenido-principal .f2-lado:has(.grande) { z-index: 200; }   /* el video agrandado queda por encima de todo */
+      #contenido-principal .hero > .vods, #contenido-principal > .wrap > .sec { grid-column: 1 / 3; min-width: 0; margin-right: 0; }
+    }
+    /* Con menos ancho, los campeones del Pick'em van en dos filas para que entren los nombres */
+    @media (min-width: 1100px) and (max-width: 1299px) { #pickem .pk-camps { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; } }
+    @media (min-width: 1100px) and (max-height: 820px) {
+      #contenido-principal > .wrap { column-gap: 12px; }
+      #contenido-principal .f2-tienda, #contenido-principal .f2-pick, #contenido-principal .f2-lado { margin-top: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -2026,7 +2042,21 @@
   /* asomado: bajó solo a la esquina sin que le dieran play. descartado: lo cerraron estando en la esquina */
   var asomado = false, descartado = false;
   /* En compu, al bajar, el video sigue chico en la esquina; en celu y pantallas chicas se queda en su lugar */
-  var puedeSeguir = window.matchMedia("(min-width: 1200px) and (min-height: 560px)");
+  var puedeSeguir = window.matchMedia("not all");   /* la esquina quedó sin uso: acompaña la columna del directo */
+  /* La columna del directo termina a la misma altura que la tienda cuando entra en la pantalla */
+  /* Arriba de todo siempre empareja; al bajar, solo si entra entera, así no se corta */
+  function emparejar() {
+    var lado = document.querySelector(".f2-lado"), tienda = document.querySelector(".f2-tienda"), alto = "";
+    if (window.innerWidth >= 1100) {
+      var arriba = parseFloat(getComputedStyle(lado).top) || 0;
+      if (window.pageYOffset < 40 || tienda.offsetHeight <= window.innerHeight - arriba) { alto = tienda.offsetHeight + "px"; }
+    }
+    if (lado.style.minHeight !== alto) { lado.style.minHeight = alto; }
+  }
+  window.addEventListener("resize", emparejar);
+  window.addEventListener("load", emparejar);
+  window.addEventListener("scroll", emparejar, { passive: true });
+  emparejar();
   /* Las secciones de abajo se corren lo justo para que el video chico (320 px) no las tape */
   function dejarLugar() {
     /* en compu el lugar se deja desde el principio, así nada se mueve de costado al bajar */
