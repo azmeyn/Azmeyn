@@ -501,6 +501,12 @@
     .tl .a { align-self: center; text-align: right; white-space: nowrap; font: 700 22px/1.1 var(--font-display); color: var(--accent); }
     .tl .a small { display: block; margin-top: 2px; font: 500 12px/1.2 var(--font-mono); color: var(--muted); }
     .tl li.final .t { font-size: 24px; }
+    .tl li.final { margin: 4px -10px 0; padding: 10px; border-radius: 9px; background: var(--accent); }
+    .tl li.final .d, .tl li.final .t, .tl li.final .s, .tl li.final .a { color: var(--accent-ink) !important; }
+    .tl li.final .a { font-size: 28px !important; }
+    .tl li.final .dot { background: var(--accent-ink) !important; border-color: var(--accent-ink) !important; color: var(--accent); }
+    .tl li.final.done { opacity: 0.55; }
+    #cal li.final .a { font-size: 24px !important; font-weight: 800; }
     .tl li.done .t, .tl li.done .a { color: var(--muted); }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .cal-foot { font: 400 12px/1.4 var(--font-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
@@ -1609,7 +1615,7 @@
               <p><b>Subs:</b> +2 tickets por semana, que entran al semanal y al final.</p>
               <p><b>Un semanal por persona:</b> si ganaste uno, no entrás a los otros semanales. Al final sí entrás.</p>
               <p><b>En pesos:</b> si sos de Argentina, todos los premios (sorteos, canjes y Pick'em) se pueden cobrar en pesos: lo que cuesta ese RP el día del pago.</p>
-              <p><b>Para cobrar RP o skins:</b> agregame en LoL como <code>OTK Azmeyn#OTK</code> (LAS). En BR solo regalo RP.</p>
+              <p><b>Para cobrar RP o skins:</b> agregame en LoL como <code>OTK Azmeyn#OTK</code> (LAS). En BR solo regalo RP: agregame como <code>ANA VOLVE XFAAA#TEAMO</code>.</p>
             </aside>
           </div>
         </div>
@@ -1633,7 +1639,7 @@
           </details>
           <details class="faq" name="faq">
             <summary><span class="q-n">04</span><h3>¿Cuándo me llega el RP o la skin?</h3><span class="chev" aria-hidden="true"></span></summary>
-            <div class="faq-a"><p>Los semanales salen en vivo al cerrar el directo los domingos 6/12, 13/12 y 20/12. El 20/12 también va el final de 3.250 RP. Los regalo desde el cliente de LoL: agregame como <code>OTK Azmeyn#OTK</code> en LAS (en BR solo RP). Riot pide 7 días de amistad, así que cuanto antes me agregues, mejor; si no llegás, te lo guardo. Si ganás, pasame tu nombre#tag y servidor por #reclamar-canje en el <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a> dentro de las 48 h.</p></div>
+            <div class="faq-a"><p>Los semanales salen en vivo al cerrar el directo los domingos 6/12, 13/12 y 20/12. El 20/12 también va el final de 3.250 RP. Los regalo desde el cliente de LoL: agregame como <code>OTK Azmeyn#OTK</code> en LAS (en BR solo RP, y ahí agregame como <code>ANA VOLVE XFAAA#TEAMO</code>). Riot pide 7 días de amistad, así que cuanto antes me agregues, mejor; si no llegás, te lo guardo. Si ganás, pasame tu nombre#tag y servidor por #reclamar-canje en el <a href="https://discord.gg/wr52zNaXzr" target="_blank" rel="noopener noreferrer">Discord</a> dentro de las 48 h.</p></div>
           </details>
         </div>
       </section>
@@ -1820,14 +1826,8 @@
     var list = [{ day: 0, title: "Arranca el torneo", sub: "18:00 hs ARG", start: true }];
     weekly.forEach(function (d, i) {
       var both = !!fin && fin.day === d.day;
-      list.push({
-        day: d.day,
-        title: both ? "Semanal " + (i + 1) + " y sorteo final" : "Sorteo semanal " + (i + 1),
-        sub: both ? "Cierre del torneo · 18:00 hs ARG" : "Al cerrar el directo",
-        amt: d.label,
-        more: both ? fin.label + " final" : "",
-        final: both
-      });
+      list.push({ day: d.day, title: "Sorteo semanal " + (i + 1), sub: "Al cerrar el directo", amt: d.label });
+      if (both) { list.push({ day: fin.day, title: "Sorteo final", sub: "Cierre · 18:00 hs ARG", amt: fin.label, final: true }); }
     });
     return list;
   }

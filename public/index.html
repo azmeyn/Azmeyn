@@ -1453,7 +1453,7 @@
                 <li><small>3.º</small><b>520</b><span>RP</span></li>
               </ol>
               <p>Gana tu mejor ronda, por porcentaje de aciertos. Los empates van a sorteo en vivo.</p>
-              <h3 class="f2-sub">Cierres</h3>
+              <h3 class="f2-sub">Cierres · hora de Argentina</h3>
               <div class="f2-cuenta-atras">
                 <p class="f2-eti" id="f2-pk-que">La semana 1 cierra en</p>
                 <div id="f2-pk-reloj" role="timer"></div>
@@ -1544,7 +1544,7 @@
               <div class="pk-txt">
                 <h3>Pick'em del SoloBoom</h3>
                 <p>Gana tu mejor ronda, por porcentaje de aciertos. Premio para los 3 mejores; los empates van a sorteo en vivo.</p>
-                <span class="pk-tags"><span>1.º 975 RP · 2.º 750 RP · 3.º 520 RP</span><span>Semana 1: hasta el miércoles 2/12 a las 18:00</span><span>Semanas 2 y 3: hasta el lunes a las 18:00</span><span>El torneo: hasta el 14/12</span></span>
+                <span class="pk-tags"><span>1.º 975 RP · 2.º 750 RP · 3.º 520 RP</span><span>Semana 1: hasta el miércoles 2/12 a las 18:00</span><span>Semanas 2 y 3: hasta el lunes a las 18:00</span><span>El torneo: hasta el 14/12 a las 18:00</span><span>Hora de Argentina</span></span>
                 <p class="pk-pesos">Si sos de Argentina, todos los premios se pueden cobrar en pesos.</p>
               </div>
               <button class="btn" type="button" id="pk-abrir" aria-expanded="false" aria-controls="pk-form">Hacer mi pick'em</button>
@@ -1587,7 +1587,7 @@
             <span class="dc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12a1 1 0 1 0 0 .01M15 12a1 1 0 1 0 0 .01"/><path d="M7.5 7.5c3.5-1 5.5-1 9 0"/><path d="M7 16.5c3.5 1 6.5 1 10 0"/><path d="M15.5 17c0 1 1.5 3 2 3 1.5 0 2.833-1.667 3.5-3 .667-1.667.5-5.833-1.5-11.5-1.457-1.015-3-1.34-4.5-1.5l-.972 1.923a11.913 11.913 0 0 0-4.053 0L9 4c-1.5.16-3.043.485-4.5 1.5-2 5.667-2.167 9.833-1.5 11.5.667 1.333 2 3 3.5 3 .5 0 2-2 2-3"/></svg></span>
             <span class="dc-body">
               <h3>Sumate al Discord</h3>
-              <p>Ahí aviso cuando prendo, hago los sorteos y te paso los premios.</p>
+              <p>Ahí aviso cuando prendo y te paso los premios.</p>
               <span class="dc-tags"><span>Avisos de directos</span><span>Sorteos</span><span>Entrega de premios</span><span>Roles</span></span>
             </span>
             <span class="dc-go">Unirme <span class="arr ne" aria-hidden="true">↗</span></span>
@@ -1800,10 +1800,23 @@
     $("f2-elo").textContent = t ? t + (alto || !c.rank ? "" : " " + c.rank) + (typeof c.lp === "number" ? " · " + c.lp + " LP" : "") : "Sin rango";
     if (typeof c.wins === "number") { $("f2-ganadas").textContent = c.wins; }
     if (typeof c.losses === "number") { $("f2-perdidas").textContent = c.losses; }
-    $("f2-nota").textContent = "Se actualiza con cada partida";
+    hayCuenta = true;
+    notaCuenta();
+  }
+  var hayCuenta = false;
+  function notaCuenta() {
+    var e = eventInfo();
+    if (!e || (!hayCuenta && e.parts)) { return; }   /* antes de arrancar queda «Se llena desde el lunes» */
+    $("f2-nota").textContent = !hayCuenta ? "Todavía no hay datos de la cuenta" : e.over ? "Así terminé el torneo" : "Se actualiza con cada partida";
+  }
+  function pedirCuenta() {
+    if (document.hidden) { return; }
+    fetch(CUENTA_API).then(function (r) { if (!r.ok) { throw new Error("http " + r.status); } return r.json(); }).then(pintarCuenta).catch(function () {}).then(notaCuenta);
   }
   if (CUENTA_API) {
-    fetch(CUENTA_API).then(function (r) { if (!r.ok) { throw new Error("http " + r.status); } return r.json(); }).then(pintarCuenta).catch(function () {});
+    pedirCuenta();
+    setInterval(pedirCuenta, 60000);
+    document.addEventListener("visibilitychange", pedirCuenta);
   }
 
   /* ---------- Copiar el mail ---------- */
@@ -2075,7 +2088,7 @@
     acomodar();
   }
   function cerrarVentana() {
-    if (vent.classList.contains("flota")) { descartado = true; }
+    if (vent.classList.contains("flota") || (grande && puedeSeguir.matches && yaBajo())) { descartado = true; }
     asomado = false;
     caja.style.minHeight = "";
     vent.classList.remove("flota");
