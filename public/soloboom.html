@@ -1638,7 +1638,7 @@
             <p class="draw-amt"><strong class="amt">1.350 RP</strong><span>en premios</span></p>
           </article>
           <article class="draw final" data-draw="20f">
-            <div class="draw-top"><p class="when">Domingo 20/12 · cierre del torneo</p><span class="state">Próximo</span></div>
+            <div class="draw-top"><p class="when">Domingo 20/12 · al cerrar el directo</p><span class="state">Próximo</span></div>
             <h3>Sorteo final</h3>
             <p>RP o skins. Todos tus tickets de las tres semanas van a una ruleta que giro en vivo.</p>
             <p class="draw-amt"><strong class="amt">3.250 RP</strong><span>de pozo</span></p>
@@ -1873,7 +1873,7 @@
     weekly.forEach(function (d, i) {
       var both = !!fin && fin.day === d.day;
       list.push({ day: d.day, title: "Sorteo semanal " + (i + 1), sub: "Al cerrar el directo", amt: d.label });
-      if (both) { list.push({ day: fin.day, title: "Sorteo final", sub: "Cierre · 18:00 hs ARG", amt: fin.label, final: true }); }
+      if (both) { list.push({ day: fin.day, title: "Sorteo final", sub: "Al cerrar el directo", amt: fin.label, final: true }); }
     });
     return list;
   }
