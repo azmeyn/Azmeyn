@@ -12,6 +12,7 @@
 
 import { handleAvisos } from "./avisos.js";
 import { ticketsAuto, ticketsAutoRuta } from "./tickets-auto.js";
+import { armarTablaTickets, tablaTickets } from "./tickets-tabla.js";
 import { pickem, pickemLista } from "./pickem.js";
 import { pickemVuelta, pickemTabla, pickemDatos, pickemPrueba, pickemEstado, pickemCuenta } from "./pickem-resolver.js";
 
@@ -361,6 +362,7 @@ export default {
         if (url.pathname === "/api/pickem-datos") { return await pickemDatos(url, env, HELPERS); }
         if (url.pathname === "/api/pickem-estado") { return await pickemEstado(env); }
         if (url.pathname === "/api/cuenta") { return await pickemCuenta(env); }
+        if (url.pathname === "/api/tickets-tabla") { return await tablaTickets(env); }
       } catch (e) {
         return plain("Error interno, probá de nuevo en un rato", 500);
       }
@@ -376,8 +378,11 @@ export default {
     if (idx < 0 || idx > EVENT_DAYS) { return; } // solo durante el torneo (y el día siguiente, por las dudas)
     // Pick'em: lee las partidas y el rango, y resuelve solo
     ctx.waitUntil(pickemVuelta(env, HELPERS).catch(function (e) { console.log("pickem: " + (e && e.message)); }));
+    // Después de sumar los tickets de esta vuelta se actualiza la tabla de la web
     ctx.waitUntil(ticketsAuto(env, HELPERS, false).then(function (inf) {
       if (inf.errores.length) { console.log("tickets-auto: " + inf.errores.join(" | ")); }
-    }));
+    }).catch(function (e) { console.log("tickets-auto: " + (e && e.message)); }).then(function () {
+      return armarTablaTickets(env, HELPERS);
+    }).catch(function (e) { console.log("tickets-tabla: " + (e && e.message)); }));
   }
 };
