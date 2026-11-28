@@ -1419,6 +1419,31 @@
       #cal li.final .a { font-size: 17px !important; }
     }
 </style>
+<style id="tickets-tabla">
+    /* Tickets de cada uno, con el mismo armado que la tabla del Pick'em */
+    .tk { margin-top: 20px; padding: 20px 24px; background: rgba(28, 31, 35, 0.9); border: 1px solid var(--line); border-radius: 10px; }
+    .tk-cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+    .tk h3 { margin: 0; font: 800 21px/1.2 var(--font-display); }
+    .tk input { width: min(260px, 100%); min-height: 42px; padding: 8px 12px; font: 400 15px/1.2 var(--font-body); color: var(--fg); background: #101215; border: 1px solid var(--line); border-radius: 8px; }
+    .tk input:focus-visible { border-color: var(--accent); }
+    .tk [hidden] { display: none !important; }
+    .tk-nota { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+    .tk table { width: 100%; margin-top: 12px; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .tk th { font: 700 11px/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-align: center; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+    .tk td { text-align: center; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+    .tk .tk-izq { text-align: left; overflow-wrap: anywhere; }
+    .tk .tk-puesto { font-weight: 700; white-space: nowrap; }
+    .tk .tk-total { font-weight: 800; color: var(--accent); }
+    .tk .tk-nada { color: #6b7078; }
+    .tk #tk-todos { margin-top: 12px; }
+    @media (max-width: 500px) {
+      .tk { padding: 16px 12px; }
+      .tk input { width: 100%; }
+      .tk table { font-size: 13.5px; }
+      .tk th { font-size: 9.5px; letter-spacing: 0.02em; padding: 7px 2px; }
+      .tk td { padding: 8px 2px; }
+    }
+</style>
 </head>
 <body>
 
@@ -1660,6 +1685,17 @@
               <p><b>Para cobrar RP o skins:</b> agregame en LoL como <code>OTK Azmeyn#OTK</code> (LAS). En BR solo regalo RP: agregame como <code>ANA VOLVE XFAAA#TEAMO</code>.</p>
             </aside>
           </div>
+        </div>
+
+        <!-- Tickets de cada uno: los arma el servidor cada 5 minutos -->
+        <div class="tk" id="tickets">
+          <div class="tk-cab">
+            <h3>Tickets de cada uno</h3>
+            <input type="search" id="tk-busca" placeholder="Buscá tu usuario" aria-label="Buscar usuario" autocomplete="off" spellcheck="false" hidden>
+          </div>
+          <p class="tk-nota" id="tk-nota">Se llena desde el lunes 30/11.</p>
+          <div id="tk-tabla"></div>
+          <button type="button" class="btn ghost sm" id="tk-todos" hidden></button>
         </div>
       </section>
 
@@ -2478,6 +2514,62 @@
     Array.prototype.forEach.call(document.querySelectorAll(".sec-h"), function (h) {
       if (h.getBoundingClientRect().top > window.innerHeight) { h.classList.add("az-espera"); io.observe(h); }
     });
+  })();
+  </script>
+  <script id="tickets-js">
+  /* Tickets de cada uno: filas [usuario, semana 1, semana 2, semana 3] ya ordenadas por el servidor */
+  (function () {
+    var LIMITE = 10, filas = [], todos = false;
+    var nota = document.getElementById("tk-nota"), caja = document.getElementById("tk-tabla"),
+      busca = document.getElementById("tk-busca"), boton = document.getElementById("tk-todos");
+    if (!caja) { return; }
+    function el(tag, clase, texto) {
+      var e = document.createElement(tag);
+      if (clase) { e.className = clase; }
+      if (texto !== undefined) { e.textContent = texto; }
+      return e;
+    }
+    function suma(f) { return f[1] + f[2] + f[3]; }
+    function pintar() {
+      var pedido = busca.value.trim().toLowerCase().replace(/^@/, "");
+      var puesto = 0, antes = null;
+      var lista = filas.map(function (f, i) {
+        if (suma(f) !== antes) { puesto = i + 1; antes = suma(f); }
+        return { f: f, puesto: puesto };
+      }).filter(function (x) { return !pedido || x.f[0].indexOf(pedido) >= 0; });
+      var ver = pedido || todos ? lista : lista.slice(0, LIMITE);
+      caja.textContent = "";
+      boton.hidden = !!pedido || filas.length <= LIMITE;
+      boton.textContent = todos ? "Ver menos" : "Ver todos (" + filas.length + ")";
+      if (!ver.length) { caja.appendChild(el("p", "tk-nota", "Ese usuario todavía no tiene tickets.")); return; }
+      var tabla = el("table"), cabeza = el("thead"), tr = el("tr"), cuerpo = el("tbody");
+      ["#", "Usuario", "S1", "S2", "S3", "Total"].forEach(function (t, i) { tr.appendChild(el("th", i === 1 ? "tk-izq" : "", t)); });
+      cabeza.appendChild(tr);
+      ver.forEach(function (x) {
+        var fila = el("tr");
+        fila.appendChild(el("td", "tk-puesto", x.puesto + ".º"));
+        fila.appendChild(el("td", "tk-izq", x.f[0]));
+        [1, 2, 3].forEach(function (n) { fila.appendChild(el("td", x.f[n] ? "" : "tk-nada", x.f[n] ? String(x.f[n]) : "—")); });
+        fila.appendChild(el("td", "tk-total", String(suma(x.f))));
+        cuerpo.appendChild(fila);
+      });
+      tabla.appendChild(cabeza);
+      tabla.appendChild(cuerpo);
+      caja.appendChild(tabla);
+    }
+    function recibir(t) {
+      if (!t || !t.filas || !t.filas.length) {
+        if (Date.now() >= Date.parse("2026-11-30T18:00:00-03:00")) { nota.textContent = "Todavía no hay tickets."; }
+        return;
+      }
+      filas = t.filas;
+      busca.hidden = false;
+      nota.textContent = "En cada sorteo semanal cuentan los tickets de esa semana; en el final, el total. Se actualiza cada 5 minutos.";
+      pintar();
+    }
+    busca.addEventListener("input", pintar);
+    boton.addEventListener("click", function () { todos = !todos; pintar(); });
+    fetch("/api/tickets-tabla").then(function (r) { if (!r.ok) { throw new Error("http " + r.status); } return r.json(); }).then(recibir).catch(function () {});
   })();
   </script>
 </body>
