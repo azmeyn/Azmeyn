@@ -26,6 +26,25 @@ export async function armarTablaTickets(env, h) {
   return nueva;
 }
 
+// Comando !tickets del chat: cuántos tiene quien pregunta, o el usuario que nombre. Solo lee.
+export async function misTickets(url, env, h) {
+  const quien = h.cleanUser(url.searchParams.get("user"));
+  // El comando manda "-" cuando no escriben nada después de !tickets
+  const otro = h.cleanUser(url.searchParams.get("de"));
+  if (!quien || !env.CHECKINS) { return h.plain("No pude leer tu usuario, probá de nuevo"); }
+  const hoy = new Date(Date.now() - 3 * 3600000).toISOString().slice(0, 10);   // día en Argentina
+  if (h.dayIndex(hoy) < 0) { return h.plain("@" + quien + " los tickets arrancan el lunes 30/11"); }
+  const ajeno = otro && otro !== quien;
+  const rec = await h.loadRec(env, ajeno ? otro : quien);
+  const partes = [1, 2, 3].filter((n) => rec.w[n] > 0).map((n) => "semana " + n + ": " + rec.w[n]);
+  const suma = [1, 2, 3].reduce((a, n) => a + (rec.w[n] || 0), 0);
+  if (!suma) {
+    return h.plain("@" + quien + (ajeno ? " " + otro + " todavía no tiene tickets" : " todavía no tenés tickets. Sumá con !presente"));
+  }
+  return h.plain("@" + quien + (ajeno ? " " + otro + " tiene " : " tenés ") + suma + (suma === 1 ? " ticket" : " tickets") +
+    " (" + partes.join(" · ") + "). Tabla: azmeyn.com/soloboom");
+}
+
 export async function tablaTickets(env) {
   const t = env.CHECKINS ? await env.CHECKINS.get(CLAVE) : null;
   return new Response(t || '{"filas":[]}', {

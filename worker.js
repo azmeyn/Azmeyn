@@ -12,7 +12,7 @@
 
 import { handleAvisos } from "./avisos.js";
 import { ticketsAuto, ticketsAutoRuta } from "./tickets-auto.js";
-import { armarTablaTickets, tablaTickets } from "./tickets-tabla.js";
+import { armarTablaTickets, tablaTickets, misTickets } from "./tickets-tabla.js";
 import { pickem, pickemLista } from "./pickem.js";
 import { pickemVuelta, pickemTabla, pickemDatos, pickemPrueba, pickemEstado, pickemCuenta } from "./pickem-resolver.js";
 
@@ -363,6 +363,7 @@ export default {
         if (url.pathname === "/api/pickem-estado") { return await pickemEstado(env); }
         if (url.pathname === "/api/cuenta") { return await pickemCuenta(env); }
         if (url.pathname === "/api/tickets-tabla") { return await tablaTickets(env); }
+        if (url.pathname === "/api/mis-tickets") { return await misTickets(url, env, HELPERS); }
       } catch (e) {
         return plain("Error interno, probá de nuevo en un rato", 500);
       }
